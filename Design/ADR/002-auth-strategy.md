@@ -38,7 +38,7 @@ A felhasználószám alacsony (tipikusan 2-5 fő egy háztartásban + meghívott
 ### Token Stratégia
 - **Access token:** JWT, 15 perces élettartam, `Authorization: Bearer` headerben
 - **Refresh token:** Opaque token, 7 napos élettartam, HttpOnly cookie-ban (XSS védett)
-- **Tárolás:** Refresh tokenek hash-elve a DB-ben (users táblában vagy külön táblában)
+- **Tárolás:** Refresh token BCrypt hash-elve a `users` táblában (`refresh_token_hash` + `refresh_token_expires_at` oszlopok). Egy aktív session per felhasználó – új bejelentkezés felülírja a régit.
 
 ### Jogosultságok
 ```

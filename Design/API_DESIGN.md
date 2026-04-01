@@ -120,7 +120,8 @@ Könyvek listázása szűrőkkel. Lapozott.
       "publishYear": 1991,
       "language": "en",
       "categories": ["Fantasy", "Fiction"],
-      "coverImageUrl": "https://cdn.example.com/...",
+      "coverImageUrl": "https://covers.openlibrary.org/...",
+      // Fázis 1: külső API (OpenLibrary/Google Books) URL-je. Fázis 2-től: S3 pre-signed URL.
       "status": "AT_HOME",
       "location": {
         "id": "...",
@@ -184,14 +185,23 @@ Egy könyv részletes adatai.
 ---
 
 ### `PUT /api/books/{id}`
-Könyv adatainak módosítása.
+Könyv adatainak módosítása. Minden mező kötelező (teljes felülírás).
 
 **Jogosultság:** `ADMIN`
 
-**Request:** Megegyezik a POST request struktúrával (részleges update is elfogadott)
+**Request:** Megegyezik a POST request struktúrával, kiegészítve a `version` mezővel:
+```json
+{
+  "version": 3,
+  ...
+}
+```
 
-**Response 200:** Frissített book objektum
+> **Optimistic locking:** A `version` mező értékét a szerver ellenőrzi. Ha közben más módosította a rekordot, 409 Conflict választ ad vissza. A frontend a legfrissebb adatot kell betöltse és újra próbálkozzon.
+
+**Response 200:** Frissített book objektum (növelt `version` értékkel)
 **Response 404:** Könyv nem található
+**Response 409:** Conflict – konkurens módosítás (verziószám ütközés)
 
 ---
 
@@ -312,11 +322,12 @@ Az összes aktív helyiség/polc listázása.
 ---
 
 ### `PUT /api/locations/{id}`
-Helyiség/polc módosítása.
+Helyiség/polc módosítása. Minden mező kötelező (teljes felülírás). `version` mező szükséges az optimistic locking miatt.
 
 **Jogosultság:** `ADMIN`
 
-**Response 200:** Frissített location objektum
+**Response 200:** Frissített location objektum (növelt `version` értékkel)
+**Response 409:** Conflict – konkurens módosítás (verziószám ütközés)
 
 ---
 
@@ -377,6 +388,8 @@ Könyv kölcsönadása.
 }
 ```
 
+> **Mellékhatás:** a könyv `status` mezője automatikusan `AT_HOME` → `LOANED`-ra vált.
+
 **Response 201:** Létrehozott loan objektum
 **Response 409:** A könyv már ki van kölcsönözve
 
@@ -386,6 +399,8 @@ Könyv kölcsönadása.
 Könyv visszavétele.
 
 **Jogosultság:** `ADMIN`
+
+> **Mellékhatás:** a könyv `status` mezője automatikusan `LOANED` → `AT_HOME`-ra vált.
 
 **Response 200:** Frissített loan objektum (returnedAt kitöltve)
 
@@ -415,6 +430,27 @@ Felhasználók listázása.
 
 ---
 
+### `GET /api/users/{id}`
+Egy felhasználó adatainak lekérdezése.
+
+**Jogosultság:** `ADMIN` (bármely user lekérheti saját adatait)
+
+**Response 200:**
+```json
+{
+  "id": "550e8400-...",
+  "username": "visitor1",
+  "email": "visitor@example.com",
+  "role": "VISITOR",
+  "preferredLanguage": "hu",
+  "active": true,
+  "createdAt": "2026-01-01T00:00:00Z"
+}
+```
+**Response 404:** Felhasználó nem található
+
+---
+
 ### `POST /api/users`
 Új felhasználó létrehozása.
 
@@ -436,11 +472,22 @@ Felhasználók listázása.
 ---
 
 ### `PUT /api/users/{id}`
-Felhasználó módosítása.
+Felhasználó módosítása. Minden mező kötelező (teljes felülírás). `version` mező szükséges az optimistic locking miatt.
 
-**Jogosultság:** `ADMIN` (saját adatait bármely user módosíthatja)
+**Jogosultság:**
 
-**Response 200:** Frissített user objektum
+| Mező | `ADMIN` | `VISITOR` (csak saját) |
+|------|---------|----------------------|
+| `preferredLanguage` | ✅ | ✅ |
+| `password` | ✅ | ✅ |
+| `username` | ✅ | ❌ |
+| `email` | ✅ | ❌ |
+| `role` | ✅ | ❌ |
+| `active` | ✅ | ❌ |
+
+**Response 200:** Frissített user objektum (növelt `version` értékkel)
+**Response 403:** Forbidden – nem saját adat vagy tiltott mező módosítása
+**Response 409:** Conflict – konkurens módosítás (verziószám ütközés)
 
 ---
 
@@ -464,5 +511,5 @@ Felhasználó deaktiválása (soft delete – `active` → `false`).
 | `401 Unauthorized` | Hiányzó vagy lejárt token |
 | `403 Forbidden` | Nincs jogosultság |
 | `404 Not Found` | Az erőforrás nem létezik |
-| `409 Conflict` | Üzleti logika ütközés (pl. dupla kölcsönzés) |
+| `409 Conflict` | Üzleti logika ütközés (pl. dupla kölcsönzés, konkurens módosítás – verziószám ütközés) |
 | `500 Internal Server Error` | Szerver oldali hiba |

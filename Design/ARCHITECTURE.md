@@ -14,7 +14,7 @@
 | Lambda adapter | `aws-serverless-java-container` | Spring Boot → Lambda bridge |
 | Auth | Spring Security + JWT | Elegendő ennél a skálánál, Cognito nem szükséges |
 | ORM | Spring Data JPA + Hibernate | Standard Spring stack |
-| DB migráció | Flyway | Verziókövetett sémaváltozások |
+| DB migráció | Liquibase | Verziókövetett sémaváltozások, rollback támogatás (lásd ADR-005) |
 | Build | Maven + maven-shade-plugin | Executable JAR Lambda deployhoz |
 | Container | Docker (csak lokális dev) | Lambda-ra JAR-t deployzunk, nem image-et |
 
@@ -96,6 +96,15 @@ S3 Bucket            API Gateway      ← always free: 1M req/hó
 A Spring Boot JVM hidegindítása Lambda-n SnapStart nélkül 3-8 másodperc lenne.
 A SnapStart az inicializált JVM memória-snapshotját menti el, és abból indítja a következő kérést.
 Eredmény: ~200-600ms hidegindítás Java 21-en is. Bekapcsolása egyetlen Lambda konfiguráció.
+
+### Kombinált hidegindítási hatás
+
+Ha az alkalmazás hosszabb ideig inaktív (pl. éjszaka), két cold start jelenség egyszerre fordulhat elő:
+- **Lambda SnapStart:** ~200-600ms
+- **Neon auto-pause felébredés:** ~500ms
+
+Együttes hatás: az első kérés **~700-1100ms** késéssel érkezhet meg. Ez tudatos tradeoff –
+az alkalmazás nem sebességkritikus, egy háztartási könyvtár esetén ez teljesen elfogadható.
 
 ### Miért nem Secrets Manager?
 
@@ -244,5 +253,5 @@ gyorsabb fejlesztési ciklust ad. Lambda-specifikus viselkedés teszteléséhez:
 
 ## Nyitott Döntések
 
-- [ ] AWS CDK stack nyelve: Java (egységes a backenddel) vagy TypeScript (CDK-ban elterjedtebb)?
+- [x] AWS CDK stack nyelve: **TypeScript** – a CDK dokumentáció, példák és közösségi tartalom túlnyomó része TypeScript-ben érhető el, ez a de facto standard CDK nyelvként
 - [ ] AI fordítás: Gemini vs DeepL (Fázis 3-ban, tesztelés után döntünk)

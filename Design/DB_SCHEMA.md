@@ -3,7 +3,7 @@
 > **Státusz:** v1 – Draft
 > **Utolsó frissítés:** 2026-03-28
 > **DB:** PostgreSQL 15 (Neon SaaS)
-> **Migráció eszköz:** Flyway
+> **Migráció eszköz:** Liquibase (lásd ADR-005)
 
 ## Entitások és Kapcsolatok
 
@@ -33,6 +33,9 @@ users
 | `preferred_language` | `VARCHAR(10)` | NOT NULL | pl. `hu`, `en` |
 | `role` | `VARCHAR(20)` | NOT NULL | `ADMIN` vagy `VISITOR` |
 | `active` | `BOOLEAN` | DEFAULT true | Soft disable felhasználóhoz |
+| `refresh_token_hash` | `VARCHAR(255)` | | BCrypt hash, NULL ha nincs aktív session |
+| `refresh_token_expires_at` | `TIMESTAMPTZ` | | NULL ha nincs aktív session |
+| `version` | `BIGINT` | NOT NULL DEFAULT 0 | JPA optimistic locking (`@Version`) |
 | `created_at` | `TIMESTAMPTZ` | NOT NULL | |
 | `updated_at` | `TIMESTAMPTZ` | NOT NULL | |
 
@@ -50,7 +53,9 @@ users
 | `shelf_name` | `VARCHAR(100)` | | pl. „Jobb polc", „Alsó sor" |
 | `description` | `TEXT` | | Opcionális megjegyzés |
 | `active` | `BOOLEAN` | DEFAULT true | Soft delete |
+| `version` | `BIGINT` | NOT NULL DEFAULT 0 | JPA optimistic locking (`@Version`) |
 | `created_at` | `TIMESTAMPTZ` | NOT NULL | |
+| `updated_at` | `TIMESTAMPTZ` | NOT NULL | |
 
 ---
 
@@ -59,7 +64,7 @@ users
 | Oszlop | Típus | Megszorítás | Leírás |
 |--------|-------|-------------|--------|
 | `id` | `UUID` | PK | |
-| `isbn` | `VARCHAR(20)` | UNIQUE | ISBN-10 vagy ISBN-13 |
+| `isbn` | `VARCHAR(20)` | UNIQUE, NULL megengedett | ISBN-10 vagy ISBN-13. NULL ha a könyv vonalkód nélkül kerül felvételre (antik, ritka, saját kiadású). PostgreSQL több NULL értéket megenged UNIQUE constraint esetén. |
 | `title` | `VARCHAR(500)` | NOT NULL | |
 | `authors` | `TEXT[]` | | PostgreSQL tömb, pl. `{"Tolkien, J.R.R."}` |
 | `publisher` | `VARCHAR(255)` | | |
@@ -71,9 +76,10 @@ users
 | `location_id` | `UUID` | FK → locations | Ahol a könyv éppen van |
 | `source` | `VARCHAR(20)` | | `OPENLIBRARY`, `GOOGLE_BOOKS`, `MANUAL` |
 | `added_by` | `UUID` | FK → users | Ki vette fel a rendszerbe |
+| `version` | `BIGINT` | NOT NULL DEFAULT 0 | JPA optimistic locking (`@Version`) |
 | `created_at` | `TIMESTAMPTZ` | NOT NULL | |
 | `updated_at` | `TIMESTAMPTZ` | NOT NULL | |
-| `deleted_at` | `TIMESTAMPTZ` | | Soft delete időbélyege |
+| `deleted_at` | `TIMESTAMPTZ` | | Soft delete időbélyege (audit célú). Canonical forrás: `status == 'DELETED'`. Mindig együtt változnak. |
 
 > **Indexek:**
 > - `isbn` (unique index)
@@ -122,15 +128,18 @@ Az AI fordítás is ide kerül, `AI_TRANSLATED` source-szal.
 
 ---
 
-## Flyway Migráció Névkonvenció
+## Liquibase Changelog Struktúra
 
 ```
-db/migration/
-  V1__create_users_and_locations.sql
-  V2__create_books.sql
-  V3__create_book_descriptions.sql
-  V4__create_loans.sql
-  V5__add_indexes.sql
+db/changelog/
+  db.changelog-master.yaml
+  changes/
+    001-create-users.yaml
+    002-create-locations.yaml
+    003-create-books.yaml
+    004-create-book-descriptions.yaml
+    005-create-loans.yaml
+    006-add-indexes.yaml
 ```
 
 ## Nyitott Kérdések
