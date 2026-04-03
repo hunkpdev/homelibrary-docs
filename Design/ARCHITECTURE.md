@@ -16,7 +16,7 @@
 | ORM | Spring Data JPA + Hibernate | Standard Spring stack |
 | DB migráció | Liquibase | Verziókövetett sémaváltozások, rollback támogatás (lásd ADR-005) |
 | Build | Maven + maven-shade-plugin | Executable JAR Lambda deployhoz |
-| Container | Docker (csak lokális dev) | Lambda-ra JAR-t deployzunk, nem image-et |
+| Container | Docker (csak lokális dev) | Lambda-ra JAR-t deploy-olunk, nem image-et |
 
 ### Frontend
 
@@ -44,7 +44,6 @@
 |------|------|------------|
 | IntelliJ IDEA Ultimate | IDE | Spring Boot, AWS Toolkit plugin |
 | Claude Code CLI | AI-asszisztált fejlesztés | Terminálból, a projekt mappájából indítva |
-| Claude Code plugin | IntelliJ integráció | Diff néző, fájl kontextus megosztás |
 | SonarLint plugin | Real-time statikus analízis | SonarQube Cloud-hoz kötve |
 | Docker Desktop | Lokális stack | PostgreSQL + backend + frontend |
 | Git + GitHub | Verziókezelés | Mono-repo (kód), külön repo (docs) |
@@ -151,7 +150,6 @@ homelibrary/                        ← GitHub repo: homelibrary
 │   ├── src/
 │   │   ├── main/java/
 │   │   └── test/java/
-│   ├── Dockerfile                  ← csak lokális dev-hez
 │   └── pom.xml
 ├── frontend/                       ← React projekt
 │   ├── src/
@@ -169,7 +167,6 @@ homelibrary/                        ← GitHub repo: homelibrary
 │   └── workflows/
 │       ├── backend-deploy.yml
 │       └── frontend-deploy.yml
-├── docker-compose.yml              ← lokális fejlesztéshez
 └── README.md
 ```
 
@@ -198,12 +195,11 @@ homelibrary-docs/                   ← GitHub repo: homelibrary-docs
 
 ## Lokális Fejlesztési Környezet
 
-```yaml
-# docker-compose.yml – a teljes stack lokálisan
-services:
-  postgres:     # lokális PostgreSQL (nem Neon) – gyors, offline fejlesztés
-  backend:      # Spring Boot hagyományos Tomcat módban (nem Lambda adapter)
-  frontend:     # Vite dev server (HMR – Hot Module Replacement)
+```
+# Nincs Docker – a lokális stack IntelliJ-ből vagy terminálból indítható:
+# - HSQLDB in-memory  ← Spring Boot automatikusan kezeli (test scope dependency, külön telepítés nélkül)
+# - backend           ← Spring Boot embedded Tomcat módban (nem Lambda adapter)
+# - frontend          ← Vite dev server (HMR – Hot Module Replacement)
 ```
 
 **Miért Tomcat lokálisan?**
@@ -213,9 +209,29 @@ gyorsabb fejlesztési ciklust ad. Lambda-specifikus viselkedés teszteléséhez:
 
 **IntelliJ IDEA Ultimate-ből:**
 - Spring Boot run config – direktben futtatható, Docker nélkül
-- Database plugin – lokális PostgreSQL direktben böngészhető
 - AWS Toolkit plugin – Lambda lokális debug, CloudWatch logok
-- Claude Code plugin – diff néző, fájl kontextus megosztás az integrált terminálban
+
+### Lokális fejlesztői adatkezelés (HSQLDB seed)
+
+A lokál és az AWS környezet élesen elválik egymástól – közös kód nincs köztük.
+
+| Környezet | DB | Adat | Aktiválás |
+|-----------|-----|------|-----------|
+| Lokál | HSQLDB in-memory | seed fájlból töltve (ha létezik) | `local` Spring profile |
+| AWS | Neon PostgreSQL | éles adat | `prod` Spring profile |
+
+**Seed export/import működése (`local` profile):**
+
+- **Első indítás:** üres DB, Liquibase lefuttatja a migrációkat, egyetlen alap admin user kerül be
+- **Leállítás előtt:** az exportot Claude Code generálja kérésre – INSERT statement-ek táblánként, `local-data/seed.sql` fájlba
+- **Következő indítás:** Spring `ApplicationRunner` betölti a `seed.sql`-t `JdbcTemplate`-tel, ha a fájl létezik
+- **Liquibase táblák** (`DATABASECHANGELOG`, `DATABASECHANGELOGLOCK`) nem kerülnek az exportba – ezeket Liquibase mindig maga kezeli
+
+**Gitignore:**
+```
+local-data/
+```
+A seed fájl és minden lokális export gitignore-os – nem kerül a repóba.
 
 ---
 
