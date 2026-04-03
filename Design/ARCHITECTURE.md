@@ -1,6 +1,6 @@
 # HomeLibrary – Architektúra
 
-> **Utolsó frissítés:** 2026-03-28
+> **Utolsó frissítés:** 2026-04-03
 > **Státusz:** v3 – végleges, Lambda + Neon PostgreSQL stack
 
 ## Tech Stack
@@ -158,9 +158,13 @@ homelibrary/                        ← GitHub repo: homelibrary
 │   ├── public/
 │   ├── vite.config.ts
 │   └── package.json
-├── infra/                          ← AWS CDK (Java)
-│   ├── src/
-│   └── pom.xml
+├── infra/                          ← AWS CDK (TypeScript)
+│   ├── bin/
+│   │   └── homelibrary.ts          ← CDK app belépési pont
+│   ├── lib/
+│   │   └── homelibrary-stack.ts    ← Stack definíció
+│   ├── package.json
+│   └── cdk.json
 ├── .github/
 │   └── workflows/
 │       ├── backend-deploy.yml
