@@ -30,6 +30,17 @@
 | HTTP | Axios | Standard, interceptorokkal JWT kezelés |
 | Vonalkód | react-zxing | Böngészős kamera API wrapper, mobil-optimalizált |
 | Routing | React Router v6 | Standard |
+| Grid/táblázat | TanStack Table | Headless, shadcn/ui-val natívan párosítható, sorting/filtering/pagination |
+
+### Frontend UI irányelvek
+
+| Szempont | Döntés |
+|----------|--------|
+| Layout | Sidebar + content area (shadcn/ui Sidebar komponens) |
+| Könyv megjelenítés | Card alapú |
+| Dark mode | Támogatott (shadcn/ui natív CSS variable theming) |
+| Színpaletta | Tailwind/shadcn/ui CSS variable alapú – konkrét paletta implementációnál döntendő |
+| Grid szűrés | Oszlopfejlécbe integrált szűrősor, hide-olható (nem táblázat feletti szűrősáv) |
 
 ### Adatbázis
 
