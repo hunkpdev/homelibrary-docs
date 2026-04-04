@@ -37,7 +37,7 @@ A felhasználószám alacsony (tipikusan 2-5 fő egy háztartásban + meghívott
 
 ### Token Stratégia
 - **Access token:** JWT, 15 perces élettartam, `Authorization: Bearer` headerben
-- **Refresh token:** Opaque token, 7 napos élettartam, HttpOnly cookie-ban (XSS védett), SameSite=Strict, Path=/api/auth/refresh
+- **Refresh token:** Opaque token, 7 napos élettartam, HttpOnly cookie-ban (XSS védett), SameSite=Strict, Path=/api/auth
 - **Tárolás:** Refresh token BCrypt hash-elve a `users` táblában (`refresh_token_hash` + `refresh_token_expires_at` oszlopok). Egy aktív session per felhasználó – új bejelentkezés felülírja a régit.
 - **Refresh token rotation:** Minden sikeres refresh híváskor a szerver új refresh tokent bocsát ki, és a régit érvényteleníti (a DB-ben az új hash-t tárolja). Ez biztosítja, hogy egy kiszivárgott refresh token legfeljebb egyszer használható. Token family tracking nem szükséges ezen a skálán. A frontend Axios interceptorja garantálja, hogy egyszerre csak egy refresh hívás fut (race condition elkerülése).
 
