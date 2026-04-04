@@ -15,6 +15,7 @@
 | Auth | Spring Security + JWT | Elegendő ennél a skálánál, Cognito nem szükséges |
 | ORM | Spring Data JPA + Hibernate | Standard Spring stack |
 | DB migráció | Liquibase | Verziókövetett sémaváltozások, rollback támogatás (lásd ADR-005) |
+| API dokumentáció | springdoc-openapi | OpenAPI spec generálás + Swagger UI, automatikusan naprakész |
 | Build | Maven + maven-shade-plugin | Executable JAR Lambda deployhoz |
 | Container | – (JAR alapú) | Lambda-ra JAR-t deploy-olunk, nem Docker image |
 
@@ -146,6 +147,10 @@ GitHub Actions
         5. CloudFront invalidation
 ```
 
+> **Liquibase:** A sémamigrációk app indításkor futnak automatikusan (Spring Boot auto-configuration) — külön pipeline lépés nem szükséges.
+
+> **Tesztstratégia:** Integrációs tesztek (`@SpringBootTest`) csak a kritikus területekre: auth flow (login/refresh/logout + token rotation) és book státuszátmenetek. Többi endpoint: manuális UI teszt. Staging környezet nincs — a main branch közvetlenül production-re deploy-ol, ami ennél a skálánál elfogadható.
+
 > **AWS hitelesítés GitHub Actions-ből: OIDC** (nem tárolt access key!)
 > A GitHub Actions ideiglenes tokent kap az IAM-tól – ez a biztonságos, modern megoldás.
 > Nincs AWS_ACCESS_KEY_ID és AWS_SECRET_ACCESS_KEY a GitHub secretekben.
@@ -263,6 +268,21 @@ A seed fájl és minden lokális export gitignore-os – nem kerül a repóba.
 - GitHub repo: **public** (SonarQube Cloud free tier feltétele)
   - Secretek soha nem kerülnek a kódba (SSM-ben vannak)
   - `.gitignore` gondosan karbantartva
+
+---
+
+## Monitoring Stratégia
+
+A CloudWatch free tier szintje elegendő — tudatos döntés, elsősorban AWS tanulási célból is.
+
+| Metrika | CloudWatch eszköz |
+|---------|------------------|
+| Lambda error rate és cold start duration | Log-based metric filter + alarm |
+| API Gateway 4xx/5xx arány | Beépített API Gateway metrikák |
+| Lambda concurrent executions | Beépített Lambda metrikák (free tier limit figyelése) |
+| Neon connection hibák | Lambda log-okból metric filter |
+
+> A CloudWatch alarmok email értesítést küldenek SNS-en keresztül (AWS free tier: 1000 email/hó ingyenes).
 
 ---
 

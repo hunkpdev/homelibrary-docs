@@ -187,6 +187,8 @@ Egy könyv részletes adatai.
 ### `PUT /api/books/{id}`
 Könyv adatainak módosítása. Minden mező kötelező (teljes felülírás).
 
+> **PUT vs PATCH:** Tudatos döntés a teljes felülírás mellett — a PATCH magasabb implementációs komplexitást és részleges update-ből adódó hibalehetőségeket hozna be, ami ennél a skálánál nem indokolt. A leggyakoribb részleges műveletek (státusz, helyszín) dedikált endpointokkal kezeltek.
+
 **Jogosultság:** `ADMIN`
 
 **Request:** Megegyezik a POST request struktúrával, kiegészítve a `version` mezővel:
