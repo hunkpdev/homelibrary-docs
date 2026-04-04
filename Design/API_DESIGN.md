@@ -13,6 +13,7 @@
 - UUID-k: string formátumban (`"550e8400-e29b-41d4-a716-446655440000"`)
 - Hibakezelés: egységes hibastruktúra (lásd lent)
 - Autentikáció: `Authorization: Bearer <access_token>` header (kivéve login endpoint)
+- Cookie: a frontend Axios `withCredentials: true` beállítással küldi a refresh token cookie-t — emiatt a szerver CORS konfigurációjában explicit origin szükséges (`Access-Control-Allow-Origin` nem lehet `*`) és `Access-Control-Allow-Credentials: true`
 - Lapozás: `page` (0-tól indexelt) és `size` query paraméterekkel
 
 ## Egységes Hibastruktúra

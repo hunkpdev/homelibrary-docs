@@ -150,7 +150,7 @@ GitHub Actions
 
 > **Liquibase:** A sémamigrációk app indításkor futnak automatikusan (Spring Boot auto-configuration) — külön pipeline lépés nem szükséges.
 
-> **Tesztstratégia:** Integrációs tesztek (`@SpringBootTest`) csak a kritikus területekre: auth flow (login/refresh/logout + token rotation) és book státuszátmenetek. Többi endpoint: manuális UI teszt. Staging környezet nincs — a main branch közvetlenül production-re deploy-ol, ami ennél a skálánál elfogadható.
+> **Tesztstratégia:** Unit tesztek minden service és üzleti logika osztályra. Integrációs tesztek (`@SpringBootTest`) csak a kritikus területekre: auth flow (login/refresh/logout + token rotation) és book státuszátmenetek. Többi endpoint: manuális UI teszt. Staging környezet nincs — a main branch közvetlenül production-re deploy-ol, ami ennél a skálánál elfogadható.
 
 > **AWS hitelesítés GitHub Actions-ből: OIDC** (nem tárolt access key!)
 > A GitHub Actions ideiglenes tokent kap az IAM-tól – ez a biztonságos, modern megoldás.
@@ -193,16 +193,22 @@ homelibrary/                        ← GitHub repo: homelibrary
 ```
 homelibrary-docs/                   ← GitHub repo: homelibrary-docs
 ├── PROJECT.md
-├── ARCHITECTURE.md
-├── DB_SCHEMA.md
-├── API_DESIGN.md
-└── ADR/
-    ├── 001-database-choice.md
-    ├── 002-auth-strategy.md
-    ├── 003-isbn-api.md
-    ├── 004-aws-compute-choice.md
-    ├── 005-db-migration-tool.md
-    └── 006-sql-standard-types.md
+├── Design/
+│   ├── ARCHITECTURE.md
+│   ├── DB_SCHEMA.md
+│   ├── API_DESIGN.md
+│   └── ADR/
+│       ├── 001-database-choice.md
+│       ├── 002-auth-strategy.md
+│       ├── 003-isbn-api.md
+│       ├── 004-aws-compute-choice.md
+│       ├── 005-db-migration-tool.md
+│       └── 006-sql-standard-types.md
+└── Plans/
+    ├── phase1-feature-order.md
+    └── specs/
+        └── feature-auth/
+            └── refresh-token-rotation.md
 ```
 
 > A dokumentáció szándékosan külön repóban van a kódtól.
@@ -256,9 +262,10 @@ A seed fájl és minden lokális export gitignore-os – nem kerül a repóba.
 ## Biztonsági Megfontolások
 
 - JWT access token: 15 perces élettartam
-- Refresh token: HttpOnly cookie (XSS ellen védett), SameSite=Strict, Path=/api/auth/refresh
+- Refresh token: HttpOnly cookie (XSS ellen védett), SameSite=Strict, Path=/api/auth
 - Refresh token rotation: minden refresh híváskor új token kerül kibocsátásra, a régi érvénytelenítésre (lásd ADR-002)
-- CSRF védelem: Az API endpointok Bearer tokennel védettek, ami természeténél fogva CSRF-biztos. A refresh token cookie SameSite=Strict és Path=/api/auth/refresh attribútumokkal van beállítva, így a böngésző cross-origin kéréshez nem csatolja. Külön CSRF token nem szükséges.
+- CSRF védelem: Az API endpointok Bearer tokennel védettek, ami természeténél fogva CSRF-biztos. A refresh token cookie SameSite=Strict és Path=/api/auth attribútumokkal van beállítva, így a böngésző cross-origin kéréshez nem csatolja. Külön CSRF token nem szükséges.
+- CORS: `withCredentials: true` (cookie küldés/fogadás) miatt az `Access-Control-Allow-Origin` nem lehet `*` — explicit CloudFront origin szükséges + `Access-Control-Allow-Credentials: true`
 - Brute-force védelem: API Gateway szintű throttling (3 req/sec per IP a login endpointon) az első védelmi vonal. Alkalmazásszintű account lockout nem szükséges — az alkalmazás nem jelent érdemi támadási célpontot ezen a skálán.
 - Access token érvényessége logout után: A `POST /api/auth/logout` törli a refresh token cookie-t, de a kiadott access token a 15 perces TTL lejártáig technikailag érvényes marad. Lambda-n in-memory blacklist nem praktikus (nincs perzisztens memória instance-ok között), DynamoDB-alapú blacklist pedig szükségtelen komplexitást és költséget adna ehhez a skálához. A 15 perces TTL elfogadható tradeoff.
 - CORS: csak a CloudFront domain engedélyezett
