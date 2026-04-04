@@ -1,6 +1,6 @@
 # HomeLibrary – Architektúra
 
-> **Utolsó frissítés:** 2026-04-03
+> **Utolsó frissítés:** 2026-04-04
 > **Státusz:** v3 – végleges, Lambda + Neon PostgreSQL stack
 
 ## Tech Stack
@@ -268,7 +268,6 @@ A seed fájl és minden lokális export gitignore-os – nem kerül a repóba.
 - CORS: `withCredentials: true` (cookie küldés/fogadás) miatt az `Access-Control-Allow-Origin` nem lehet `*` — explicit CloudFront origin szükséges + `Access-Control-Allow-Credentials: true`
 - Brute-force védelem: API Gateway szintű throttling (3 req/sec per IP a login endpointon) az első védelmi vonal. Alkalmazásszintű account lockout nem szükséges — az alkalmazás nem jelent érdemi támadási célpontot ezen a skálán.
 - Access token érvényessége logout után: A `POST /api/auth/logout` törli a refresh token cookie-t, de a kiadott access token a 15 perces TTL lejártáig technikailag érvényes marad. Lambda-n in-memory blacklist nem praktikus (nincs perzisztens memória instance-ok között), DynamoDB-alapú blacklist pedig szükségtelen komplexitást és költséget adna ehhez a skálához. A 15 perces TTL elfogadható tradeoff.
-- CORS: csak a CloudFront domain engedélyezett
 - SSM Parameter Store: SOHA nem kerül secret kódba vagy `.env` fájlba plain textként
 - Neon PostgreSQL: SSL kapcsolat kötelező (alapértelmezett)
 - GitHub Actions → AWS: OIDC, nem tárolt access key

@@ -20,60 +20,30 @@ A frontend Axios interceptorja biztosítja, hogy párhuzamos 401-es válaszok es
 
 ## Backend módosítások
 
-### A refresh endpoint új flow-ja
+### A refresh endpoint flow-ja
 
 **Endpoint:** `POST /api/auth/refresh`
 
 ```
-Jelenlegi flow:                        Új flow:
-─────────────────                      ────────────
-1. Cookie → refresh token              1. Cookie → refresh token
-2. BCrypt match DB hash                2. BCrypt match DB hash
-3. Ha egyezik:                         3. Ha egyezik:
-   → új access token kiadása              a. Új refresh token generálása (SecureRandom, UUID vagy opaque string)
-                                          b. BCrypt hash számítása az új refresh tokenből
-                                          c. DB UPDATE users SET
-                                               refresh_token_hash = <új hash>,
-                                               refresh_token_expires_at = NOW() + 7 nap
-                                             WHERE id = <user id>
-                                          d. Új access token kiadása
-                                          e. Set-Cookie header az új refresh tokennel
-4. Response: { accessToken, expiresIn } 4. Response: { accessToken, expiresIn }
-                                          + Set-Cookie (lásd lent)
+1. Cookie → refresh token kiolvasás
+2. BCrypt match a DB-ben tárolt hash-sel
+3. Ha egyezik:
+   a. Új refresh token generálása (SecureRandom, UUID vagy opaque string)
+   b. BCrypt hash számítása az új refresh tokenből
+   c. DB UPDATE users SET
+        refresh_token_hash = <új hash>,
+        refresh_token_expires_at = NOW() + 7 nap
+      WHERE id = <user id>
+   d. Új access token kiadása
+   e. Set-Cookie header az új refresh tokennel
+4. Response: { accessToken, expiresIn }
+   + Set-Cookie (lásd lent)
 ```
 
 ### Cookie beállítások
 
-A refresh token cookie-t **minden** alábbi attribútummal kell beállítani — a login és a refresh endpoint is ugyanezt a cookie konfigurációt használja:
+A refresh token cookie-t **minden** alábbi attribútummal kell beállítani — a login, a refresh és a logout endpoint is ugyanezt a cookie konfigurációt használja:
 
-```
-Set-Cookie: refreshToken=<token érték>;
-  HttpOnly;
-  Secure;
-  SameSite=Strict;
-  Path=/api/auth/refresh;
-  Max-Age=604800
-```
-
-| Attribútum | Érték | Miért |
-|------------|-------|-------|
-| `HttpOnly` | igen | JavaScript nem olvashatja (XSS védelem) |
-| `Secure` | igen | Csak HTTPS-en megy ki |
-| `SameSite` | `Strict` | Cross-origin kéréshez a böngésző nem csatolja (CSRF védelem) |
-| `Path` | `/api/auth/refresh` | Csak a refresh endpointra küldi a böngésző, más API hívásokhoz nem |
-| `Max-Age` | `604800` | 7 nap másodpercben |
-
-**Fontos:** A `Path` beállítás azt jelenti, hogy a `POST /api/auth/logout` endpoint **nem fogja automatikusan megkapni** a cookie-t. Két megoldás:
-- **A) Logout endpoint path módosítása:** `POST /api/auth/refresh/logout` (a Path alá esik)
-- **B) Logout is a `/api/auth/refresh` path-ra:** a szerver a request body vagy egy query param alapján különbözteti meg
-- **C) Path=/api/auth** (tágabb scope, de egyszerűbb — a cookie a login, refresh és logout endpointra is kimegy)
-
-**Javasolt: C opció** — `Path=/api/auth`, mert:
-- A login endpointnak is be kell állítania a cookie-t, tehát ott is kell a path
-- A logout endpointnak törölnie kell a cookie-t, tehát ott is kell
-- Az `/api/auth` alá csak az auth endpointok esnek, nincs biztonsági kockázat
-
-Tehát a végleges cookie:
 ```
 Set-Cookie: refreshToken=<token>;
   HttpOnly;
@@ -82,6 +52,14 @@ Set-Cookie: refreshToken=<token>;
   Path=/api/auth;
   Max-Age=604800
 ```
+
+| Attribútum | Érték | Miért |
+|------------|-------|-------|
+| `HttpOnly` | igen | JavaScript nem olvashatja (XSS védelem) |
+| `Secure` | igen | Csak HTTPS-en megy ki |
+| `SameSite` | `Strict` | Cross-origin kéréshez a böngésző nem csatolja (CSRF védelem) |
+| `Path` | `/api/auth` | A cookie a login, refresh és logout endpointokra is kimegy — szükséges, mert a login beállítja, a refresh cseréli, a logout törli. Az `/api/auth` alá csak auth endpointok esnek, nincs biztonsági kockázat. |
+| `Max-Age` | `604800` | 7 nap másodpercben |
 
 ### Spring Boot implementációs részletek
 
