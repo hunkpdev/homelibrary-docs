@@ -15,8 +15,9 @@
 | Auth | Spring Security + JWT | Elegendő ennél a skálánál, Cognito nem szükséges |
 | ORM | Spring Data JPA + Hibernate | Standard Spring stack |
 | DB migráció | Liquibase | Verziókövetett sémaváltozások, rollback támogatás (lásd ADR-005) |
+| API dokumentáció | springdoc-openapi | OpenAPI spec generálás + Swagger UI (`/swagger-ui.html`), automatikusan naprakész. Publikusan elérhető production-ban is — tudatos döntés: portfolió projekt, álláspályázatnál előny. |
 | Build | Maven + maven-shade-plugin | Executable JAR Lambda deployhoz |
-| Container | Docker (csak lokális dev) | Lambda-ra JAR-t deploy-olunk, nem image-et |
+| Container | – (JAR alapú) | Lambda-ra JAR-t deploy-olunk, nem Docker image |
 
 ### Frontend
 
@@ -46,7 +47,7 @@
 
 - **PostgreSQL 15** – [Neon](https://neon.tech) free tier SaaS-on futtatva
 - Free tier: 0.5GB tárhely, **perzisztens** (auto-pause inaktivitás után, de adat megmarad)
-- Pontosan standard PostgreSQL: azonos JDBC driver, JPA, Flyway – semmi vendor-specifikus
+- Pontosan standard PostgreSQL: azonos JDBC driver, JPA, Liquibase – semmi vendor-specifikus
 - Migrációs útvonal: connection string csere → RDS PostgreSQL (ha és amikor szükséges)
 
 ### Fejlesztői toolchain
@@ -56,7 +57,6 @@
 | IntelliJ IDEA Ultimate | IDE | Spring Boot, AWS Toolkit plugin |
 | Claude Code CLI | AI-asszisztált fejlesztés | Terminálból, a projekt mappájából indítva |
 | SonarLint plugin | Real-time statikus analízis | SonarQube Cloud-hoz kötve |
-| Docker Desktop | Lokális stack | PostgreSQL + backend + frontend |
 | Git + GitHub | Verziókezelés | Mono-repo (kód), külön repo (docs) |
 | SonarQube Cloud | CI statikus analízis | GitHub Actions-ből, public repo, ingyenes |
 | GitHub Actions | CI/CD | OIDC alapú AWS hitelesítés |
@@ -97,7 +97,8 @@ S3 Bucket            API Gateway      ← always free: 1M req/hó
 | **S3** | React SPA statikus hosting | ~$0.02/GB – fillér |
 | **CloudFront** | CDN, HTTPS | ✅ Always free (1TB transfer/hó) |
 | **SSM Parameter Store** | Secretek tárolása | ✅ Standard tier ingyenes |
-| **CloudWatch** | Logok, monitoring | ✅ Always free (alap szint) |
+| **CloudWatch** | Logok, monitoring | ✅ Always free (10 alarm, 5GB log) |
+| **SNS** | CloudWatch alarm értesítések | ✅ Always free (1000 email/hó) |
 
 > 💡 **Becsült havi költség: ~$0** (S3 tárhelyen kívül, ami fillér nagyságrendű)
 
@@ -147,6 +148,10 @@ GitHub Actions
         5. CloudFront invalidation
 ```
 
+> **Liquibase:** A sémamigrációk app indításkor futnak automatikusan (Spring Boot auto-configuration) — külön pipeline lépés nem szükséges.
+
+> **Tesztstratégia:** Integrációs tesztek (`@SpringBootTest`) csak a kritikus területekre: auth flow (login/refresh/logout + token rotation) és book státuszátmenetek. Többi endpoint: manuális UI teszt. Staging környezet nincs — a main branch közvetlenül production-re deploy-ol, ami ennél a skálánál elfogadható.
+
 > **AWS hitelesítés GitHub Actions-ből: OIDC** (nem tárolt access key!)
 > A GitHub Actions ideiglenes tokent kap az IAM-tól – ez a biztonságos, modern megoldás.
 > Nincs AWS_ACCESS_KEY_ID és AWS_SECRET_ACCESS_KEY a GitHub secretekben.
@@ -195,7 +200,9 @@ homelibrary-docs/                   ← GitHub repo: homelibrary-docs
     ├── 001-database-choice.md
     ├── 002-auth-strategy.md
     ├── 003-isbn-api.md
-    └── 004-aws-compute-choice.md
+    ├── 004-aws-compute-choice.md
+    ├── 005-db-migration-tool.md
+    └── 006-sql-standard-types.md
 ```
 
 > A dokumentáció szándékosan külön repóban van a kódtól.
@@ -249,15 +256,35 @@ A seed fájl és minden lokális export gitignore-os – nem kerül a repóba.
 ## Biztonsági Megfontolások
 
 - JWT access token: 15 perces élettartam
-- Refresh token: HttpOnly cookie (XSS ellen védett)
+- Refresh token: HttpOnly cookie (XSS ellen védett), SameSite=Strict, Path=/api/auth/refresh
+- Refresh token rotation: minden refresh híváskor új token kerül kibocsátásra, a régi érvénytelenítésre (lásd ADR-002)
+- CSRF védelem: Az API endpointok Bearer tokennel védettek, ami természeténél fogva CSRF-biztos. A refresh token cookie SameSite=Strict és Path=/api/auth/refresh attribútumokkal van beállítva, így a böngésző cross-origin kéréshez nem csatolja. Külön CSRF token nem szükséges.
+- Brute-force védelem: API Gateway szintű throttling (3 req/sec per IP a login endpointon) az első védelmi vonal. Alkalmazásszintű account lockout nem szükséges — az alkalmazás nem jelent érdemi támadási célpontot ezen a skálán.
+- Access token érvényessége logout után: A `POST /api/auth/logout` törli a refresh token cookie-t, de a kiadott access token a 15 perces TTL lejártáig technikailag érvényes marad. Lambda-n in-memory blacklist nem praktikus (nincs perzisztens memória instance-ok között), DynamoDB-alapú blacklist pedig szükségtelen komplexitást és költséget adna ehhez a skálához. A 15 perces TTL elfogadható tradeoff.
 - CORS: csak a CloudFront domain engedélyezett
 - SSM Parameter Store: SOHA nem kerül secret kódba vagy `.env` fájlba plain textként
 - Neon PostgreSQL: SSL kapcsolat kötelező (alapértelmezett)
 - GitHub Actions → AWS: OIDC, nem tárolt access key
 - S3 (SPA): public read, de csak a `dist/` tartalmára
+- Swagger UI (`/swagger-ui.html`): publikusan elérhető production-ban — tudatos döntés, portfolió projekt (álláspályázatnál előny). Írási műveletek Bearer token nélkül úgysem hajthatók végre.
 - GitHub repo: **public** (SonarQube Cloud free tier feltétele)
   - Secretek soha nem kerülnek a kódba (SSM-ben vannak)
   - `.gitignore` gondosan karbantartva
+
+---
+
+## Monitoring Stratégia
+
+A CloudWatch free tier szintje elegendő — tudatos döntés, elsősorban AWS tanulási célból is.
+
+| Metrika | CloudWatch eszköz |
+|---------|------------------|
+| Lambda error rate és cold start duration | Log-based metric filter + alarm |
+| API Gateway 4xx/5xx arány | Beépített API Gateway metrikák |
+| Lambda concurrent executions | Beépített Lambda metrikák (free tier limit figyelése) |
+| Neon connection hibák | Lambda log-okból metric filter |
+
+> A CloudWatch alarmok email értesítést küldenek SNS-en keresztül (AWS free tier: 1000 email/hó ingyenes).
 
 ---
 

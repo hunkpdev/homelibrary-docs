@@ -121,7 +121,7 @@ Könyvek listázása szűrőkkel. Lapozott.
       "language": "en",
       "categories": ["Fantasy", "Fiction"],
       "coverImageUrl": "https://covers.openlibrary.org/...",
-      // Fázis 1: külső API (OpenLibrary/Google Books) URL-je. Fázis 2-től: S3 pre-signed URL.
+      // Fázis 1: a DB cover_image_url mezőjéből (külső forrás URL). Fázis 2-től: S3 pre-signed URL, a service réteg generálja a cover_image_key alapján on-the-fly.
       "status": "AT_HOME",
       "location": {
         "id": "...",
@@ -186,6 +186,8 @@ Egy könyv részletes adatai.
 
 ### `PUT /api/books/{id}`
 Könyv adatainak módosítása. Minden mező kötelező (teljes felülírás).
+
+> **PUT vs PATCH:** Tudatos döntés a teljes felülírás mellett — a PATCH magasabb implementációs komplexitást és részleges update-ből adódó hibalehetőségeket hozna be, ami ennél a skálánál nem indokolt. A leggyakoribb részleges műveletek (státusz, helyszín) dedikált endpointokkal kezeltek.
 
 **Jogosultság:** `ADMIN`
 
