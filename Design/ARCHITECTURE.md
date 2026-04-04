@@ -250,7 +250,11 @@ A seed fájl és minden lokális export gitignore-os – nem kerül a repóba.
 ## Biztonsági Megfontolások
 
 - JWT access token: 15 perces élettartam
-- Refresh token: HttpOnly cookie (XSS ellen védett)
+- Refresh token: HttpOnly cookie (XSS ellen védett), SameSite=Strict, Path=/api/auth/refresh
+- Refresh token rotation: minden refresh híváskor új token kerül kibocsátásra, a régi érvénytelenítésre (lásd ADR-002)
+- CSRF védelem: Az API endpointok Bearer tokennel védettek, ami természeténél fogva CSRF-biztos. A refresh token cookie SameSite=Strict és Path=/api/auth/refresh attribútumokkal van beállítva, így a böngésző cross-origin kéréshez nem csatolja. Külön CSRF token nem szükséges.
+- Brute-force védelem: API Gateway szintű throttling (3 req/sec per IP a login endpointon) az első védelmi vonal. Alkalmazásszintű account lockout nem szükséges — az alkalmazás nem jelent érdemi támadási célpontot ezen a skálán.
+- Access token érvényessége logout után: A `POST /api/auth/logout` törli a refresh token cookie-t, de a kiadott access token a 15 perces TTL lejártáig technikailag érvényes marad. Lambda-n in-memory blacklist nem praktikus (nincs perzisztens memória instance-ok között), DynamoDB-alapú blacklist pedig szükségtelen komplexitást és költséget adna ehhez a skálához. A 15 perces TTL elfogadható tradeoff.
 - CORS: csak a CloudFront domain engedélyezett
 - SSM Parameter Store: SOHA nem kerül secret kódba vagy `.env` fájlba plain textként
 - Neon PostgreSQL: SSL kapcsolat kötelező (alapértelmezett)
