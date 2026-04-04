@@ -121,7 +121,7 @@ Könyvek listázása szűrőkkel. Lapozott.
       "language": "en",
       "categories": ["Fantasy", "Fiction"],
       "coverImageUrl": "https://covers.openlibrary.org/...",
-      // Fázis 1: külső API (OpenLibrary/Google Books) URL-je. Fázis 2-től: S3 pre-signed URL.
+      // Fázis 1: a DB cover_image_url mezőjéből (külső forrás URL). Fázis 2-től: S3 pre-signed URL, a service réteg generálja a cover_image_key alapján on-the-fly.
       "status": "AT_HOME",
       "location": {
         "id": "...",

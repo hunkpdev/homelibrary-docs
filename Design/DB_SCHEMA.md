@@ -73,7 +73,7 @@ users
 | `publish_year` | `INTEGER` | | |
 | `language` | `VARCHAR(10)` | | Az eredeti könyv nyelve, pl. `hu`, `en` |
 | `categories` | `VARCHAR(500)` | | JSON string, pl. `["Fantasy", "Fiction"]` |
-| `cover_image_key` | `VARCHAR(500)` | | S3 object key a borítóképhez |
+| `cover_image_url` | `VARCHAR(500)` | | Fázis 1: külső forrás borítókép URL-je (OpenLibrary/Google Books). Fázis 2: Liquibase migráció — `cover_image_key` (S3 object key) mező kerül be helyette, a service réteg generálja a pre-signed URL-t. |
 | `status` | `VARCHAR(20)` | NOT NULL | `AT_HOME`, `LOANED`, `DELETED` |
 | `location_id` | `UUID` | FK → locations | Ahol a könyv éppen van |
 | `source` | `VARCHAR(20)` | | `OPENLIBRARY`, `GOOGLE_BOOKS`, `MANUAL` |
@@ -115,6 +115,8 @@ Az AI fordítás is ide kerül, `AI_TRANSLATED` source-szal.
 ---
 
 ### `loans` (kölcsönzések)
+
+> **Optimistic locking:** A `loans` táblán nincs `version` mező. A `PUT /api/loans/{id}/return` endpointnál konkurens módosítás elvileg lehetséges, de 2-5 felhasználós háztartási alkalmazásnál a valószínűsége elhanyagolható — tudatos döntés a komplexitás csökkentése érdekében.
 
 | Oszlop | Típus | Megszorítás | Leírás |
 |--------|-------|-------------|--------|
