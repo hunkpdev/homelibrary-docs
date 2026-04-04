@@ -15,7 +15,7 @@
 | Auth | Spring Security + JWT | Elegendő ennél a skálánál, Cognito nem szükséges |
 | ORM | Spring Data JPA + Hibernate | Standard Spring stack |
 | DB migráció | Liquibase | Verziókövetett sémaváltozások, rollback támogatás (lásd ADR-005) |
-| API dokumentáció | springdoc-openapi | OpenAPI spec generálás + Swagger UI, automatikusan naprakész |
+| API dokumentáció | springdoc-openapi | OpenAPI spec generálás + Swagger UI (`/swagger-ui.html`), automatikusan naprakész. Publikusan elérhető production-ban is — tudatos döntés: portfolió projekt, álláspályázatnál előny. |
 | Build | Maven + maven-shade-plugin | Executable JAR Lambda deployhoz |
 | Container | – (JAR alapú) | Lambda-ra JAR-t deploy-olunk, nem Docker image |
 
@@ -97,7 +97,8 @@ S3 Bucket            API Gateway      ← always free: 1M req/hó
 | **S3** | React SPA statikus hosting | ~$0.02/GB – fillér |
 | **CloudFront** | CDN, HTTPS | ✅ Always free (1TB transfer/hó) |
 | **SSM Parameter Store** | Secretek tárolása | ✅ Standard tier ingyenes |
-| **CloudWatch** | Logok, monitoring | ✅ Always free (alap szint) |
+| **CloudWatch** | Logok, monitoring | ✅ Always free (10 alarm, 5GB log) |
+| **SNS** | CloudWatch alarm értesítések | ✅ Always free (1000 email/hó) |
 
 > 💡 **Becsült havi költség: ~$0** (S3 tárhelyen kívül, ami fillér nagyságrendű)
 
@@ -265,6 +266,7 @@ A seed fájl és minden lokális export gitignore-os – nem kerül a repóba.
 - Neon PostgreSQL: SSL kapcsolat kötelező (alapértelmezett)
 - GitHub Actions → AWS: OIDC, nem tárolt access key
 - S3 (SPA): public read, de csak a `dist/` tartalmára
+- Swagger UI (`/swagger-ui.html`): publikusan elérhető production-ban — tudatos döntés, portfolió projekt (álláspályázatnál előny). Írási műveletek Bearer token nélkül úgysem hajthatók végre.
 - GitHub repo: **public** (SonarQube Cloud free tier feltétele)
   - Secretek soha nem kerülnek a kódba (SSM-ben vannak)
   - `.gitignore` gondosan karbantartva
