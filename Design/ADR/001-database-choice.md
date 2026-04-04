@@ -24,7 +24,7 @@ Az AWS "always free" adatbázis opciók: csak DynamoDB (NoSQL).
 - ❌ Meglévő SQL/JPA tudás nem hasznosítható
 
 ### B: PostgreSQL Neon SaaS-on (választott)
-- ✅ Valódi PostgreSQL – azonos driver, JPA, Flyway, SQL
+- ✅ Valódi PostgreSQL – azonos driver, JPA, Liquibase, SQL
 - ✅ Ingyenes tier: 0.5GB, perzisztens
 - ✅ Meglévő tudás teljes mértékben hasznosítható
 - ✅ Migrációs útvonal: connection string csere → RDS (ha szükséges)
@@ -50,7 +50,7 @@ pontosan arra való a relációs adatbázis.
 ## Következmények
 
 - A Spring Boot alkalmazásban standard JPA/Hibernate konfiguráció
-- Flyway migrációk kezelik a sémaváltozásokat
+- Liquibase migrációk kezelik a sémaváltozásokat
 - Neon connection string SSM Parameter Store-ban tárolva
 - SSL kapcsolat kötelező (Neon alapértelmezés)
 - Auto-pause inaktivitás után: az első kérés ~500ms késéssel érkezhet

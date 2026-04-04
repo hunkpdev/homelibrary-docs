@@ -86,7 +86,7 @@ Ez az architektúra a következő AWS szolgáltatások megismerését teszi lehe
 ## Következmények
 
 - A Spring Boot kódba bekerül az `aws-serverless-java-container` adapter
-- Lokálisan Docker Compose-zal fut (hagyományos Tomcat mód) – gyorsabb fejlesztési ciklus
+- Lokálisan HSQLDB + embedded Tomcat módban fut – gyorsabb fejlesztési ciklus, Docker nélkül
 - Lambda viselkedés tesztelése: AWS SAM CLI (`sam local start-api`)
 - Deployment: JAR alapú (nem Docker image) – eltér az OpenShift tapasztalattól, de egyszerűbb
 - A GitHub repo **public** kell legyen (SonarQube Cloud free tier feltétele)

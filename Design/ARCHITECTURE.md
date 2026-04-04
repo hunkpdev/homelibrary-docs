@@ -16,7 +16,7 @@
 | ORM | Spring Data JPA + Hibernate | Standard Spring stack |
 | DB migráció | Liquibase | Verziókövetett sémaváltozások, rollback támogatás (lásd ADR-005) |
 | Build | Maven + maven-shade-plugin | Executable JAR Lambda deployhoz |
-| Container | Docker (csak lokális dev) | Lambda-ra JAR-t deploy-olunk, nem image-et |
+| Container | – (JAR alapú) | Lambda-ra JAR-t deploy-olunk, nem Docker image |
 
 ### Frontend
 
@@ -46,7 +46,7 @@
 
 - **PostgreSQL 15** – [Neon](https://neon.tech) free tier SaaS-on futtatva
 - Free tier: 0.5GB tárhely, **perzisztens** (auto-pause inaktivitás után, de adat megmarad)
-- Pontosan standard PostgreSQL: azonos JDBC driver, JPA, Flyway – semmi vendor-specifikus
+- Pontosan standard PostgreSQL: azonos JDBC driver, JPA, Liquibase – semmi vendor-specifikus
 - Migrációs útvonal: connection string csere → RDS PostgreSQL (ha és amikor szükséges)
 
 ### Fejlesztői toolchain
@@ -56,7 +56,6 @@
 | IntelliJ IDEA Ultimate | IDE | Spring Boot, AWS Toolkit plugin |
 | Claude Code CLI | AI-asszisztált fejlesztés | Terminálból, a projekt mappájából indítva |
 | SonarLint plugin | Real-time statikus analízis | SonarQube Cloud-hoz kötve |
-| Docker Desktop | Lokális stack | PostgreSQL + backend + frontend |
 | Git + GitHub | Verziókezelés | Mono-repo (kód), külön repo (docs) |
 | SonarQube Cloud | CI statikus analízis | GitHub Actions-ből, public repo, ingyenes |
 | GitHub Actions | CI/CD | OIDC alapú AWS hitelesítés |
@@ -195,7 +194,9 @@ homelibrary-docs/                   ← GitHub repo: homelibrary-docs
     ├── 001-database-choice.md
     ├── 002-auth-strategy.md
     ├── 003-isbn-api.md
-    └── 004-aws-compute-choice.md
+    ├── 004-aws-compute-choice.md
+    ├── 005-db-migration-tool.md
+    └── 006-sql-standard-types.md
 ```
 
 > A dokumentáció szándékosan külön repóban van a kódtól.
