@@ -80,7 +80,7 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 | 1.9 | CDK projekt setup (`infra/`): TypeScript, `cdk.json`, alap stack struktúra |
 | 1.10 | Lambda + API Gateway HTTP API: Spring Boot JAR deploy, CORS konfiguráció (explicit CloudFront origin) |
 | 1.11 | S3 + CloudFront: React SPA hosting, HTTPS |
-| 1.12 | SSM Parameter Store: `/homelibrary/neon-connection-string`, `/homelibrary/jwt-secret` paraméterek |
+| 1.12 | SSM Parameter Store: `/homelibrary/neon-connection-string`, `/homelibrary/jwt-secret`, `/homelibrary/admin-password-hash` paraméterek |
 | 1.13 | IAM + OIDC: GitHub Actions szerepkör, minimális jogosultságok (Lambda update, S3 sync, CloudFront invalidation) |
 | 1.14 | GitHub Actions workflow-ok: backend deploy (JAR → Lambda) + frontend deploy (dist → S3 + invalidation) |
 
