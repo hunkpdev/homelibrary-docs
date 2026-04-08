@@ -51,6 +51,10 @@ Mindkét workflow csak `main` branch-re való push esetén fut — és csak akko
 
 ---
 
+> **Megjegyzés:** SonarQube Cloud integráció (scan lépés mindkét workflow-ba) a Feature 2 step 2.1-ben kerül be — az első érdemi kód (Auth) előtt.
+
+---
+
 ## Elfogadási kritériumok
 
 - `main`-re pusholt backend változás után a Lambda automatikusan frissül

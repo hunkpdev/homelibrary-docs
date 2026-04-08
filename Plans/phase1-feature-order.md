@@ -94,27 +94,33 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 
 **Integrációs teszt:** `@SpringBootTest` — login → refresh (rotation ellenőrzés) → logout flow.
 
+### Infra
+
+| Step | Mit állít elő |
+|------|---------------|
+| 2.1 | SonarQube Cloud bekötés: backend és frontend GitHub Actions workflow kiegészítése scan lépéssel, szükséges GitHub Secrets (`SONAR_TOKEN`, `SONAR_ORGANIZATION`, `SONAR_PROJECT_KEY`) |
+
 ### Backend
 
 | Step | Mit állít elő |
 |------|---------------|
-| 2.1 | `User` entitás + `UserRepository` (a Liquibase changeset az 1.3-ban már elkészül) |
-| 2.2 | `JwtUtil`: access token generálás, validálás, claim kinyerés |
-| 2.3 | `JwtAuthenticationFilter`: Bearer token validálás minden kérésnél |
-| 2.4 | Spring Security konfiguráció: filter chain, role hierarchia, publikus endpointok (`/api/auth/**`, `/api/health`, `/swagger-ui/**`, `/v3/api-docs/**`) |
-| 2.5 | `POST /api/auth/login`: hitelesítés, access token + refresh token cookie kibocsátás (HttpOnly, Secure, SameSite=Strict, Path=/api/auth, `app.cookie.secure=false` local profilon) |
-| 2.6 | `POST /api/auth/refresh`: refresh token validálás, rotation (új token kibocsátás, régi érvénytelenítés DB-ben) |
-| 2.7 | `POST /api/auth/logout`: refresh token cookie törlése + DB-ben érvénytelenítés |
+| 2.2 | `User` entitás + `UserRepository` (a Liquibase changeset az 1.3-ban már elkészül) |
+| 2.3 | `JwtUtil`: access token generálás, validálás, claim kinyerés |
+| 2.4 | `JwtAuthenticationFilter`: Bearer token validálás minden kérésnél |
+| 2.5 | Spring Security konfiguráció: filter chain, role hierarchia, publikus endpointok (`/api/auth/**`, `/api/health`, `/swagger-ui/**`, `/v3/api-docs/**`) |
+| 2.6 | `POST /api/auth/login`: hitelesítés, access token + refresh token cookie kibocsátás (HttpOnly, Secure, SameSite=Strict, Path=/api/auth, `app.cookie.secure=false` local profilon) |
+| 2.7 | `POST /api/auth/refresh`: refresh token validálás, rotation (új token kibocsátás, régi érvénytelenítés DB-ben) |
+| 2.8 | `POST /api/auth/logout`: refresh token cookie törlése + DB-ben érvénytelenítés |
 
 ### Frontend
 
 | Step | Mit állít elő |
 |------|---------------|
-| 2.8 | Zustand auth store: `accessToken`, `user` tárolása, `setAccessToken`, `clearAuth` műveletek |
-| 2.9 | Axios interceptor: 401 kezelés, refresh token rotation race condition védelem (spec szerint) |
-| 2.10 | Login oldal: felhasználónév + jelszó form, hibaüzenet kezelés |
-| 2.11 | Protected route wrapper: bejelentkezett felhasználó ellenőrzése, redirect /login-ra |
-| 2.12 | Logout gomb a sidebar-ban |
+| 2.9 | Zustand auth store: `accessToken`, `user` tárolása, `setAccessToken`, `clearAuth` műveletek |
+| 2.10 | Axios interceptor: 401 kezelés, refresh token rotation race condition védelem (spec szerint) |
+| 2.11 | Login oldal: felhasználónév + jelszó form, hibaüzenet kezelés |
+| 2.12 | Protected route wrapper: bejelentkezett felhasználó ellenőrzése, redirect /login-ra |
+| 2.13 | Logout gomb a sidebar-ban |
 
 ---
 
