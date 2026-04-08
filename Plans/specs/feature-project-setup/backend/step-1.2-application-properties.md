@@ -23,7 +23,7 @@
 spring.application.name=homelibrary
 
 # Liquibase – mindkét profilon fut
-spring.liquibase.change-log=classpath:db/changelog/db.changelog-master.xml
+spring.liquibase.change-log=classpath:db/changelog/db.changelog-master.yaml
 
 # JWT – értékét prod-on SSM-ből kapja (ld. lent), local-on fix placeholder
 app.jwt.secret=${JWT_SECRET:local-dev-secret-not-for-production}
