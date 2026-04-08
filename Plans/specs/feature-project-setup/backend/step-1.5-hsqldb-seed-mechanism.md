@@ -30,3 +30,4 @@ A projektben egy `local-data/seed.sql.example` fájl dokumentálja az elvárt fo
 - `local` profilon, ha `local-data/seed.sql` nem létezik: az alkalmazás figyelmeztetés nélkül elindul
 - `local` profilon, ha `local-data/seed.sql` létezik: az SQL lefut, az adatok lekérdezhetők
 - `prod` profilon a `LocalDataSeeder` bean nem példányosodik
+- `local-data/seed.sql.example` commitolva, placeholder INSERT statement-ekkel

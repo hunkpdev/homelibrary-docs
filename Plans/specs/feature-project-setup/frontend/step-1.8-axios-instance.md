@@ -34,3 +34,5 @@ Ebben a stepben interceptor nincs — a 401 kezelés és refresh token rotation 
 
 - `axiosInstance` importálható, `baseURL` és `withCredentials` beállítva
 - `GET /api/health` hívás az instance-on keresztül sikeres `local` profilon
+- `.gitignore` tartalmazza a `frontend/.env.local` bejegyzést
+- `frontend/.env.example` commitolva, placeholder értékekkel

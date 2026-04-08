@@ -12,6 +12,7 @@
 - Handler: `com.homelibrary.StreamLambdaHandler`
 - Memory: 512 MB
 - Timeout: 30 s
+- SnapStart: `PublishedVersions` — Java cold start csökkentésére (3–8 s → ~1 s)
 - JAR forrása: `../backend/target/homelibrary-*.jar` (fat JAR, step 1.1)
 - Environment variables:
   - `SPRING_PROFILES_ACTIVE=prod`

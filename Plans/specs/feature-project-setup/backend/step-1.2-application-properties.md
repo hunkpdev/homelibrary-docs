@@ -76,9 +76,6 @@ spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:}
 
 spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
 spring.jpa.hibernate.ddl-auto=none
-
-# Lambda adapter – ne indítson embedded Tomcat-ot
-spring.main.web-application-type=none
 ```
 
 > **Megjegyzés – Neon connection string formátuma:**

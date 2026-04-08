@@ -22,9 +22,10 @@ Mindkét workflow csak `main` branch-re való push esetén fut — és csak akko
 
 1. Checkout
 2. Java 21 setup (Temurin)
-3. `mvn clean package -DskipTests`
+3. `mvn clean package`
 4. AWS hitelesítés OIDC-vel (step 1.13 szerepköre)
 5. `aws lambda update-function-code` — JAR feltöltése
+6. `aws lambda publish-version` — SnapStart csak published verziókon aktív
 
 ---
 
@@ -47,6 +48,10 @@ Mindkét workflow csak `main` branch-re való push esetén fut — és csak akko
 | `AWS_REGION` | Variable | `eu-central-1` |
 | `CLOUDFRONT_DISTRIBUTION_ID` | Variable | Step 1.11 outputja |
 | `S3_BUCKET_NAME` | Variable | Step 1.11 outputja |
+
+---
+
+> **Megjegyzés:** SonarQube Cloud integráció (scan lépés mindkét workflow-ba) a Feature 2 step 2.1-ben kerül be — az első érdemi kód (Auth) előtt.
 
 ---
 
