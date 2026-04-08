@@ -22,7 +22,7 @@ Mindkét workflow csak `main` branch-re való push esetén fut — és csak akko
 
 1. Checkout
 2. Java 21 setup (Temurin)
-3. `mvn clean package -DskipTests`
+3. `mvn clean package`
 4. AWS hitelesítés OIDC-vel (step 1.13 szerepköre)
 5. `aws lambda update-function-code` — JAR feltöltése
 6. `aws lambda publish-version` — SnapStart csak published verziókon aktív
