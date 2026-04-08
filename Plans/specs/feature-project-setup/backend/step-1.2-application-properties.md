@@ -89,4 +89,3 @@ spring.jpa.hibernate.ddl-auto=none
 
 - `mvn spring-boot:run -Dspring-boot.run.profiles=local` — az alkalmazás elindul, HSQLDB-t használ
 - `local` profilon `http://localhost:8080/swagger-ui/index.html` elérhető
-- `app.cookie.secure` értéke `false` local profilon (HTTPS nélkül a cookie működik)
