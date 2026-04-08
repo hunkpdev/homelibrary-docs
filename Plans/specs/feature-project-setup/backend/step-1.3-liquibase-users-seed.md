@@ -63,7 +63,7 @@ A közös `application.properties`-be kerül (az 1.2-es specben lévők mellé):
 
 ```properties
 # Liquibase paraméterek
-spring.liquibase.parameters.admin-password-hash=${ADMIN_PASSWORD_HASH}
+spring.liquibase.parameters.adminPasswordHash=${ADMIN_PASSWORD_HASH}
 ```
 
 Ha `ADMIN_PASSWORD_HASH` nincs beállítva, Spring Boot induláskor hibával leáll — szándékos fail-fast.

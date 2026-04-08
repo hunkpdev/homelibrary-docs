@@ -10,7 +10,7 @@
 | Komponens | Technológia | Indok |
 |-----------|-------------|-------|
 | Language | Java 21 LTS | Meglévő tudás, LTS |
-| Framework | Spring Boot 3.x | Meglévő tudás |
+| Framework | Spring Boot 4.x | Meglévő tudás |
 | Lambda adapter | `aws-serverless-java-container` | Spring Boot → Lambda bridge |
 | Auth | Spring Security + JWT | Elegendő ennél a skálánál, Cognito nem szükséges |
 | ORM | Spring Data JPA + Hibernate | Standard Spring stack |
