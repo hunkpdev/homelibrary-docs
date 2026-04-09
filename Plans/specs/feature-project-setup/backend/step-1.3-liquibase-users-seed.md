@@ -209,5 +209,4 @@ databaseChangeLog:
 - `local` profilon az `ADMIN_PASSWORD_HASH` env var-ral az alkalmazás elindul, Liquibase lefuttatja mindkét changesetet (log: `Running Changeset: ...`)
 - `users` tábla létrejön HSQLDB-ben a séma szerint
 - `admin` felhasználó bekerül a táblába `ADMIN` szerepkörrel, a megadott jelszó hash-sel
-- Ismételt indításkor a Liquibase nem futtatja újra a changeseteket (`DATABASECHANGELOG` tábla alapján)
 - `local-env.example` commitolva van, valós hash értéket nem tartalmaz
