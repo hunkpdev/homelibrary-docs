@@ -51,7 +51,8 @@ new BCryptPasswordEncoder(12).encode("jelszó-ide")
 # Ez a fájl NEM tartalmaz valós értékeket — ne commitolj valós értékeket!
 
 # BCrypt hash az admin user seed changesethez (cost factor: 12)
-# Generálás: htpasswd -bnBC 12 "" <jelszó> | tr -d ':\n'
+# Generálás (elsődleges, cost 12): new BCryptPasswordEncoder(12).encode("<jelszó>") — futtatható Spring Boot tesztből
+# Generálás (gyors, cost 10): spring encodepassword <jelszó>  ← Spring CLI, alapértelmezett cost 10, nem 12!
 ADMIN_PASSWORD_HASH=<bcrypt-hash-ide>
 ```
 
