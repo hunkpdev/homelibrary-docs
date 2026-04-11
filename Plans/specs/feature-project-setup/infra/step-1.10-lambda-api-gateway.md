@@ -37,4 +37,3 @@
 ## Elfogadási kritériumok
 
 - `cdk synth` hiba nélkül lefut, a template tartalmazza a Lambda és HTTP API erőforrásokat
-- Deploy után `GET <api-gateway-url>/api/health` → `200 OK`
