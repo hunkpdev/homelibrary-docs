@@ -21,8 +21,16 @@
 ## Megjegyzések
 
 - A paramétereket **manuálisan kell feltölteni** az AWS konzolban vagy AWS CLI-vel a CDK deploy előtt — a CDK stack csak olvassa őket, nem hozza létre
-- Típus: `SecureString` (titkosított)
+- Típus: **`String`** (nem `SecureString`) — lásd magyarázat lent
 - A Lambda execution role-nak `ssm:GetParameter` jogosultság szükséges ezekre a kulcsokra (step 1.13)
+
+### Miért nem SecureString?
+
+A CDK `valueForStringParameter()` hívás CloudFormation `AWS::SSM::Parameter::Value<String>` típust generál, ami **csak `String` típusú SSM paraméterekkel működik**. A CloudFormation nem tudja `SecureString` értékeket Lambda env var-okba injektálni.
+
+A valóban korrekt megoldás az AWS Secrets Manager lenne, de annak havi díja (~$0.40/secret/hó) miatt ezt a projektnél kizártuk.
+
+A Lambda env var-ok at rest titkosítottak az AWS-ben — ez nem kereskedelmi projektnél elfogadható kompromisszum.
 
 ---
 
