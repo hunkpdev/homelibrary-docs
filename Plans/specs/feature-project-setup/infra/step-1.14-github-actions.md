@@ -70,4 +70,8 @@ Mindkét workflow csak `main` branch-re való push esetén fut — és csak akko
 - `main`-re pusholt backend változás után a Lambda automatikusan frissül
 - `main`-re pusholt frontend változás után az S3 tartalma frissül és a CloudFront cache invalidálódik
 - Egyik workflow sem fut le, ha a másik könyvtárban történt a változás
-- `GET <api-gateway-url>/api/health` → `200 OK` (első éles deploy utáni smoke test)
+
+**Smoke test (az összes infra step és az első deploy után):**
+- `GET <api-gateway-url>/api/health` → `200 OK`
+- A CloudFront URL-en a React app betöltődik
+- A Lambda environment variables között megjelennek az SSM-ből injektált értékek
