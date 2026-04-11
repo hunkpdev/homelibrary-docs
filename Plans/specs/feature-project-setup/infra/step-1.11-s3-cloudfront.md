@@ -32,4 +32,3 @@ A CloudFront distribution URL-je stack outputként publikálva — a step 1.10 C
 ## Elfogadási kritériumok
 
 - `cdk synth` hiba nélkül lefut, a template tartalmazza az S3 és CloudFront erőforrásokat
-- Deploy után a CloudFront URL-en a React app betöltődik

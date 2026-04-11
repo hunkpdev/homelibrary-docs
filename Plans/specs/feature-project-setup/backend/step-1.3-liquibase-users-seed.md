@@ -51,7 +51,8 @@ new BCryptPasswordEncoder(12).encode("jelszó-ide")
 # Ez a fájl NEM tartalmaz valós értékeket — ne commitolj valós értékeket!
 
 # BCrypt hash az admin user seed changesethez (cost factor: 12)
-# Generálás: htpasswd -bnBC 12 "" <jelszó> | tr -d ':\n'
+# Generálás (elsődleges, cost 12): new BCryptPasswordEncoder(12).encode("<jelszó>") — futtatható Spring Boot tesztből
+# Generálás (gyors, cost 10): spring encodepassword <jelszó>  ← Spring CLI, alapértelmezett cost 10, nem 12!
 ADMIN_PASSWORD_HASH=<bcrypt-hash-ide>
 ```
 
@@ -209,5 +210,4 @@ databaseChangeLog:
 - `local` profilon az `ADMIN_PASSWORD_HASH` env var-ral az alkalmazás elindul, Liquibase lefuttatja mindkét changesetet (log: `Running Changeset: ...`)
 - `users` tábla létrejön HSQLDB-ben a séma szerint
 - `admin` felhasználó bekerül a táblába `ADMIN` szerepkörrel, a megadott jelszó hash-sel
-- Ismételt indításkor a Liquibase nem futtatja újra a changeseteket (`DATABASECHANGELOG` tábla alapján)
 - `local-env.example` commitolva van, valós hash értéket nem tartalmaz

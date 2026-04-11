@@ -105,10 +105,10 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 | Step | Mit állít elő |
 |------|---------------|
 | 2.2 | `User` entitás + `UserRepository` (a Liquibase changeset az 1.3-ban már elkészül) |
-| 2.3 | `JwtUtil`: access token generálás, validálás, claim kinyerés |
+| 2.3 | `JwtProperties` (`@ConfigurationProperties` az `app.jwt.*` property-khez) + `JwtUtil`: access token generálás, validálás, claim kinyerés |
 | 2.4 | `JwtAuthenticationFilter`: Bearer token validálás minden kérésnél |
 | 2.5 | Spring Security konfiguráció: filter chain, role hierarchia, publikus endpointok (`/api/auth/**`, `/api/health`, `/swagger-ui/**`, `/v3/api-docs/**`) |
-| 2.6 | `POST /api/auth/login`: hitelesítés, access token + refresh token cookie kibocsátás (HttpOnly, Secure, SameSite=Strict, Path=/api/auth, `app.cookie.secure=false` local profilon) |
+| 2.6 | `CookieProperties` (`@ConfigurationProperties` az `app.cookie.*` property-khez) + `POST /api/auth/login`: hitelesítés, access token + refresh token cookie kibocsátás (HttpOnly, Secure, SameSite=Strict, Path=/api/auth, `app.cookie.secure=false` local profilon) |
 | 2.7 | `POST /api/auth/refresh`: refresh token validálás, rotation (új token kibocsátás, régi érvénytelenítés DB-ben) |
 | 2.8 | `POST /api/auth/logout`: refresh token cookie törlése + DB-ben érvénytelenítés |
 

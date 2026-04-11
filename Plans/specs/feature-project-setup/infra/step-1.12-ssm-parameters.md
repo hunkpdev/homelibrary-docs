@@ -29,4 +29,3 @@
 ## Elfogadási kritériumok
 
 - `cdk synth` hiba nélkül lefut
-- Deploy után a Lambda environment variables között megjelennek a fenti értékek

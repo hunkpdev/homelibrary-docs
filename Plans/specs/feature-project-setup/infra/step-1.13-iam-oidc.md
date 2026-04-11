@@ -20,6 +20,8 @@ Jelszó/access key nélküli autentikáció GitHub Actions és AWS között — 
 | Művelet | Erőforrás | Mire |
 |---------|-----------|------|
 | `lambda:UpdateFunctionCode` | `HomelibraryFunction` | Backend JAR deploy |
+| `lambda:PublishVersion` | `HomelibraryFunction` | SnapStart — új verzió publikálása |
+| `lambda:UpdateAlias` | `HomelibraryFunction` | SnapStart — alias frissítése az új verzióra |
 | `s3:PutObject`, `s3:DeleteObject`, `s3:ListBucket` | Frontend S3 bucket | React dist feltöltése |
 | `cloudfront:CreateInvalidation` | CloudFront distribution | Cache invalidálás deploy után |
 | `ssm:GetParameter` | `/homelibrary/*` | Lambda SSM olvasás futásidőben |
