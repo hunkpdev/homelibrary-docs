@@ -16,6 +16,8 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 5. Unit tesztek futtatása lokálban
 6. Commit + push
 
+**OpenAPI dokumentáció:** Minden controller endpoint `@Operation` és `@ApiResponse` annotációkkal látandó el — a Swagger UI automatikusan naprakész dokumentációt ad.
+
 **Feature lezárásakor (minden step elkészülte után):**
 - CI ellenőrzés (GitHub Actions)
 - Integrációs tesztek ahol releváns (`@SpringBootTest`: auth flow, könyv státuszátmenetek)
