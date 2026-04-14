@@ -70,6 +70,20 @@ A `frontend-deploy.yml`-be szintén egy új **`sonar` job** kerül be, a deploy 
 
 ---
 
+## Coverage kizárások (`pom.xml`)
+
+A default Quality Gate **minimum 80% coverage** elvárással fut. A coverage scope kizárólag a `service/`, `controller/` és `util/` package-ekre vonatkozik — minden más ki van zárva. A kizárások a `pom.xml` `<properties>` blokkjában, `sonar.coverage.exclusions` property-vel kerülnek be:
+
+| Kizárt pattern | Miért |
+|---|---|
+| `**/entity/**` | JPA entitások — nem üzleti logika |
+| `**/dto/**` | Adathordozó POJO-k |
+| `**/model/**` | Cross-domain enum-ok |
+| `**/config/**` | Spring konfigurációs osztályok |
+| `**/repository/**` | Spring Data interfészek — nincs implementáció |
+
+---
+
 ## Elfogadási kritériumok
 
 - `main`-re pusholt backend változás után:
