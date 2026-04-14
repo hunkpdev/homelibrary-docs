@@ -14,6 +14,7 @@
 |---|---|---|
 | `accessToken` | `string \| null` | In-memory tárolt access token — nem localStorage, nem sessionStorage |
 | `user` | `AuthUser \| null` | Bejelentkezett user adatai |
+| `isInitialized` | `boolean` | `false` induláskor — `true` miután az App.tsx elvégezte az első refresh kísérletet (akár sikeres, akár sikertelen). A `ProtectedRoute` ez alapján dönt, hogy renderel-e vagy loading spinnerben vár. |
 
 **`AuthUser` típus:**
 
@@ -30,6 +31,7 @@
 | `setAuth(accessToken, user)` | Login után: access token és user beállítása |
 | `setAccessToken(token)` | Refresh után: csak az access token cseréje, user megmarad |
 | `clearAuth()` | Logout vagy session lejárat: state törlése |
+| `setInitialized()` | App.tsx hívja az első refresh kísérlet után (siker vagy kudarc egyaránt) — `isInitialized=true`. Nem kötött a `setAuth`/`clearAuth`-hoz, mert `clearAuth` mid-session is hívódhat. |
 
 ---
 
@@ -64,5 +66,6 @@ A login response body-ból (`accessToken`, `tokenType`, `expiresIn`) nem jön us
 
 - `setAuth` után `accessToken` és `user` beállítva
 - `setAccessToken` után csak `accessToken` változik, `user` megmarad
-- `clearAuth` után mindkét mező `null`
+- `clearAuth` után `accessToken` és `user` `null`, `isInitialized` **nem változik**
+- `setInitialized` után `isInitialized=true`
 - Az `accessToken` nem kerül localStorage-ba vagy sessionStorage-ba
