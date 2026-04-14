@@ -122,7 +122,7 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 | 2.10 | Axios interceptor: 401 kezelés, refresh token rotation race condition védelem (spec szerint) |
 | 2.11 | Login oldal: felhasználónév + jelszó form, hibaüzenet kezelés |
 | 2.12 | Protected route wrapper: bejelentkezett felhasználó ellenőrzése, redirect /login-ra |
-| 2.13 | Logout gomb a sidebar-ban |
+| 2.13 | Role-alapú menü szűrés a sidebar-ban (az 1.7-ben minden menüpont megjelenik, itt kerül bekötésre a láthatóság role szerint) + logout gomb |
 
 ---
 
