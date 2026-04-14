@@ -17,7 +17,14 @@ Minden kimenő kérésen automatikusan beállítja az `Authorization` headert:
 
 ## Response interceptor — 401 kezelés és race condition védelem
 
-**A probléma:** Ha egyszerre több API hívás kap 401-et (lejárt access token), mindegyik megpróbálhatja a refresh-t. A rotation miatt a második refresh hívás már érvénytelen tokennel megy → `401` → felesleges kijelentkezés.
+**A probléma:** Két különböző szcenárióban kaphat a kliens `401`-et:
+
+1. **Lejárt access token futás közben** — az interceptor refresh-el, majd újraküldi az eredeti kérést
+2. **Oldal refresh utáni első kérés** — a Zustand store üres (in-memory), de a HttpOnly refresh token cookie él; az első API hívás `401`-et kap (nincs Bearer token), az interceptor ezt is ugyanúgy kezeli: refresh → új access token → store frissítése → kérés újraküldése
+
+Mindkét szcenárió azonos interceptor logikával kezelendő — a `ProtectedRoute` (step 2.12) nem csinál saját auth logikát, a redirect kizárólag az interceptorból érkezik.
+
+**Race condition probléma:** Ha egyszerre több API hívás kap 401-et, mindegyik megpróbálhatja a refresh-t. A rotation miatt a második refresh hívás már érvénytelen tokennel megy → `401` → felesleges kijelentkezés.
 
 **Megoldás:** Module-szintű `isRefreshing` flag és egyetlen `refreshPromise` — az összes várakozó kérés ezt a promise-t várja meg.
 
