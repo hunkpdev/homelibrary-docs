@@ -85,6 +85,20 @@ A default Quality Gate **minimum 80% coverage** elvárással fut. A coverage sco
 
 ---
 
+## Coverage kizárások (frontend — `sonar-project.properties`)
+
+A frontend coverage kizárások a `frontend/sonar-project.properties` fájlban kerülnek be, `sonar.coverage.exclusions` property-vel:
+
+| Kizárt pattern | Miért |
+|---|---|
+| `src/components/ui/**` | shadcn/ui generált komponensek — nem saját kód |
+| `src/lib/**` | shadcn/ui utility (`cn()`) — nem saját kód |
+| `src/api/model/**` | API request/response típusdefiníciók — pure TypeScript interfészek, nincs logika |
+| `src/main.tsx` | App bootstrap entry point — nincs üzleti logika |
+| `src/i18n/**` | i18n konfiguráció |
+
+---
+
 ## Elfogadási kritériumok
 
 - `main`-re pusholt backend változás után:
