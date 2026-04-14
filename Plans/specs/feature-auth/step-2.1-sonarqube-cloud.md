@@ -81,6 +81,7 @@ A default Quality Gate **minimum 80% coverage** elvárással fut. A coverage sco
 | `**/model/**` | Cross-domain enum-ok |
 | `**/config/**` | Spring konfigurációs osztályok |
 | `**/repository/**` | Spring Data interfészek — nincs implementáció |
+| `**/exception/**` | Egyedi kivételek — POJO-k, nem üzleti logika |
 
 ---
 
