@@ -27,7 +27,7 @@
 
 **`LoginRequest`:** `username`, `password` — mindkettő `@NotBlank` validációval.
 
-**`LoginResponse`:** `accessToken` (String), `expiresIn` (long, másodpercben — `app.jwt.expiration-ms / 1000`)
+**`LoginResponse`:** `accessToken` (String), `tokenType` (String, konstans `"Bearer"` — OAuth2 konvenció), `expiresIn` (long, másodpercben — `app.jwt.expiration-ms / 1000`)
 
 ---
 
