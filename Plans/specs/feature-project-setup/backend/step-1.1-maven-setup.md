@@ -18,7 +18,8 @@ com.homelibrary
 ├── service/         ← üzleti logika (következő stepekben)
 ├── repository/      ← JPA repository-k (következő stepekben)
 ├── entity/          ← JPA entitások (következő stepekben)
-└── dto/             ← request/response DTO-k (következő stepekben)
+├── dto/             ← request/response DTO-k (következő stepekben)
+└── model/           ← cross-domain enum-ok (Role, BookStatus, LoanStatus, stb.)
 ```
 
 ---
