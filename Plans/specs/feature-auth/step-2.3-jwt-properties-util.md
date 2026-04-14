@@ -28,7 +28,7 @@ JWT library: `io.jsonwebtoken:jjwt-api` (0.12.6), algoritmus: **HS256**.
 
 | Metódus | Leírás |
 |---|---|
-| `String generateToken(User user)` | Access token generálás — `sub`: user UUID, `role` claim: `user.getRole().name()`, lejárat: `now + expirationMs` |
+| `String generateToken(User user)` | Access token generálás — `sub`: user UUID, `username` claim: `user.getUsername()`, `role` claim: `user.getRole().name()`, lejárat: `now + expirationMs` |
 | `boolean isTokenValid(String token)` | Aláírás és lejárat validálás — bármilyen hiba esetén `false`, nem dob kivételt |
 | `UUID extractUserId(String token)` | `sub` claim kinyerése és UUID-dé konvertálása |
 
