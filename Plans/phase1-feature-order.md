@@ -100,7 +100,7 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 
 | Step | Mit állít elő |
 |------|---------------|
-| [2.1](specs/feature-auth/infra/step-2.1-sonarqube-cloud.md) | SonarQube Cloud bekötés: backend és frontend GitHub Actions workflow kiegészítése scan lépéssel, szükséges GitHub Secrets (`SONAR_TOKEN`, `SONAR_ORGANIZATION`, `SONAR_PROJECT_KEY`) |
+| [2.1](specs/feature-auth/infra/step-2.1-ci-code-quality.md) | CI code quality: SonarQube Cloud (backend + frontend, külön projektek, QG-blokkolt deploy), human-readable test report lokálban és GitHub Check fülön |
 
 ### Backend
 

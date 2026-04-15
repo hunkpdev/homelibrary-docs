@@ -1,4 +1,4 @@
-# Step 2.1 – SonarQube Cloud integráció
+# Step 2.1 – CI code quality: SonarQube Cloud + test reporting
 
 ## Mit állít elő
 
@@ -55,6 +55,18 @@ A `backend-deploy.yml`-be egy új **`sonar` job** kerül be, **a meglévő deplo
 | `SONAR_TOKEN` | `${{ secrets.SONAR_TOKEN }}` | SonarQube Cloud hitelesítés |
 
 A `sonar.projectKey` és `sonar.organization` Maven property-k értéke: `${{ vars.SONAR_PROJECT_KEY_BACKEND }}` és `${{ vars.SONAR_ORGANIZATION }}`.
+
+### Test reporting
+
+**Lokális** (`pom.xml`): `maven-surefire-report-plugin` hozzáadva — `mvn test` után `target/site/surefire-report.html` generálódik, böngészőben megnyitható.
+
+**CI** (`backend-deploy.yml` sonar job):
+- A Build + test + scan step után `dorny/test-reporter@v1` step kerül be
+- `if: always()` — akkor is fut, ha a tesztek elbuktak
+- A sonar job-on `checks: write` permission szükséges
+- Eredmény: a workflow futásnál és PR-on megjelenik egy **"Backend Unit Tests"** Check fül, tesztenként részletes eredménnyel; bukott tesztnél stack trace is látható
+
+---
 
 ### Coverage kizárások (`pom.xml`)
 
@@ -114,6 +126,9 @@ A frontend coverage kizárások a `frontend/sonar-project.properties` fájlban k
   - Ha a Quality Gate passed → a deploy job elindul
   - Ha a Quality Gate failed → a deploy job nem indul el, a workflow piros
 - `main`-re pusholt frontend változás után — ugyanígy
+- `mvn test` után `target/site/surefire-report.html` generálódik és böngészőben megnyitható
+- CI-ban a workflow futás után megjelenik a "Backend Unit Tests" Check fül a GitHub-on
+- Ha valamely teszt elbukik, a Check fülön látható a részletes hibaüzenet és stack trace
 - `SONAR_TOKEN` secret és `SONAR_ORGANIZATION`, `SONAR_PROJECT_KEY_BACKEND`, `SONAR_PROJECT_KEY_FRONTEND` repository variable-k beállítva (manuális előfeltétel, a workflow-ból nem ellenőrizhető)
 - A backend és frontend analízis a SonarQube Cloud-on két külön projektként jelenik meg
 - A meglévő deploy job-ok logikája nem változik (csak a `needs: sonar` függőség kerül rájuk)
