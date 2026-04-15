@@ -9,13 +9,21 @@
 
 ## Előfeltételek (kézzel, az implementáció előtt)
 
-A következő GitHub Secrets-eket fel kell venni a repóban (Settings → Secrets and variables → Actions → Secrets):
+**Secret** (Settings → Secrets and variables → Actions → **Secrets**) — csak az érzékeny adat:
 
 | Secret neve | Honnan | Megjegyzés |
 |---|---|---|
 | `SONAR_TOKEN` | SonarQube Cloud projekt Settings → Security | Project Analysis Token (nem User Token) |
-| `SONAR_ORGANIZATION` | SonarQube Cloud szervezet neve | pl. `hunkpdev` |
-| `SONAR_PROJECT_KEY` | SonarQube Cloud projekt kulcsa | pl. `hunkpdev_homelibrary` |
+
+**Repository variable** (Settings → Secrets and variables → Actions → **Variables**) — nem érzékeny, a workflow logban látható és debugolható:
+
+| Variable neve | Érték példa | Megjegyzés |
+|---|---|---|
+| `SONAR_ORGANIZATION` | `hunkpdev` | SonarQube Cloud szervezet neve |
+| `SONAR_PROJECT_KEY_BACKEND` | `hunkpdev_homelibrary-backend` | Backend SonarQube Cloud projekt kulcsa |
+| `SONAR_PROJECT_KEY_FRONTEND` | `hunkpdev_homelibrary-frontend` | Frontend SonarQube Cloud projekt kulcsa |
+
+A backend és frontend **külön SonarQube Cloud projektet** alkotnak — így a QG-k egymástól függetlenek, és az analízisek nem írják felül egymást. A SonarQube Cloud-on mindkét projektet létre kell hozni manuálisan az implementáció előtt.
 
 ---
 
@@ -46,6 +54,8 @@ A `backend-deploy.yml`-be egy új **`sonar` job** kerül be, **a meglévő deplo
 | `GITHUB_TOKEN` | `${{ secrets.GITHUB_TOKEN }}` | A Maven Sonar plugin explicit env var-t vár a GitHub API hívásokhoz (commit status visszajelzés) |
 | `SONAR_TOKEN` | `${{ secrets.SONAR_TOKEN }}` | SonarQube Cloud hitelesítés |
 
+A `sonar.projectKey` és `sonar.organization` Maven property-k értéke: `${{ vars.SONAR_PROJECT_KEY_BACKEND }}` és `${{ vars.SONAR_ORGANIZATION }}`.
+
 ---
 
 ## Frontend workflow kiegészítés
@@ -65,6 +75,8 @@ A `frontend-deploy.yml`-be szintén egy új **`sonar` job** kerül be, a deploy 
 | Változó | Érték | Miért |
 |---|---|---|
 | `SONAR_TOKEN` | `${{ secrets.SONAR_TOKEN }}` | SonarQube Cloud hitelesítés |
+
+A `sonar.projectKey` és `sonar.organization` action args értéke: `${{ vars.SONAR_PROJECT_KEY_FRONTEND }}` és `${{ vars.SONAR_ORGANIZATION }}`.
 
 > **Megjegyzés:** `GITHUB_TOKEN`-t itt nem kell explicit deklarálni — a `sonarqube-scan-action` automatikusan felveszi a GitHub Actions környezetéből. Ez aszimmetria a backend Maven plugin megközelítéssel szemben, ahol explicit átadás szükséges.
 
@@ -106,5 +118,6 @@ A frontend coverage kizárások a `frontend/sonar-project.properties` fájlban k
   - Ha a Quality Gate passed → a deploy job elindul
   - Ha a Quality Gate failed → a deploy job nem indul el, a workflow piros
 - `main`-re pusholt frontend változás után — ugyanígy
-- A három SonarQube Secret beállítva a repóban (manuális előfeltétel, a workflow-ból nem ellenőrizhető)
+- `SONAR_TOKEN` secret és `SONAR_ORGANIZATION`, `SONAR_PROJECT_KEY_BACKEND`, `SONAR_PROJECT_KEY_FRONTEND` repository variable-k beállítva (manuális előfeltétel, a workflow-ból nem ellenőrizhető)
+- A backend és frontend analízis a SonarQube Cloud-on két külön projektként jelenik meg
 - A meglévő deploy job-ok logikája nem változik (csak a `needs: sonar` függőség kerül rájuk)
