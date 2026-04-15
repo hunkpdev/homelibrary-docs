@@ -27,7 +27,7 @@ A `users` táblára képezi le (az 1.3-as Liquibase changeset hozta létre). Nem
 
 | Java mező | DB oszlop | Típus | Megjegyzés |
 |---|---|---|---|
-| `id` | `id` | `UUID` | `@Id`, generált |
+| `id` | `id` | `UUID` | `@Id`, `@GeneratedValue(strategy = GenerationType.UUID)` (Hibernate 6+) |
 | `username` | `username` | `String` | `unique=true`, `nullable=false` |
 | `email` | `email` | `String` | `unique=true`, `nullable=false` |
 | `passwordHash` | `password_hash` | `String` | `nullable=false` |
