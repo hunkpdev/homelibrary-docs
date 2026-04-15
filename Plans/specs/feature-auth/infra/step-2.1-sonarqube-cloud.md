@@ -56,6 +56,19 @@ A `backend-deploy.yml`-be egy új **`sonar` job** kerül be, **a meglévő deplo
 
 A `sonar.projectKey` és `sonar.organization` Maven property-k értéke: `${{ vars.SONAR_PROJECT_KEY_BACKEND }}` és `${{ vars.SONAR_ORGANIZATION }}`.
 
+### Coverage kizárások (`pom.xml`)
+
+A default Quality Gate **minimum 80% coverage** elvárással fut. A coverage scope kizárólag a `service/`, `controller/` és `util/` package-ekre vonatkozik — minden más ki van zárva. A kizárások a `pom.xml` `<properties>` blokkjában, `sonar.coverage.exclusions` property-vel kerülnek be:
+
+| Kizárt pattern | Miért |
+|---|---|
+| `**/entity/**` | JPA entitások — nem üzleti logika |
+| `**/dto/**` | Adathordozó POJO-k |
+| `**/model/**` | Cross-domain enum-ok |
+| `**/config/**` | Spring konfigurációs osztályok |
+| `**/repository/**` | Spring Data interfészek — nincs implementáció |
+| `**/exception/**` | Egyedi kivételek — POJO-k, nem üzleti logika |
+
 ---
 
 ## Frontend workflow kiegészítés
@@ -80,24 +93,7 @@ A `sonar.projectKey` és `sonar.organization` action args értéke: `${{ vars.SO
 
 > **Megjegyzés:** `GITHUB_TOKEN`-t itt nem kell explicit deklarálni — a `sonarqube-scan-action` automatikusan felveszi a GitHub Actions környezetéből. Ez aszimmetria a backend Maven plugin megközelítéssel szemben, ahol explicit átadás szükséges.
 
----
-
-## Coverage kizárások (`pom.xml`)
-
-A default Quality Gate **minimum 80% coverage** elvárással fut. A coverage scope kizárólag a `service/`, `controller/` és `util/` package-ekre vonatkozik — minden más ki van zárva. A kizárások a `pom.xml` `<properties>` blokkjában, `sonar.coverage.exclusions` property-vel kerülnek be:
-
-| Kizárt pattern | Miért |
-|---|---|
-| `**/entity/**` | JPA entitások — nem üzleti logika |
-| `**/dto/**` | Adathordozó POJO-k |
-| `**/model/**` | Cross-domain enum-ok |
-| `**/config/**` | Spring konfigurációs osztályok |
-| `**/repository/**` | Spring Data interfészek — nincs implementáció |
-| `**/exception/**` | Egyedi kivételek — POJO-k, nem üzleti logika |
-
----
-
-## Coverage kizárások (frontend — `sonar-project.properties`)
+### Coverage kizárások (`frontend/sonar-project.properties`)
 
 A frontend coverage kizárások a `frontend/sonar-project.properties` fájlban kerülnek be, `sonar.coverage.exclusions` property-vel:
 
