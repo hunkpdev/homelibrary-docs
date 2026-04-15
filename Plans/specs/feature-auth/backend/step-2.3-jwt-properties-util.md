@@ -24,7 +24,12 @@
 
 ## `JwtUtil`
 
-JWT library: `io.jsonwebtoken:jjwt-api` (0.12.6), algoritmus: **HS256**.
+JWT library: JJWT 0.12.6, algoritmus: **HS256**. A pom.xml-be mind a három artifact szükséges:
+- `io.jsonwebtoken:jjwt-api:0.12.6` (compile)
+- `io.jsonwebtoken:jjwt-impl:0.12.6` (runtime)
+- `io.jsonwebtoken:jjwt-jackson:0.12.6` (runtime)
+
+Csak a `jjwt-api` hozzáadása `ClassNotFoundException`-t okoz futásidőben.
 
 | Metódus | Leírás |
 |---|---|
