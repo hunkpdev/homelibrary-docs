@@ -35,7 +35,9 @@
 
 | Endpoint pattern | Hozzáférés |
 |---|---|
-| `POST /api/auth/**` | `permitAll` |
+| `POST /api/auth/login` | `permitAll` |
+| `POST /api/auth/refresh` | `permitAll` |
+| `POST /api/auth/logout` | `permitAll` |
 | `GET /api/health` | `permitAll` |
 | `/swagger-ui/**` | `permitAll` |
 | `/v3/api-docs/**` | `permitAll` |
