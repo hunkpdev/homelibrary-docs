@@ -33,7 +33,7 @@ A cookie törlése minden esetben megtörténik — a controlleren.
 
 `@SpringBootTest` — teljes Spring context, HSQLDB, valós HTTP réteg (`MockMvc`). Az auth flow end-to-end validálása:
 
-1. `POST /api/auth/login` admin credentials-szel → `200 OK`, access token + refresh token cookie
+1. `POST /api/auth/login` admin credentials-szel → `200 OK`, access token + refresh token cookie; az access token JWT payload-ja tartalmaz `username` és `role` claim-et a helyes értékekkel
 2. `POST /api/auth/refresh` az 1. lépés refresh cookie-jával → `200 OK`, új access token + új refresh token cookie
 3. `POST /api/auth/refresh` az 1. lépés **régi** refresh cookie-jával → `401` (rotation ellenőrzés — a DB-ben már az új hash van)
 4. `POST /api/auth/logout` az 1. lépés access tokenjével → `204 No Content`, `Set-Cookie: Max-Age=0`
