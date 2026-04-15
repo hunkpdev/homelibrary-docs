@@ -36,8 +36,8 @@
 1. `authenticationManager.authenticate()` — érvénytelen credentials esetén kivételt dob (Spring Security kezeli)
 2. User betöltése `userRepository.findByUsername()` alapján
 3. Access token generálása: `jwtUtil.generateToken(user)`
-4. Refresh token generálása: `SecureRandom` alapú opaque string
-5. BCrypt hash számítása a refresh tokenből (`passwordEncoder.encode()`)
+4. Refresh token generálása a `<userId>:<secureRandomPart>` formátumban — a generálási és BCrypt hash logika egy private helper metódusba (`generateRefreshToken(User user)`) szervezendő az `AuthService`-ben, mert a step 2.7 refresh endpointja ugyanezt hívja (lásd step 2.7 — Refresh token formátum szekció)
+5. BCrypt hash számítása a refresh token `secureRandomPart` részéből (`passwordEncoder.encode()`) — szintén a `generateRefreshToken` helper végzi
 6. DB mentés: `user.refreshTokenHash = hash`, `user.refreshTokenExpiresAt = now() + 7 nap`
 7. `LoginResponse` visszaadása + refresh token átadása a controllernek cookie beállításhoz
 
