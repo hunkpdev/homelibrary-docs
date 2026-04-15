@@ -48,17 +48,12 @@ Bejelentkezés. Nincs szükség Bearer tokenre.
 {
   "accessToken": "eyJhbGci...",
   "tokenType": "Bearer",
-  "expiresIn": 900,
-  "user": {
-    "id": "550e8400-...",
-    "username": "admin",
-    "email": "admin@example.com",
-    "role": "ADMIN",
-    "preferredLanguage": "hu"
-  }
+  "expiresIn": 900
 }
 ```
 > Refresh token: HttpOnly cookie-ban érkezik (`Set-Cookie` header), nem a JSON bodyban.
+>
+> User adatok (id, username, role) a frontend az access token JWT payload-jából nyeri ki client-side Base64URL decode-dal — külön user objektum nem szerepel a response-ban.
 
 **Response 401:** Hibás felhasználónév vagy jelszó
 

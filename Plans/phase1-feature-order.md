@@ -16,6 +16,8 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 5. Unit tesztek futtatása lokálban
 6. Commit + push
 
+**OpenAPI dokumentáció:** Minden controller endpoint `@Operation` és `@ApiResponse` annotációkkal látandó el — a Swagger UI automatikusan naprakész dokumentációt ad.
+
 **Feature lezárásakor (minden step elkészülte után):**
 - CI ellenőrzés (GitHub Actions)
 - Integrációs tesztek ahol releváns (`@SpringBootTest`: auth flow, könyv státuszátmenetek)
@@ -59,30 +61,30 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 
 | Step | Mit állít elő |
 |------|---------------|
-| 1.1 | Maven projekt: `pom.xml` minden függőséggel (Spring Boot, Lambda adapter, JPA, Liquibase, HSQLDB, springdoc-openapi, teszt lib-ek) |
-| 1.2 | Application properties: `local` profil (HSQLDB, embedded Tomcat) és `prod` profil (Neon, Lambda adapter) |
-| 1.3 | Liquibase setup: master changelog + `users` tábla changeset + default admin user seed changeset (BCrypt hash-elt jelszó, minden profilon lefut) |
-| 1.4 | Lambda handler bekötés (`StreamLambdaHandler`) + health check endpoint (`GET /api/health`) |
-| 1.5 | HSQLDB seed mechanizmus: `ApplicationRunner` betölti a `local-data/seed.sql`-t `local` profilon, ha a fájl létezik |
+| [1.1](specs/feature-project-setup/backend/step-1.1-maven-setup.md) | Maven projekt: `pom.xml` minden függőséggel (Spring Boot, Lambda adapter, JPA, Liquibase, HSQLDB, springdoc-openapi, teszt lib-ek) |
+| [1.2](specs/feature-project-setup/backend/step-1.2-application-properties.md) | Application properties: `local` profil (HSQLDB, embedded Tomcat) és `prod` profil (Neon, Lambda adapter) |
+| [1.3](specs/feature-project-setup/backend/step-1.3-liquibase-users-seed.md) | Liquibase setup: master changelog + `users` tábla changeset + default admin user seed changeset (BCrypt hash-elt jelszó, minden profilon lefut) |
+| [1.4](specs/feature-project-setup/backend/step-1.4-lambda-handler-health.md) | Lambda handler bekötés (`StreamLambdaHandler`) + health check endpoint (`GET /api/health`) |
+| [1.5](specs/feature-project-setup/backend/step-1.5-hsqldb-seed-mechanism.md) | HSQLDB seed mechanizmus: `ApplicationRunner` betölti a `local-data/seed.sql`-t `local` profilon, ha a fájl létezik |
 
 ### Frontend
 
 | Step | Mit állít elő |
 |------|---------------|
-| 1.6 | Vite + React + TypeScript projekt setup: shadcn/ui, Tailwind CSS, React Router, Zustand, Axios, i18next alap konfiguráció |
-| 1.7 | Alap layout: sidebar + content area (shadcn/ui Sidebar komponens), dark mode toggle |
-| 1.8 | Axios instance: `baseURL`, `withCredentials: true` |
+| [1.6](specs/feature-project-setup/frontend/step-1.6-vite-react-setup.md) | Vite + React + TypeScript projekt setup: shadcn/ui, Tailwind CSS, React Router, Zustand, Axios, i18next alap konfiguráció |
+| [1.7](specs/feature-project-setup/frontend/step-1.7-base-layout.md) | Alap layout: sidebar + content area (shadcn/ui Sidebar komponens), dark mode toggle |
+| [1.8](specs/feature-project-setup/frontend/step-1.8-axios-instance.md) | Axios instance: `baseURL`, `withCredentials: true` |
 
 ### Infra (CDK)
 
 | Step | Mit állít elő |
 |------|---------------|
-| 1.9 | CDK projekt setup (`infra/`): TypeScript, `cdk.json`, alap stack struktúra |
-| 1.10 | Lambda + API Gateway HTTP API: Spring Boot JAR deploy, CORS konfiguráció (explicit CloudFront origin) |
-| 1.11 | S3 + CloudFront: React SPA hosting, HTTPS |
-| 1.12 | SSM Parameter Store: `/homelibrary/neon-connection-string`, `/homelibrary/jwt-secret`, `/homelibrary/admin-password-hash` paraméterek |
-| 1.13 | IAM + OIDC: GitHub Actions szerepkör, minimális jogosultságok (Lambda update, S3 sync, CloudFront invalidation) |
-| 1.14 | GitHub Actions workflow-ok: backend deploy (JAR → Lambda) + frontend deploy (dist → S3 + invalidation) |
+| [1.9](specs/feature-project-setup/infra/step-1.9-cdk-project-setup.md) | CDK projekt setup (`infra/`): TypeScript, `cdk.json`, alap stack struktúra |
+| [1.10](specs/feature-project-setup/infra/step-1.10-lambda-api-gateway.md) | Lambda + API Gateway HTTP API: Spring Boot JAR deploy, CORS konfiguráció (explicit CloudFront origin) |
+| [1.11](specs/feature-project-setup/infra/step-1.11-s3-cloudfront.md) | S3 + CloudFront: React SPA hosting, HTTPS |
+| [1.12](specs/feature-project-setup/infra/step-1.12-ssm-parameters.md) | SSM Parameter Store: `/homelibrary/neon-connection-string`, `/homelibrary/jwt-secret`, `/homelibrary/admin-password-hash` paraméterek |
+| [1.13](specs/feature-project-setup/infra/step-1.13-iam-oidc.md) | IAM + OIDC: GitHub Actions szerepkör, minimális jogosultságok (Lambda update, S3 sync, CloudFront invalidation) |
+| [1.14](specs/feature-project-setup/infra/step-1.14-github-actions.md) | GitHub Actions workflow-ok: backend deploy (JAR → Lambda) + frontend deploy (dist → S3 + invalidation) |
 
 ---
 
@@ -98,29 +100,29 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 
 | Step | Mit állít elő |
 |------|---------------|
-| 2.1 | SonarQube Cloud bekötés: backend és frontend GitHub Actions workflow kiegészítése scan lépéssel, szükséges GitHub Secrets (`SONAR_TOKEN`, `SONAR_ORGANIZATION`, `SONAR_PROJECT_KEY`) |
+| [2.1](specs/feature-auth/infra/step-2.1-sonarqube-cloud.md) | SonarQube Cloud bekötés: backend és frontend GitHub Actions workflow kiegészítése scan lépéssel, szükséges GitHub Secrets (`SONAR_TOKEN`, `SONAR_ORGANIZATION`, `SONAR_PROJECT_KEY`) |
 
 ### Backend
 
 | Step | Mit állít elő |
 |------|---------------|
-| 2.2 | `User` entitás + `UserRepository` (a Liquibase changeset az 1.3-ban már elkészül) |
-| 2.3 | `JwtProperties` (`@ConfigurationProperties` az `app.jwt.*` property-khez) + `JwtUtil`: access token generálás, validálás, claim kinyerés |
-| 2.4 | `JwtAuthenticationFilter`: Bearer token validálás minden kérésnél |
-| 2.5 | Spring Security konfiguráció: filter chain, role hierarchia, publikus endpointok (`/api/auth/**`, `/api/health`, `/swagger-ui/**`, `/v3/api-docs/**`) |
-| 2.6 | `CookieProperties` (`@ConfigurationProperties` az `app.cookie.*` property-khez) + `POST /api/auth/login`: hitelesítés, access token + refresh token cookie kibocsátás (HttpOnly, Secure, SameSite=Strict, Path=/api/auth, `app.cookie.secure=false` local profilon) |
-| 2.7 | `POST /api/auth/refresh`: refresh token validálás, rotation (új token kibocsátás, régi érvénytelenítés DB-ben) |
-| 2.8 | `POST /api/auth/logout`: refresh token cookie törlése + DB-ben érvénytelenítés |
+| [2.2](specs/feature-auth/backend/step-2.2-user-entity-repository.md) | `User` entitás + `UserRepository` (a Liquibase changeset az 1.3-ban már elkészül) |
+| [2.3](specs/feature-auth/backend/step-2.3-jwt-properties-util.md) | `JwtProperties` (`@ConfigurationProperties` az `app.jwt.*` property-khez) + `JwtUtil`: access token generálás, validálás, claim kinyerés |
+| [2.4](specs/feature-auth/backend/step-2.4-jwt-authentication-filter.md) | `JwtAuthenticationFilter`: Bearer token validálás minden kérésnél |
+| [2.5](specs/feature-auth/backend/step-2.5-security-config.md) | Spring Security konfiguráció: filter chain, role hierarchia, publikus endpointok (`/api/auth/**`, `/api/health`, `/swagger-ui/**`, `/v3/api-docs/**`) |
+| [2.6](specs/feature-auth/backend/step-2.6-login-endpoint.md) | `CookieProperties` (`@ConfigurationProperties` az `app.cookie.*` property-khez) + `POST /api/auth/login`: hitelesítés, access token + refresh token cookie kibocsátás (HttpOnly, Secure, SameSite=Strict, Path=/api/auth, `app.cookie.secure=false` local profilon) |
+| [2.7](specs/feature-auth/backend/step-2.7-refresh-endpoint.md) | `POST /api/auth/refresh`: refresh token validálás, rotation (új token kibocsátás, régi érvénytelenítés DB-ben) |
+| [2.8](specs/feature-auth/backend/step-2.8-logout-integration-test.md) | `POST /api/auth/logout`: refresh token cookie törlése + DB-ben érvénytelenítés |
 
 ### Frontend
 
 | Step | Mit állít elő |
 |------|---------------|
-| 2.9 | Zustand auth store: `accessToken`, `user` tárolása, `setAccessToken`, `clearAuth` műveletek |
-| 2.10 | Axios interceptor: 401 kezelés, refresh token rotation race condition védelem (spec szerint) |
-| 2.11 | Login oldal: felhasználónév + jelszó form, hibaüzenet kezelés |
-| 2.12 | Protected route wrapper: bejelentkezett felhasználó ellenőrzése, redirect /login-ra |
-| 2.13 | Logout gomb a sidebar-ban |
+| [2.9](specs/feature-auth/frontend/step-2.9-auth-store.md) | Zustand auth store: `accessToken`, `user` tárolása, `setAccessToken`, `clearAuth` műveletek |
+| [2.10](specs/feature-auth/frontend/step-2.10-axios-interceptor.md) | Axios interceptor: 401 kezelés, refresh token rotation race condition védelem (spec szerint) |
+| [2.11](specs/feature-auth/frontend/step-2.11-login-page.md) | Login oldal: felhasználónév + jelszó form, hibaüzenet kezelés |
+| [2.12](specs/feature-auth/frontend/step-2.12-protected-route.md) | Protected route wrapper: bejelentkezett felhasználó ellenőrzése, redirect /login-ra |
+| [2.13](specs/feature-auth/frontend/step-2.13-logout-button.md) | Role-alapú menü szűrés a sidebar-ban (az 1.7-ben minden menüpont megjelenik, itt kerül bekötésre a láthatóság role szerint) + logout gomb |
 
 ---
 
