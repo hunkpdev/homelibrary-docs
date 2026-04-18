@@ -49,7 +49,9 @@
 **Exportált bean-ek:**
 - `PasswordEncoder` — `BCryptPasswordEncoder(12)` (login és jövőbeli user management használja)
 - `AuthenticationManager` — a login endpoint (step 2.6) manuális autentikációhoz
-- `CorsConfigurationSource` — allowed origin: `corsProperties.getAllowedOrigin()`, allowed methods: GET, POST, PUT, DELETE, OPTIONS, allowed headers: `*`, `allowCredentials: true`
+- `CorsConfigurationSource` — allowed origin: `corsProperties.getAllowedOrigin()`, allowed methods: GET, POST, PUT, DELETE, OPTIONS, allowed headers: `Authorization`, `Content-Type`, `Accept`, `allowCredentials: true`
+
+  > `*` helyett explicit lista — a wildcard egyes böngésző implementációkban CORS preflight bypass-hoz használható lenne. Ha jövőben egyedi headerek szükségesek, itt bővítendő.
 
 ---
 

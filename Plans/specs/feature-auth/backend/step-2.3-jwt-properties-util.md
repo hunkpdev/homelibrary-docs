@@ -18,7 +18,10 @@
 | Property | Java mező | Típus |
 |---|---|---|
 | `app.jwt.secret` | `secret` | `String` |
-| `app.jwt.expiration-ms` | `expirationMs` | `long` |
+| `app.jwt.access-token-expiration-ms` | `accessTokenExpirationMs` | `long` |
+| `app.jwt.refresh-token-expiration-ms` | `refreshTokenExpirationMs` | `long` |
+
+A refresh token lejárat (`refreshTokenExpirationMs`) centralizálva van itt — a `RefreshTokenCookieBuilder` és az `AuthService` is ebből olvassa, nem magic number.
 
 ---
 
@@ -33,18 +36,18 @@ Csak a `jjwt-api` hozzáadása `ClassNotFoundException`-t okoz futásidőben.
 
 | Metódus | Leírás |
 |---|---|
-| `String generateToken(User user)` | Access token generálás — `sub`: user UUID, `username` claim: `user.getUsername()`, `role` claim: `user.getRole().name()`, lejárat: `now + expirationMs` |
-| `boolean isTokenValid(String token)` | Aláírás és lejárat validálás — bármilyen hiba esetén `false`, nem dob kivételt |
-| `UUID extractUserId(String token)` | `sub` claim kinyerése és UUID-dé konvertálása |
+| `String generateToken(User user)` | Access token generálás — `sub`: user UUID, `username` claim: `user.getUsername()`, `role` claim: `user.getRole().name()`, lejárat: `now + accessTokenExpirationMs` |
+| `UUID extractUserId(String token)` | `sub` claim kinyerése és UUID-dé konvertálása — érvénytelen aláírás vagy lejárt token esetén JJWT exception-t dob, nem tér vissza `false`-szal |
 
-A `role` claim kinyerésére nincs külön metódus — a JWT filter (step 2.4) user ID alapján DB-ből tölti be a teljes `User` objektumot.
+A `role` claim kinyerésére nincs külön metódus — a JWT filter (step 2.4) user ID alapján DB-ből tölti be a teljes `User` objektumot. Az `extractUserId` hívás `try-catch` blokkban történik a filterben; exception esetén WARN logolás és a kérés folytatása autentikáció nélkül (nem `if (isTokenValid(...))` előőrs).
 
 ---
 
 ## Application properties kiegészítések
 
 **`application.properties`:**
-- `app.jwt.expiration-ms=900000` *(15 perc, minden profilon azonos)*
+- `app.jwt.access-token-expiration-ms=900000` *(15 perc, minden profilon azonos)*
+- `app.jwt.refresh-token-expiration-ms=604800000` *(7 nap, minden profilon azonos)*
 
 **`application-local.yml`:**
 - `app.jwt.secret: local-dev-secret-for-homelibrary-min32` *(hardcoded, nem érzékeny)*
@@ -58,10 +61,9 @@ A `role` claim kinyerésére nincs külön metódus — a JWT filter (step 2.4) 
 
 **Unit tesztek** (`JwtUtilTest`) — ebben a stepben készülnek el, lokálisan futtatva zölden kell lenniük:
 
-- `generateToken` → `isTokenValid` → `true` (happy path)
-- `generateToken` → `extractUserId` → visszaadja a user UUID-ját
-- Módosított tokennel `isTokenValid` → `false`
-- Lejárt tokennel `isTokenValid` → `false` (tesztben `expirationMs=1` beállítással)
+- `generateToken` → `extractUserId` → visszaadja a user UUID-ját (happy path)
+- Módosított tokennel `extractUserId` → JJWT exception-t dob
+- Lejárt tokennel `extractUserId` → JJWT exception-t dob (tesztben `accessTokenExpirationMs=1` beállítással)
 
 **Manuálisan:**
 - `local` profilon az alkalmazás elindul, `JWT_SECRET` env var nélkül
