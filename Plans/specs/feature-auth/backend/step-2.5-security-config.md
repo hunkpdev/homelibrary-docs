@@ -61,7 +61,8 @@
 
 `loadUserByUsername(String username)`:
 - `userRepository.findByUsername(username)` — ha nem találja: `UsernameNotFoundException`
-- Visszaadott `UserDetails`: Spring Security beépített `User` builderével összerakva (`username`, `passwordHash`, authorities: `ROLE_` + role)
+- Visszaadott `UserDetails`: Spring Security beépített `User` builderével összerakva (`username`, `passwordHash`, `.disabled(!user.isActive())`, authorities: `ROLE_` + role)
+- **Fontos:** `.disabled(!user.isActive())` kötelező — enélkül deaktivált user érvényes jelszóval be tud lépni
 
 ---
 

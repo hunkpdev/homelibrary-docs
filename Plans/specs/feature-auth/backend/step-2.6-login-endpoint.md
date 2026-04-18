@@ -58,9 +58,9 @@
 | `Secure` | `cookieProperties.isSecure()` | HTTPS-en megy csak ki; `local` profilon `false` |
 | `SameSite` | `Strict` | CSRF védelem |
 | `Path` | `/api/auth` | Csak az auth endpointokra megy ki a cookie |
-| `Max-Age` | `604800` | 7 nap másodpercben |
+| `Max-Age` | `jwtProperties.getRefreshTokenExpirationMs() / 1000` | Számított érték a `JwtProperties`-ből, nem hardcoded |
 
-A cookie összeállítása `ResponseCookie` builderrel történik — private helper metódus az `AuthController`-ben, amelyet a login (2.6), refresh (2.7) és logout (2.8) endpoint egyaránt használ.
+A cookie összeállítása `ResponseCookie` builderrel történik — önálló `@Component`: `RefreshTokenCookieUtil`. Az `AuthController` nem tartalmaz cookie logikát; a login (2.6), refresh (2.7) és logout (2.8) endpoint egyaránt ezt a bean-t használja.
 
 ---
 

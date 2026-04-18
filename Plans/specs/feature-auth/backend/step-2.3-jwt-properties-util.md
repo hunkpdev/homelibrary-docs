@@ -21,7 +21,7 @@
 | `app.jwt.access-token-expiration-ms` | `accessTokenExpirationMs` | `long` |
 | `app.jwt.refresh-token-expiration-ms` | `refreshTokenExpirationMs` | `long` |
 
-A refresh token lejárat (`refreshTokenExpirationMs`) centralizálva van itt — a `RefreshTokenCookieBuilder` és az `AuthService` is ebből olvassa, nem magic number.
+A refresh token lejárat (`refreshTokenExpirationMs`) centralizálva van itt — a `RefreshTokenCookieUtil` és az `AuthService` is ebből olvassa, nem magic number.
 
 ---
 

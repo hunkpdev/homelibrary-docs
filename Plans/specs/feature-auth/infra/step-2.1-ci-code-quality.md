@@ -92,8 +92,19 @@ A `frontend-deploy.yml`-be szintén egy új **`sonar` job** kerül be, a deploy 
 1. **Checkout** — `fetch-depth: 0`
 2. **Node.js setup**
 3. **`npm ci`**
-4. **SonarQube scan** — `sonarqube-scan-action` (SonarSource official action), `args`-ban a szükséges property-k (`sonar.projectKey`, `sonar.organization`)
-5. **Quality Gate check** — `sonarqube-quality-gate-check` (SonarSource official action) — ha a QG failed, ez a step elbukik, és a deploy job nem indul el
+4. **Run tests** — `npm test` (SonarQube scan előtt; JUnit XML riport generálása `frontend/test-results/junit.xml`-be)
+5. **SonarQube scan** — `sonarqube-scan-action` (SonarSource official action), `args`-ban a szükséges property-k (`sonar.projectKey`, `sonar.organization`)
+6. **Quality Gate check** — `sonarqube-quality-gate-check` (SonarSource official action) — ha a QG failed, ez a step elbukik, és a deploy job nem indul el
+7. **Publish test report** — `dorny/test-reporter@v1`, `if: always()`, path: `frontend/test-results/junit.xml`, reporter: `java-junit`
+
+### Permissions a `sonar` job-ban
+
+```yaml
+permissions:
+  checks: write
+```
+
+A `checks: write` szükséges a `dorny/test-reporter@v1` step-hez — enélkül a Check fül létrehozása permission error-ral elbukik.
 
 ### Env változók a `sonar` job-ban
 
