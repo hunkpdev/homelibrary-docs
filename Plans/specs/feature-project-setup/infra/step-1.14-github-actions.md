@@ -61,7 +61,7 @@ Mindkét workflow csak `main` branch-re való push esetén fut — és csak akko
 
 > **`VITE_API_BASE_URL` és `API_GATEWAY_URL`:** A `VITE_API_BASE_URL` Vite build-time változó — prod-on nincs Vite proxy, az axios-nak build időben tudnia kell az API Gateway URL-t. A backend és frontend deploy külön workflow, ezért a CDK stack outputja nem érhető el a frontend workflow-ban. Az API Gateway URL ritkán változik, ezért egyszer kézzel beállított repository variable (`vars.API_GATEWAY_URL`) a megfelelő megközelítés. A változót a CDK deploy lefutása után kell egyszer felvinni a repo Settings > Variables oldalon.
 
-> **Megjegyzés:** SonarQube Cloud integráció (scan lépés mindkét workflow-ba) a Feature 2 step 2.1-ben kerül be — az első érdemi kód (Auth) előtt.
+> **Megjegyzés:** SonarQube Cloud integráció és test reporting (scan + Quality Gate + human-readable riport mindkét workflow-ba) a Feature 2 step 2.1-ben kerül be — az első érdemi kód (Auth) előtt.
 
 ---
 

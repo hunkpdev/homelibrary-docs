@@ -26,7 +26,7 @@
 `@Configuration` + `@EnableWebSecurity`.
 
 **Filter chain:**
-- CSRF: disabled — stateless JWT + `SameSite=Strict` cookie véd a CSRF ellen
+- CSRF: disabled — stateless JWT + `SameSite=Strict` cookie véd a CSRF ellen; a `SecurityConfig` osztályon `@SuppressWarnings("java:S4502")` annotáció szükséges, különben SonarQube S4502 rule-t triggerel
 - Session management: `STATELESS`
 - CORS: `.cors(withDefaults())` — `CorsConfigurationSource` bean-ből olvassa a konfigurációt
 - `JwtAuthenticationFilter` hozzáadva `UsernamePasswordAuthenticationFilter` elé
@@ -49,7 +49,9 @@
 **Exportált bean-ek:**
 - `PasswordEncoder` — `BCryptPasswordEncoder(12)` (login és jövőbeli user management használja)
 - `AuthenticationManager` — a login endpoint (step 2.6) manuális autentikációhoz
-- `CorsConfigurationSource` — allowed origin: `corsProperties.getAllowedOrigin()`, allowed methods: GET, POST, PUT, DELETE, OPTIONS, allowed headers: `*`, `allowCredentials: true`
+- `CorsConfigurationSource` — allowed origin: `corsProperties.getAllowedOrigin()`, allowed methods: GET, POST, PUT, DELETE, OPTIONS, allowed headers: `Authorization`, `Content-Type`, `Accept`, `allowCredentials: true`
+
+  > `*` helyett explicit lista — a wildcard egyes böngésző implementációkban CORS preflight bypass-hoz használható lenne. Ha jövőben egyedi headerek szükségesek, itt bővítendő.
 
 ---
 
@@ -59,7 +61,8 @@
 
 `loadUserByUsername(String username)`:
 - `userRepository.findByUsername(username)` — ha nem találja: `UsernameNotFoundException`
-- Visszaadott `UserDetails`: Spring Security beépített `User` builderével összerakva (`username`, `passwordHash`, authorities: `ROLE_` + role)
+- Visszaadott `UserDetails`: Spring Security beépített `User` builderével összerakva (`username`, `passwordHash`, `.disabled(!user.isActive())`, authorities: `ROLE_` + role)
+- **Fontos:** `.disabled(!user.isActive())` kötelező — enélkül deaktivált user érvényes jelszóval be tud lépni
 
 ---
 

@@ -1,4 +1,4 @@
-# Step 2.1 – SonarQube Cloud integráció
+# Step 2.1 – CI code quality: SonarQube Cloud + test reporting
 
 ## Mit állít elő
 
@@ -56,6 +56,18 @@ A `backend-deploy.yml`-be egy új **`sonar` job** kerül be, **a meglévő deplo
 
 A `sonar.projectKey` és `sonar.organization` Maven property-k értéke: `${{ vars.SONAR_PROJECT_KEY_BACKEND }}` és `${{ vars.SONAR_ORGANIZATION }}`.
 
+### Test reporting
+
+**Lokális** (`pom.xml`): `maven-surefire-report-plugin` hozzáadva — `mvn test` után `target/site/surefire-report.html` generálódik, böngészőben megnyitható.
+
+**CI** (`backend-deploy.yml` sonar job):
+- A Build + test + scan step után `dorny/test-reporter@v1` step kerül be
+- `if: always()` — akkor is fut, ha a tesztek elbuktak
+- A sonar job-on `checks: write` permission szükséges
+- Eredmény: a workflow futásnál és PR-on megjelenik egy **"Backend Unit Tests"** Check fül, tesztenként részletes eredménnyel; bukott tesztnél stack trace is látható
+
+---
+
 ### Coverage kizárások (`pom.xml`)
 
 A default Quality Gate **minimum 80% coverage** elvárással fut. A coverage scope kizárólag a `service/`, `controller/` és `util/` package-ekre vonatkozik — minden más ki van zárva. A kizárások a `pom.xml` `<properties>` blokkjában, `sonar.coverage.exclusions` property-vel kerülnek be:
@@ -80,8 +92,19 @@ A `frontend-deploy.yml`-be szintén egy új **`sonar` job** kerül be, a deploy 
 1. **Checkout** — `fetch-depth: 0`
 2. **Node.js setup**
 3. **`npm ci`**
-4. **SonarQube scan** — `sonarqube-scan-action` (SonarSource official action), `args`-ban a szükséges property-k (`sonar.projectKey`, `sonar.organization`)
-5. **Quality Gate check** — `sonarqube-quality-gate-check` (SonarSource official action) — ha a QG failed, ez a step elbukik, és a deploy job nem indul el
+4. **Run tests** — `npm test` (SonarQube scan előtt; JUnit XML riport generálása `frontend/test-results/junit.xml`-be)
+5. **SonarQube scan** — `sonarqube-scan-action` (SonarSource official action), `args`-ban a szükséges property-k (`sonar.projectKey`, `sonar.organization`)
+6. **Quality Gate check** — `sonarqube-quality-gate-check` (SonarSource official action) — ha a QG failed, ez a step elbukik, és a deploy job nem indul el
+7. **Publish test report** — `dorny/test-reporter@v1`, `if: always()`, path: `frontend/test-results/junit.xml`, reporter: `java-junit`
+
+### Permissions a `sonar` job-ban
+
+```yaml
+permissions:
+  checks: write
+```
+
+A `checks: write` szükséges a `dorny/test-reporter@v1` step-hez — enélkül a Check fül létrehozása permission error-ral elbukik.
 
 ### Env változók a `sonar` job-ban
 
@@ -114,6 +137,9 @@ A frontend coverage kizárások a `frontend/sonar-project.properties` fájlban k
   - Ha a Quality Gate passed → a deploy job elindul
   - Ha a Quality Gate failed → a deploy job nem indul el, a workflow piros
 - `main`-re pusholt frontend változás után — ugyanígy
+- `mvn test` után `target/site/surefire-report.html` generálódik és böngészőben megnyitható
+- CI-ban a workflow futás után megjelenik a "Backend Unit Tests" Check fül a GitHub-on
+- Ha valamely teszt elbukik, a Check fülön látható a részletes hibaüzenet és stack trace
 - `SONAR_TOKEN` secret és `SONAR_ORGANIZATION`, `SONAR_PROJECT_KEY_BACKEND`, `SONAR_PROJECT_KEY_FRONTEND` repository variable-k beállítva (manuális előfeltétel, a workflow-ból nem ellenőrizhető)
 - A backend és frontend analízis a SonarQube Cloud-on két külön projektként jelenik meg
 - A meglévő deploy job-ok logikája nem változik (csak a `needs: sonar` függőség kerül rájuk)
