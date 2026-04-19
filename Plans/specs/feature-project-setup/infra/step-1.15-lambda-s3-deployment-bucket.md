@@ -28,27 +28,19 @@ A backend fat JAR mérete meghaladja a Lambda direkt upload 70 MB-os korlátját
 
 ## IAM jogosultság kiegészítések
 
-### Lambda execution role (step 1.10)
-
-| Művelet | Erőforrás | Mire |
-|---------|-----------|------|
-| `s3:GetObject` | deployment bucket | Lambda kódfrissítés során a JAR letöltése az S3-ról |
-
 ### GitHub Actions OIDC role (step 1.13)
 
 | Művelet | Erőforrás | Mire |
 |---------|-----------|------|
 | `s3:PutObject` | deployment bucket | JAR feltöltése CI/CD workflow-ból |
 
+> **Megjegyzés:** A Lambda execution role-nak **nem** kell `s3:GetObject` jog a deployment bucketre. Az `update-function-code` híváskor az AWS Lambda service tölti le a JAR-t — nem a Lambda function maga. A Lambda service-nek van belső hozzáférése ehhez.
+
 ---
 
-## SSM paraméter
+## CDK output
 
-| SSM kulcs | GitHub Variable | Leírás |
-|-----------|-----------------|--------|
-| `/homelibrary/deployment-bucket-name` | `DEPLOYMENT_BUCKET_NAME` | Deployment S3 bucket neve — CDK deploy után egyszer, kézzel felvinni a repo Settings > Variables oldalon |
-
-A CDK stack a bucket nevét SSM-be írja (`StringParameter.fromStringParameterName` helyett `new StringParameter` — ez a stack hozza létre, nem olvassa).
+A bucket neve `CfnOutput`-ként jön ki a CDK-ból (`DeploymentBucketName`). CDK deploy után egyszer, kézzel felvinni a `DEPLOYMENT_BUCKET_NAME` GitHub repository variable-be (Settings > Variables) — konzisztens a többi infra output kezelésével (CloudFront URL, OIDC Role ARN).
 
 ---
 
@@ -65,7 +57,7 @@ aws s3 cp target/homelibrary-*.jar \
 **2. Lambda kódfrissítés S3-ról:**
 ```
 aws lambda update-function-code \
-  --function-name HomelibraryFunction \
+  --function-name homelibrary-backend \
   --s3-bucket ${{ vars.DEPLOYMENT_BUCKET_NAME }} \
   --s3-key backend/homelibrary-${{ github.sha }}.jar
 ```
