@@ -33,8 +33,8 @@ A backend fat JAR mérete meghaladja a Lambda direkt upload 70 MB-os korlátját
 | Művelet | Erőforrás | Mire |
 |---------|-----------|------|
 | `s3:PutObject` | deployment bucket | JAR feltöltése CI/CD workflow-ból |
-
-> **Megjegyzés:** A Lambda execution role-nak **nem** kell `s3:GetObject` jog a deployment bucketre. Az `update-function-code` híváskor az AWS Lambda service tölti le a JAR-t — nem a Lambda function maga. A Lambda service-nek van belső hozzáférése ehhez.
+| `s3:GetObject` | deployment bucket | `update-function-code --s3-bucket` az OIDC credentials-szel ellenőrzi az S3 hozzáférést |
+| `lambda:GetFunctionConfiguration` | `homelibrary-backend` | `aws lambda wait function-updated` polling hívja a frissítés befejezésének ellenőrzésekor |
 
 ---
 
@@ -62,6 +62,14 @@ aws lambda update-function-code \
   --s3-key backend/homelibrary-${{ github.sha }}.jar
 ```
 
+**3. Várakozás a frissítés befejezésére:**
+```
+aws lambda wait function-updated \
+  --function-name homelibrary-backend
+```
+
+> Az `update-function-code` aszinkron — a `publish-version` (SnapStart) `ResourceConflictException`-nel bukik el, ha a frissítés még nem fejeződött be. A `wait` lépés megakadályozza ezt.
+
 A `${{ github.sha }}` alapú S3 key biztosítja, hogy minden deploy egyedi objektumot hoz létre — a lifecycle policy 7 nap után törli a régieket.
 
 ---
@@ -69,6 +77,6 @@ A `${{ github.sha }}` alapú S3 key biztosítja, hogy minden deploy egyedi objek
 ## Elfogadási kritériumok
 
 - `cdk synth` hiba nélkül lefut, a template tartalmazza az S3 bucketet és a frissített IAM policy-kat
-- `DEPLOYMENT_BUCKET_NAME` repository variable beállítva (manuális előfeltétel a workflow futtatása előtt)
+- **Manuális előfeltétel:** `DEPLOYMENT_BUCKET_NAME` GitHub repository variable beállítva a CDK deploy output alapján (Settings > Variables). Tényleges bucket név: `homelibrarystack-deploymentbucketc91a09da-pmj5kyagabry`
 - `main`-re pusholt backend változás után a JAR megjelenik az S3 bucketben és a Lambda frissül
 - `GET <api-gateway-url>/api/health` → `200 OK` az új deploy után
