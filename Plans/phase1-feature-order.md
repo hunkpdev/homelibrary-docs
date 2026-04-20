@@ -150,7 +150,8 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 | Step | Mit állít elő |
 |------|---------------|
 | 3.9 | Rooms + Locations oldal: rooms csoportos nézet locationökkel, TanStack Table (sort, filter, lapozás, groupolt ↔ flat toggle), `locationCount` / `bookCount` |
-| 3.10 | Room és Location form modalok: létrehozás / szerkesztés / törlés megerősítés — `roomName` autocomplete dropdownnal (szerkeszthető placeholder), csoportfejlécből előre kitöltve |
+| 3.10 | Room form modalok: létrehozás / szerkesztés / törlés megerősítés |
+| 3.11 | Location form modalok: létrehozás / szerkesztés / törlés megerősítés — `roomId` autocomplete dropdownnal (szerkeszthető placeholder), csoportfejlécből előre kitöltve |
 
 ---
 
