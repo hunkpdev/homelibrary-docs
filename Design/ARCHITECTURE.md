@@ -203,7 +203,8 @@ homelibrary-docs/                   ← GitHub repo: homelibrary-docs
 │       ├── 003-isbn-api.md
 │       ├── 004-aws-compute-choice.md
 │       ├── 005-db-migration-tool.md
-│       └── 006-sql-standard-types.md
+│       ├── 006-sql-standard-types.md
+│       └── 007-rooms-locations-normalization.md
 └── Plans/
     ├── phase1-feature-order.md
     └── specs/
