@@ -10,18 +10,21 @@
 ## Entitások és Kapcsolatok
 
 ```
+rooms (helyiség)
+  │
+  └──< locations (konkrét tárolási hely: polc, szekrény, láda, stb.)
+          │
+          └──< books
+                │
+                ├──< loans (kölcsönzések)
+                │       │
+                │       └── users (kölcsönző)
+                │
+                └──< book_descriptions (i18n leírások)
+
 users
-  │
-  ├──< loans (kölcsönzések)
-  │       │
-  │       └── books
-  │
-  └── books
-        │
-        ├── locations (konkrét tárolási hely: polc, szekrény, láda, stb.)
-        │       │
-        │       └── rooms (helyiség)
-        └──< book_descriptions (i18n leírások)
+  ├──< loans (loaned_by)
+  └──< books (added_by)
 ```
 
 ## Táblák
