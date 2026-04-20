@@ -1,17 +1,18 @@
-# Step 3.2 – Location entitás és repository
+# Step 3.4 – Location entitás és repository
 
 ## Mit állít elő
 
-- `backend/src/main/java/.../location/Location.java` — JPA entitás
-- `backend/src/main/java/.../location/LocationRepository.java` — Spring Data JPA repository
+- `Location.java` — JPA entitás
+- `LocationRepository.java` — Spring Data JPA repository
 
 ---
 
 ## Kulcs döntések
 
 **Location entitás:**
-- Mezők: `id` (UUID), `roomName`, `shelfName`, `description`, `active`, `version`, `createdAt`, `updatedAt`
-- `@Version` annotáció a `version` mezőn — optimistic locking (konzisztens a `User` entitással)
+- Mezők: `id` (UUID), `name`, `description`, `room` (OneToOne FK → Room), `active`, `version`, `createdAt`, `updatedAt`
+- `@OneToOne` kapcsolat a `Room` entitásra (`room_id` FK, NOT NULL — lásd ADR-007)
+- `@Version` annotáció a `version` mezőn — optimistic locking
 - `@CreationTimestamp` / `@UpdateTimestamp` a timestamp mezőkön
 
 **LocationRepository:**
