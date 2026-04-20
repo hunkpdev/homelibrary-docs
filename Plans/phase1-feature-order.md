@@ -169,13 +169,14 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 
 | Step | Mit állít elő |
 |------|---------------|
-| 4.5 | ISBN beviteli mező a könyv felvétel formon: lookup gomb, találat esetén mezők előtöltése, nem találat esetén üzenet |
+| 4.5 | `IsbnScannerInput` React komponens: `react-zxing` integráció, kamera elérhetőség detektálás (MediaDevices API), kamera nézet elsődleges / kézi szövegmező fallback — ha a kamera elérhető, alapból az aktív |
+| 4.6 | ISBN lookup UI: trigger a scanner/mező értékéből, találat → mezők előtöltése, nem találat → üzenet |
 
 ### Infra (CDK)
 
 | Step | Mit állít elő |
 |------|---------------|
-| 4.6 | SSM Parameter Store: `/homelibrary/google-books-api-key` paraméter hozzáadása a stack-hez |
+| 4.7 | SSM Parameter Store: `/homelibrary/google-books-api-key` paraméter hozzáadása a stack-hez |
 
 ---
 
