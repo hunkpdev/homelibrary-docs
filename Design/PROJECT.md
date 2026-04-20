@@ -58,7 +58,7 @@ Webalapú elektronikus házi könyvtárkezelő alkalmazás, amellyel egy háztar
 
 ### Fázis 1 – MVP (core funkciók)
 - [ ] Auth (bejelentkezés, JWT, két szerepkör)
-- [ ] ISBN lookup (OpenLibrary API + Google Books fallback)
+- [ ] ISBN lookup (OpenLibrary API + Google Books fallback) + vonalkód olvasás kamerával (react-zxing, elsődleges) / kézi bevitel (fallback)
 - [ ] Könyv CRUD (felvétel, listázás, módosítás, soft delete)
 - [ ] Helyiség/polc kezelés
 - [ ] Státusz kezelés (AT_HOME, LOANED, DELETED)
@@ -67,7 +67,6 @@ Webalapú elektronikus házi könyvtárkezelő alkalmazás, amellyel egy háztar
 - [ ] CI/CD (GitHub Actions)
 
 ### Fázis 2 – Kényelem
-- [ ] Vonalkód olvasás mobilon (react-zxing, kamera API)
 - [ ] Light/Dark mód
 - [ ] i18n (HU/EN)
 - [ ] Kölcsönadás nyilvántartás (kinek, mikor, visszahozta-e)
