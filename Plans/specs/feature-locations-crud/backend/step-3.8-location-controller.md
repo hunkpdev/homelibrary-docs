@@ -1,4 +1,4 @@
-# Step 3.4 – LocationController
+# Step 3.8 – LocationController
 
 ## Mit állít elő
 
@@ -14,8 +14,8 @@
 
 | Mező | Típus | Validáció |
 |------|-------|-----------|
-| `roomName` | `String` | `@NotBlank` |
-| `shelfName` | `String` | `@NotBlank` |
+| `name` | `String` | `@NotBlank` |
+| `roomId` | `UUID` | `@NotNull` (csak POST-nál, PUT-nál figyelmen kívül hagyva — lásd ADR-007) |
 | `description` | `String` | — |
 | `version` | `Long` | — (csak PUT-nál kötelező, de egységes DTO) |
 
@@ -26,9 +26,9 @@
 | Mező | Típus | Leírás |
 |------|-------|--------|
 | `id` | `UUID` | |
-| `roomName` | `String` | |
-| `shelfName` | `String` | |
+| `name` | `String` | |
 | `description` | `String` | |
+| `room` | `RoomResponse` | Beágyazott room objektum |
 | `bookCount` | `int` | Aktív (nem `DELETED`) könyvek száma |
 | `version` | `Long` | Optimistic locking |
 
@@ -38,7 +38,7 @@
 
 ### `GET /api/locations`
 - Jogosultság: `ADMIN`, `VISITOR`
-- Query paraméterek: `roomName`, `shelfName`, `description` (mind opcionális, részleges egyezés), `page` (default: 0), `size` (default: 20), `sort` (default: `roomName,asc`)
+- Query paraméterek: `name`, `roomId` (mind opcionális), `page` (default: 0), `size` (default: 20), `sort` (default: `name,asc`)
 - Response 200: `Page<LocationResponse>`
 
 ### `POST /api/locations`
@@ -46,10 +46,11 @@
 - Request: `LocationRequest` (`version` mező figyelmen kívül hagyva)
 - Response 201: `LocationResponse`
 - Response 400: validációs hiba
+- Response 404: room nem található
 
 ### `PUT /api/locations/{id}`
 - Jogosultság: `ADMIN`
-- Request: `LocationRequest` (`version` kötelező az optimistic lockinghoz)
+- Request: `LocationRequest` (`version` kötelező, `roomId` figyelmen kívül hagyva)
 - Response 200: `LocationResponse` (növelt `version`)
 - Response 404: location nem található
 - Response 409: optimistic locking ütközés
@@ -64,7 +65,7 @@
 
 ## Kulcs döntések
 
-- `@PreAuthorize` annotációk a jogosultság kezeléshez (konzisztens a Feature 2 security config-jával)
+- `@PreAuthorize` annotációk a jogosultság kezeléshez
 - `@Operation` és `@ApiResponse` annotációk minden endpointon (springdoc-openapi)
 - `@Valid` a request DTO-kon
 
@@ -74,7 +75,7 @@
 
 **Unit tesztek** (`LocationServiceTest`):
 - Listázás szűrők nélkül az összes aktív locationt visszaadja
-- Több szűrő egyszerre kombinálható
+- `roomId` szűrővel csak az adott roomhoz tartozó locationök jelennek meg
 - Törlés aktív könyvvel rendelkező locationon 409-et dob
 - Optimistic locking ütközés 409-et dob
 
