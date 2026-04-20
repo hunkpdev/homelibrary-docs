@@ -126,9 +126,9 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 
 ---
 
-## Feature 3 – Locations CRUD
+## Feature 3 – Rooms és Locations CRUD
 
-**Cél:** Teljes helyiség/polc kezelés — előfeltétele a könyvek elhelyezésének.
+**Cél:** Teljes helyiség és tárolási hely kezelés — előfeltétele a könyvek elhelyezésének. Lásd ADR-007.
 
 **Jogosultság:** GET — ADMIN, VISITOR | POST, PUT, DELETE — ADMIN
 
@@ -136,17 +136,21 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 
 | Step | Mit állít elő |
 |------|---------------|
-| 3.1 | Liquibase: `locations` tábla changeset |
-| 3.2 | `Location` entitás + `LocationRepository` |
-| 3.3 | `LocationService`: összes aktív lekérés, létrehozás, módosítás, soft delete (könyv hozzárendelés ellenőrzéssel) |
-| 3.4 | `LocationController`: `GET /api/locations`, `POST`, `PUT /{id}`, `DELETE /{id}` |
+| 3.1 | Liquibase: `rooms` tábla changeset (`002-create-rooms.yaml`) |
+| 3.2 | Liquibase: `locations` tábla changeset (`003-create-locations.yaml`, `room_id` FK-val) |
+| 3.3 | `Room` entitás + `RoomRepository` |
+| 3.4 | `Location` entitás + `LocationRepository` |
+| 3.5 | `RoomService`: listázás (Specification + Pageable), létrehozás, módosítás, soft delete (aktív location ellenőrzéssel) |
+| 3.6 | `RoomController`: `GET /api/rooms`, `POST`, `PUT /{id}`, `DELETE /{id}` |
+| 3.7 | `LocationService`: listázás (Specification + Pageable, `roomId` szűrővel), létrehozás, módosítás, soft delete (aktív könyv ellenőrzéssel) |
+| 3.8 | `LocationController`: `GET /api/locations`, `POST`, `PUT /{id}`, `DELETE /{id}` |
 
 ### Frontend
 
 | Step | Mit állít elő |
 |------|---------------|
-| 3.5 | Locations oldal: helyiségek/polcok listája, könyv darabszámmal |
-| 3.6 | Létrehozás / szerkesztés form (dialog vagy inline), törlés megerősítéssel |
+| 3.9 | Rooms + Locations oldal: rooms csoportos nézet locationökkel, TanStack Table (sort, filter, lapozás, groupolt ↔ flat toggle), `locationCount` / `bookCount` |
+| 3.10 | Room és Location form modalok: létrehozás / szerkesztés / törlés megerősítés — `roomName` autocomplete dropdownnal (szerkeszthető placeholder), csoportfejlécből előre kitöltve |
 
 ---
 
