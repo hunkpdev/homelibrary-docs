@@ -62,17 +62,14 @@ Webalapú elektronikus házi könyvtárkezelő alkalmazás, amellyel egy háztar
 - [ ] Könyv CRUD (felvétel, listázás, módosítás, soft delete)
 - [ ] Helyiség/polc kezelés
 - [ ] Státusz kezelés (AT_HOME, LOANED, DELETED)
-- [ ] Alap responsive UI (React)
+- [ ] Kölcsönzés nyilvántartás (kinek, mikor, visszahozta-e)
+- [ ] Alap responsive UI (React), dark mode, i18n alap (hu/en)
 - [ ] AWS deploy (Lambda + API Gateway + S3 + CloudFront)
-- [ ] CI/CD (GitHub Actions)
+- [ ] CI/CD (GitHub Actions) + SonarQube Cloud
 
 ### Fázis 2 – Kényelem
-- [ ] Light/Dark mód
-- [ ] i18n (HU/EN)
-- [ ] Kölcsönadás nyilvántartás (kinek, mikor, visszahozta-e)
 - [ ] Borítókép megjelenítés (S3 pre-signed URL)
 - [ ] Jelszó visszaállítás
-- [ ] SonarQube Cloud integráció (GitHub Actions-ben)
 
 ### Fázis 3 – AI & kiterjesztés
 - [ ] AI alapú leírás-fordítás (Gemini vagy DeepL – tesztelés után döntés)
