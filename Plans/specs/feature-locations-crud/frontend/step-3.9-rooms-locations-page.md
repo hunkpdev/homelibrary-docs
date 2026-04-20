@@ -28,10 +28,12 @@
 - Toggle gomb az oldal tetején: groupolt ↔ flat
 
 ### Műveletek — room szint (csak `ADMIN`)
-- Room fejlécen: **szerkesztés** ikon gomb, **törlés** ikon gomb, **Új location** gomb (step 3.10 modaljai)
+- Room fejlécen: **szerkesztés** ikon gomb, **Új location** gomb (step 3.10 modaljai)
+- **Törlés** ikon gomb csak akkor látható, ha `locationCount === 0` — backend 409 védelme ettől függetlenül megmarad
 
 ### Műveletek — location szint (csak `ADMIN`)
-- Soronként: **szerkesztés** ikon gomb, **törlés** ikon gomb (step 3.10 modaljai)
+- Soronként: **szerkesztés** ikon gomb (step 3.11 modalja)
+- **Törlés** ikon gomb csak akkor látható, ha `bookCount === 0` — backend 409 védelme ettől függetlenül megmarad
 
 ### Műveletek — oldal szint (csak `ADMIN`)
 - **Új room** gomb az oldal tetején (step 3.10 modalja)
