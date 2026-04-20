@@ -136,22 +136,22 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 
 | Step | Mit állít elő |
 |------|---------------|
-| 3.1 | Liquibase: `rooms` tábla changeset (`002-create-rooms.yaml`) |
-| 3.2 | Liquibase: `locations` tábla changeset (`003-create-locations.yaml`, `room_id` FK-val) |
-| 3.3 | `Room` entitás + `RoomRepository` |
-| 3.4 | `Location` entitás + `LocationRepository` |
-| 3.5 | `RoomService`: listázás (Specification + Pageable), létrehozás, módosítás, soft delete (aktív location ellenőrzéssel) |
-| 3.6 | `RoomController`: `GET /api/rooms`, `POST`, `PUT /{id}`, `DELETE /{id}` |
-| 3.7 | `LocationService`: listázás (Specification + Pageable, `roomId` szűrővel), létrehozás, módosítás, soft delete (aktív könyv ellenőrzéssel) |
-| 3.8 | `LocationController`: `GET /api/locations`, `POST`, `PUT /{id}`, `DELETE /{id}` |
+| [3.1](specs/feature-locations-crud/backend/step-3.1-liquibase-rooms.md) | Liquibase: `rooms` tábla changeset (`002-create-rooms.yaml`) |
+| [3.2](specs/feature-locations-crud/backend/step-3.2-liquibase-locations.md) | Liquibase: `locations` tábla changeset (`003-create-locations.yaml`, `room_id` FK-val) |
+| [3.3](specs/feature-locations-crud/backend/step-3.3-room-entity-repository.md) | `Room` entitás + `RoomRepository` |
+| [3.4](specs/feature-locations-crud/backend/step-3.4-location-entity-repository.md) | `Location` entitás + `LocationRepository` |
+| [3.5](specs/feature-locations-crud/backend/step-3.5-room-service.md) | `RoomService`: listázás (Specification + Pageable), létrehozás, módosítás, soft delete (aktív location ellenőrzéssel) |
+| [3.6](specs/feature-locations-crud/backend/step-3.6-room-controller.md) | `RoomController`: `GET /api/rooms`, `POST`, `PUT /{id}`, `DELETE /{id}` |
+| [3.7](specs/feature-locations-crud/backend/step-3.7-location-service.md) | `LocationService`: listázás (Specification + Pageable, `roomId` szűrővel), létrehozás, módosítás, soft delete (aktív könyv ellenőrzéssel) |
+| [3.8](specs/feature-locations-crud/backend/step-3.8-location-controller.md) | `LocationController`: `GET /api/locations`, `POST`, `PUT /{id}`, `DELETE /{id}` |
 
 ### Frontend
 
 | Step | Mit állít elő |
 |------|---------------|
-| 3.9 | Rooms + Locations oldal: rooms csoportos nézet locationökkel, TanStack Table (sort, filter, lapozás, groupolt ↔ flat toggle), `locationCount` / `bookCount` |
-| 3.10 | Room form modalok: létrehozás / szerkesztés / törlés megerősítés |
-| 3.11 | Location form modalok: létrehozás / szerkesztés / törlés megerősítés — `roomId` autocomplete dropdownnal (szerkeszthető placeholder), csoportfejlécből előre kitöltve |
+| [3.9](specs/feature-locations-crud/frontend/step-3.9-rooms-locations-page.md) | Rooms + Locations oldal: rooms csoportos nézet locationökkel, TanStack Table (sort, filter, lapozás, groupolt ↔ flat toggle), `locationCount` / `bookCount` |
+| [3.10](specs/feature-locations-crud/frontend/step-3.10-room-modals.md) | Room form modalok: létrehozás / szerkesztés / törlés megerősítés |
+| [3.11](specs/feature-locations-crud/frontend/step-3.11-location-modals.md) | Location form modalok: létrehozás / szerkesztés / törlés megerősítés — `roomId` autocomplete dropdownnal (szerkeszthető placeholder), csoportfejlécből előre kitöltve |
 
 ---
 
