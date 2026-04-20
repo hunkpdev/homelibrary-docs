@@ -18,7 +18,9 @@ users
   │
   └── books
         │
-        ├── locations (helyiség/polc)
+        ├── locations (konkrét tárolási hely: polc, szekrény, láda, stb.)
+        │       │
+        │       └── rooms (helyiség)
         └──< book_descriptions (i18n leírások)
 ```
 
@@ -46,15 +48,31 @@ users
 
 ---
 
-### `locations` (helyiségek és polcok)
+### `rooms` (helyiségek)
 
 | Oszlop | Típus | Megszorítás | Leírás |
 |--------|-------|-------------|--------|
 | `id` | `UUID` | PK | |
-| `room_name` | `VARCHAR(100)` | NOT NULL | pl. „Nappali", „Dolgozószoba" |
-| `shelf_name` | `VARCHAR(100)` | | pl. „Jobb polc", „Alsó sor" |
+| `name` | `VARCHAR(100)` | NOT NULL | pl. „Nappali", „Dolgozószoba" |
 | `description` | `TEXT` | | Opcionális megjegyzés |
-| `active` | `BOOLEAN` | DEFAULT true | Soft delete |
+| `active` | `BOOLEAN` | NOT NULL DEFAULT true | Soft delete |
+| `version` | `BIGINT` | NOT NULL DEFAULT 0 | JPA optimistic locking (`@Version`) |
+| `created_at` | `TIMESTAMP WITH TIME ZONE` | NOT NULL | |
+| `updated_at` | `TIMESTAMP WITH TIME ZONE` | NOT NULL | |
+
+---
+
+### `locations` (konkrét tárolási helyek)
+
+Egy location pontosan egy roomhoz tartozik (`room_id` NOT NULL) — lásd ADR-007.
+
+| Oszlop | Típus | Megszorítás | Leírás |
+|--------|-------|-------------|--------|
+| `id` | `UUID` | PK | |
+| `name` | `VARCHAR(100)` | NOT NULL | pl. „Bal polc", „Felső szekrény", „Sarokláda" |
+| `description` | `TEXT` | | Opcionális megjegyzés |
+| `room_id` | `UUID` | FK → rooms NOT NULL | Melyik helyiségben van |
+| `active` | `BOOLEAN` | NOT NULL DEFAULT true | Soft delete |
 | `version` | `BIGINT` | NOT NULL DEFAULT 0 | JPA optimistic locking (`@Version`) |
 | `created_at` | `TIMESTAMP WITH TIME ZONE` | NOT NULL | |
 | `updated_at` | `TIMESTAMP WITH TIME ZONE` | NOT NULL | |
@@ -138,11 +156,12 @@ db/changelog/
   db.changelog-master.yaml
   changes/
     001-create-users.yaml
-    002-create-locations.yaml
-    003-create-books.yaml
-    004-create-book-descriptions.yaml
-    005-create-loans.yaml
-    006-add-indexes.yaml
+    002-create-rooms.yaml
+    003-create-locations.yaml
+    004-create-books.yaml
+    005-create-book-descriptions.yaml
+    006-create-loans.yaml
+    007-add-indexes.yaml
 ```
 
 ## Nyitott Kérdések
