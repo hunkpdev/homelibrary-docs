@@ -121,8 +121,11 @@ Könyvek listázása szűrőkkel. Lapozott.
       "status": "AT_HOME",
       "location": {
         "id": "...",
-        "roomName": "Nappali",
-        "shelfName": "Bal polc"
+        "name": "Bal polc",
+        "room": {
+          "id": "...",
+          "name": "Nappali"
+        }
       },
       "description": "Egy hobbit kalandjai...",
       "createdAt": "2026-03-28T14:30:00Z"
@@ -279,63 +282,143 @@ Fázis 1-ben az OpenLibrary API-t hívja, fallbackként Google Books API-t.
 
 ---
 
-## Location Endpoints
+## Room Endpoints
 
-### `GET /api/locations`
-Az összes aktív helyiség/polc listázása.
+### `GET /api/rooms`
+Az összes aktív helyiség listázása.
 
 **Jogosultság:** `ADMIN` vagy `VISITOR`
 
-**Response 200:**
+**Query paraméterek:** `name` (opcionális, részleges egyezés), `page`, `size`, `sort` (default: `name,asc`)
+
+**Response 200:** `Page<RoomResponse>`
 ```json
-[
-  {
-    "id": "550e8400-...",
-    "roomName": "Nappali",
-    "shelfName": "Bal polc",
-    "description": "Az ablak melletti polc",
-    "bookCount": 23
-  }
-]
+{
+  "content": [
+    {
+      "id": "550e8400-...",
+      "name": "Nappali",
+      "description": "Opcionális megjegyzés",
+      "locationCount": 3,
+      "version": 1
+    }
+  ],
+  ...
+}
 ```
 
 ---
 
-### `POST /api/locations`
-Új helyiség/polc felvétele.
+### `POST /api/rooms`
+Új helyiség felvétele.
 
 **Jogosultság:** `ADMIN`
 
 **Request:**
 ```json
 {
-  "roomName": "Dolgozószoba",
-  "shelfName": "Felső polc",
+  "name": "Dolgozószoba",
+  "description": "Opcionális megjegyzés"
+}
+```
+
+**Response 201:** Létrehozott room objektum
+**Response 400:** Validációs hiba (kötelező mező hiányzik)
+
+---
+
+### `PUT /api/rooms/{id}`
+Helyiség módosítása. `version` mező szükséges az optimistic locking miatt.
+
+**Jogosultság:** `ADMIN`
+
+**Response 200:** Frissített room objektum (növelt `version` értékkel)
+**Response 404:** Room nem található
+**Response 409:** Conflict – optimistic locking ütközés
+
+---
+
+### `DELETE /api/rooms/{id}`
+Helyiség törlése (soft delete, csak akkor, ha nincs hozzá aktív location rendelve).
+
+**Jogosultság:** `ADMIN`
+
+**Response 204:** No content
+**Response 404:** Room nem található
+**Response 409:** Conflict – van aktív location a roomhoz rendelve
+
+---
+
+## Location Endpoints
+
+### `GET /api/locations`
+Az összes aktív location listázása.
+
+**Jogosultság:** `ADMIN` vagy `VISITOR`
+
+**Query paraméterek:** `name`, `roomId` (opcionálisak, részleges egyezés / UUID szűrő), `page`, `size`, `sort` (default: `name,asc`)
+
+**Response 200:** `Page<LocationResponse>`
+```json
+{
+  "content": [
+    {
+      "id": "550e8400-...",
+      "name": "Bal polc",
+      "description": "Az ablak melletti polc",
+      "room": {
+        "id": "...",
+        "name": "Nappali"
+      },
+      "bookCount": 23,
+      "version": 1
+    }
+  ],
+  ...
+}
+```
+
+---
+
+### `POST /api/locations`
+Új location felvétele.
+
+**Jogosultság:** `ADMIN`
+
+**Request:**
+```json
+{
+  "name": "Felső polc",
+  "roomId": "550e8400-...",
   "description": "Opcionális megjegyzés"
 }
 ```
 
 **Response 201:** Létrehozott location objektum
+**Response 400:** Validációs hiba (kötelező mező hiányzik)
+**Response 404:** Room nem található
 
 ---
 
 ### `PUT /api/locations/{id}`
-Helyiség/polc módosítása. Minden mező kötelező (teljes felülírás). `version` mező szükséges az optimistic locking miatt.
+Location módosítása. `version` mező szükséges az optimistic locking miatt.
 
 **Jogosultság:** `ADMIN`
 
 **Response 200:** Frissített location objektum (növelt `version` értékkel)
-**Response 409:** Conflict – konkurens módosítás (verziószám ütközés)
+**Response 404:** Location nem található
+**Response 409:** Conflict – optimistic locking ütközés
 
 ---
 
 ### `DELETE /api/locations/{id}`
-Helyiség/polc törlése (csak akkor, ha nincs hozzá könyv rendelve).
+Location törlése (soft delete, csak akkor, ha nincs hozzá aktív könyv rendelve).
 
 **Jogosultság:** `ADMIN`
 
 **Response 204:** No content
-**Response 409:** Conflict – van könyv ezen a helyen
+**Response 404:** Location nem található
+**Response 409:** Conflict – van aktív könyv a locationhöz rendelve
 
 ---
 
