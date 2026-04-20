@@ -16,7 +16,7 @@
 | Mező | Kötelező | Leírás |
 |------|----------|--------|
 | `name` | igen | Tárolási hely neve |
-| `roomId` | igen | Autocomplete dropdown meglévő room nevekből, szerkeszthető placeholder (szabad szöveg új room esetén) — POST-nál aktív, PUT-nál disabled (lásd ADR-007) |
+| `roomId` | igen | Combobox: meglévő room nevek kereshetők/szűrhetők — csak listából választható, új room az oldal tetején lévő "Új room" gombbal hozható létre — POST-nál aktív, PUT-nál disabled (lásd ADR-007) |
 | `description` | nem | Opcionális megjegyzés |
 
 - Létrehozás és szerkesztés ugyanaz a modal — a title változik ("Új tárolási hely" / "Tárolási hely szerkesztése")
@@ -42,7 +42,7 @@
 shadcn/ui komponensekkel:
 - `Dialog` — modal wrapper
 - `Input` — szöveges mezők
-- `Combobox` — `roomId` autocomplete dropdown (meglévő room nevek + szabad szöveg új roomhoz)
+- `Combobox` — `roomId` kereshető dropdown, csak listából választható érték fogadható el
 - `Button` — submit, mégse gombok, loading state jelzéssel (`disabled` + spinner amíg a kérés fut)
 
 ---

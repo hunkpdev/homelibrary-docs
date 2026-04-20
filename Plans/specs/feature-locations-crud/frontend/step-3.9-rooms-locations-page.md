@@ -11,21 +11,27 @@
 
 ## Funkcionális követelmények
 
+### Adatlekérés (mindkét nézetben)
+- **2 párhuzamos fetch** oldal betöltésekor és szűrő/sort/lap változáskor:
+  1. `GET /api/rooms` — összes aktív room (nem lapozott, egyetlen hívás)
+  2. `GET /api/locations?page=...&size=...&sort=...&name=...` — lapozott locations, beágyazott `room` objektummal
+- A toggle **nem indít új fetch-et** — csak a megjelenítési módot váltja a már betöltött adatokon
+
 ### Táblázat — groupolt nézet (default)
-- Csoportok forrása: `GET /api/rooms` — minden aktív room megjelenik fejlécként, **üres roomok is** (nincs aktív location)
-- Csoporton belüli sorok forrása: `GET /api/locations?roomId=...` — az adott room locationjei
+- Kliens csoportosít `location.room.id` alapján
+- Minden aktív room megjelenik fejlécként, **üres roomok is** — a rooms fetch-ből jönnek, location nélkül
 - Location sorok oszlopai: `name`, `description`, `bookCount`
 - Room fejléc mutatja: room `name`, `locationCount`
 - Szűrők: oszlopfejlécbe integrált, hide-olható szűrősor — location `name`, `description` szűrhető; room szinten `name` szűrhető
 - Sort: location sorok `name ASC` alapértelmezetten, oszlopfejlécre kattintva váltható
-- Lapozás: location szinten, backend `page`/`size` paraméterekkel
+- Lapozás: location szinten
 
 ### Táblázat — flat nézet
 - Egyetlen lapozott lista az összes aktív locationről, `room.name` oszloppal kiegészítve
-- Szűrők és sort azonos logikával mint groupolt nézetben
+- Szűrők, sort és lapozás azonos logikával mint groupolt nézetben
 
 ### Nézet váltás
-- Toggle gomb az oldal tetején: groupolt ↔ flat
+- Toggle gomb az oldal tetején: groupolt ↔ flat (csak megjelenítés vált, nincs új fetch)
 
 ### Műveletek — room szint (csak `ADMIN`)
 - Room fejlécen: **szerkesztés** ikon gomb, **Új location** gomb (step 3.10 modaljai)

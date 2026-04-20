@@ -20,6 +20,17 @@ Olyan feladatok, amelyek nem tartoznak aktív feature-höz, de határidőre vagy
 
 ---
 
+### Feature 3 → Feature 5: LocationService book check és bookCount
+
+**Érintett fájlok (Feature 5, step 5.4 után):**
+- `LocationService.java` — soft delete bővítése: aktív könyv ellenőrzés (`books` tábla, `location_id` alapján) → 409 Conflict
+- `LocationService.java` — `bookCount` kiszámítása: hardcoded `0`-ról tényleges GROUP BY count query-re váltás
+- `LocationResponse.java` — `bookCount` valódi értékkel
+
+**Forrás:** Feature 3 tervezés során azonosítva — a `books` tábla Feature 3 idején még nem létezik.
+
+---
+
 ## Lezárt
 
 *(még üres)*

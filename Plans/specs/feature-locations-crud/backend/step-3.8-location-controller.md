@@ -3,21 +3,33 @@
 ## Mit állít elő
 
 - `LocationController` — `GET /api/locations`, `POST /api/locations`, `PUT /api/locations/{id}`, `DELETE /api/locations/{id}`
-- `LocationRequest` — request DTO (létrehozás és módosítás)
+- `CreateLocationRequest` — request DTO létrehozáshoz
+- `UpdateLocationRequest` — request DTO módosításhoz
 - `LocationResponse` — response DTO
 - `LocationServiceTest` — unit teszt
 - `LocationControllerTest` — unit teszt (MockMvc)
 
 ---
 
-## `LocationRequest` DTO
+## `CreateLocationRequest` DTO
 
 | Mező | Típus | Validáció |
 |------|-------|-----------|
-| `name` | `String` | `@NotBlank` |
-| `roomId` | `UUID` | `@NotNull` (csak POST-nál, PUT-nál figyelmen kívül hagyva — lásd ADR-007) |
-| `description` | `String` | — |
-| `version` | `Long` | — (csak PUT-nál kötelező, de egységes DTO) |
+| `name` | `String` | `@NotBlank` + `@Size(max = 100)` |
+| `roomId` | `UUID` | `@NotNull` |
+| `description` | `String` | `@Size(max = 2000)` |
+
+---
+
+## `UpdateLocationRequest` DTO
+
+| Mező | Típus | Validáció |
+|------|-------|-----------|
+| `name` | `String` | `@NotBlank` + `@Size(max = 100)` |
+| `version` | `Long` | `@NotNull` |
+| `description` | `String` | `@Size(max = 2000)` |
+
+> `roomId` szándékosan hiányzik — location nem helyezhető át másik roomba (lásd ADR-007)
 
 ---
 
@@ -29,7 +41,7 @@
 | `name` | `String` | |
 | `description` | `String` | |
 | `room` | `RoomResponse` | Beágyazott room objektum |
-| `bookCount` | `int` | Aktív (nem `DELETED`) könyvek száma |
+| `bookCount` | `int` | Feature 3-ban hardcoded `0` — Feature 5-ben bővítendő (tech-debt) |
 | `version` | `Long` | Optimistic locking |
 
 ---
@@ -43,14 +55,14 @@
 
 ### `POST /api/locations`
 - Jogosultság: `ADMIN`
-- Request: `LocationRequest` (`version` mező figyelmen kívül hagyva)
+- Request: `CreateLocationRequest`
 - Response 201: `LocationResponse`
 - Response 400: validációs hiba
 - Response 404: room nem található
 
 ### `PUT /api/locations/{id}`
 - Jogosultság: `ADMIN`
-- Request: `LocationRequest` (`version` kötelező, `roomId` figyelmen kívül hagyva)
+- Request: `UpdateLocationRequest`
 - Response 200: `LocationResponse` (növelt `version`)
 - Response 404: location nem található
 - Response 409: optimistic locking ütközés
@@ -59,7 +71,7 @@
 - Jogosultság: `ADMIN`
 - Response 204: No content
 - Response 404: location nem található
-- Response 409: van aktív könyv a locationhöz rendelve
+- Response 409: Feature 5-ben kerül be (book check stub, lásd step 3.7)
 
 ---
 
@@ -76,14 +88,13 @@
 **Unit tesztek** (`LocationServiceTest`):
 - Listázás szűrők nélkül az összes aktív locationt visszaadja
 - `roomId` szűrővel csak az adott roomhoz tartozó locationök jelennek meg
-- Törlés aktív könyvvel rendelkező locationon 409-et dob
 - Optimistic locking ütközés 409-et dob
 
 **Unit tesztek** (`LocationControllerTest`, MockMvc):
 - `GET /api/locations` VISITOR tokennel → 200
 - `POST /api/locations` VISITOR tokennel → 403
 - `POST /api/locations` hiányzó kötelező mezővel → 400
-- `DELETE /api/locations/{id}` aktív könyvvel → 409
+- `PUT /api/locations/{id}` `roomId` megadásával → 400 (mező nem létezik a DTO-ban, deszérializáció hibát dob)
 
 **Manuálisan:**
-- Swagger UI-on mind a négy endpoint dokumentált és elérhető
+- Swagger UI-on POST és PUT külön request body-val dokumentált

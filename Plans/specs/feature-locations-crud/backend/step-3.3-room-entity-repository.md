@@ -13,6 +13,7 @@
 - Mezők: `id` (UUID), `name`, `description`, `active`, `version`, `createdAt`, `updatedAt`
 - `@Version` annotáció a `version` mezőn — optimistic locking
 - `@CreationTimestamp` / `@UpdateTimestamp` a timestamp mezőkön
+- **Nincs `@OneToMany` collection** a Location felé — unidirectional kapcsolat (Location → Room), a `locationCount` aggregation query-vel számított (lásd step 3.5)
 
 **RoomRepository:**
 - Kiterjeszti a `JpaSpecificationExecutor<Room>` interfészt a dinamikus szűréshez

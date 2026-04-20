@@ -13,7 +13,7 @@
 - A Specification dinamikusan épül fel: csak a nem null szűrők kerülnek be (`LIKE %value%` / UUID egyezés)
 - `active = true` feltétel mindig része a Specification-nek
 - Default sort: `name ASC` — ha a hívó nem ad meg rendezést, ez az alapértelmezett
-- `bookCount` kiszámítása: az aktív (nem `DELETED` státuszú) könyvek száma locationnként — count query a `books` táblán, `location_id` alapján
+- `bookCount`: Feature 3-ban hardcoded `0` — a `books` tábla még nem létezik. Feature 5 (step 5.4) után bővítendő egyetlen GROUP BY query-vel (N+1 elkerülése érdekében JPA projection) — tech-debt backlog
 
 ### Létrehozás
 - Bemenő: `name` (kötelező), `roomId` (kötelező), `description` (opcionális)
@@ -26,7 +26,7 @@
 
 ### Soft delete
 - Bemenő: `id`
-- Ellenőrzés: ha van aktív (nem `DELETED` státuszú) könyv a locationhöz rendelve → üzleti kivétel → 409 Conflict
+- Ellenőrzés: Feature 3-ban kihagyva — a `books` tábla még nem létezik. Feature 5 (step 5.4) után bővítendő (tech-debt backlog)
 - Sikeres esetben: `active = false`
 
 ---
@@ -36,5 +36,5 @@
 - Listázás üres szűrőkkel az összes aktív locationt visszaadja `name ASC` sorrendben
 - `roomId` szűrővel csak az adott roomhoz tartozó locationök jelennek meg
 - Létrehozás nem létező `roomId`-val 404-et dob
-- Törlés aktív könyvvel rendelkező locationon 409-et dob
+- Törlés bármely locationon sikeres (book check Feature 5-ben kerül be)
 - Optimistic locking ütközés 409-et dob

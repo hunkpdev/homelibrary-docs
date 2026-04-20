@@ -10,8 +10,9 @@
 ## Kulcs döntések
 
 **Location entitás:**
-- Mezők: `id` (UUID), `name`, `description`, `room` (OneToOne FK → Room), `active`, `version`, `createdAt`, `updatedAt`
-- `@OneToOne` kapcsolat a `Room` entitásra (`room_id` FK, NOT NULL — lásd ADR-007)
+- Mezők: `id` (UUID), `name`, `description`, `room` (ManyToOne FK → Room), `active`, `version`, `createdAt`, `updatedAt`
+- `@ManyToOne` kapcsolat a `Room` entitásra (`room_id` FK, NOT NULL) — egy room több locationt tartalmazhat, egy location pontosan egy roomhoz tartozik (lásd ADR-007)
+- Unidirectional kapcsolat (Location → Room) — a Room entitáson nincs `@OneToMany` collection
 - `@Version` annotáció a `version` mezőn — optimistic locking
 - `@CreationTimestamp` / `@UpdateTimestamp` a timestamp mezőkön
 
