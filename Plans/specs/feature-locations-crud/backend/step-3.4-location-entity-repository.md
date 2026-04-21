@@ -14,7 +14,7 @@
 - `@ManyToOne` kapcsolat a `Room` entitásra (`room_id` FK, NOT NULL) — egy room több locationt tartalmazhat, egy location pontosan egy roomhoz tartozik (lásd ADR-007)
 - Unidirectional kapcsolat (Location → Room) — a Room entitáson nincs `@OneToMany` collection
 - `@Version` annotáció a `version` mezőn — optimistic locking
-- `@CreationTimestamp` / `@UpdateTimestamp` a timestamp mezőkön
+- `@PrePersist` / `@PreUpdate` lifecycle callback-ek a timestamp mezőkön, explicit UTC timezone-nal (lásd ADR-008)
 
 **LocationRepository:**
 - Kiterjeszti a `JpaSpecificationExecutor<Location>` interfészt a dinamikus szűréshez

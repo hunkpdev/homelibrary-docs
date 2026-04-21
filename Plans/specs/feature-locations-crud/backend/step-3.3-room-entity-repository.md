@@ -12,7 +12,7 @@
 **Room entitás:**
 - Mezők: `id` (UUID), `name`, `description`, `active`, `version`, `createdAt`, `updatedAt`
 - `@Version` annotáció a `version` mezőn — optimistic locking
-- `@CreationTimestamp` / `@UpdateTimestamp` a timestamp mezőkön
+- `@PrePersist` / `@PreUpdate` lifecycle callback-ek a timestamp mezőkön, explicit UTC timezone-nal (lásd ADR-008)
 - **Nincs `@OneToMany` collection** a Location felé — unidirectional kapcsolat (Location → Room), a `locationCount` aggregation query-vel számított (lásd step 3.5)
 
 **RoomRepository:**
