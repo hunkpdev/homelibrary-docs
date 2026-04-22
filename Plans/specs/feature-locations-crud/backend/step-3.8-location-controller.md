@@ -53,6 +53,12 @@
 - Query paraméterek: `name`, `roomId` (mind opcionális), `page` (default: 0), `size` (default: 20), `sort` (default: `name,asc`)
 - Response 200: `Page<LocationResponse>`
 
+### `GET /api/locations/all`
+- Jogosultság: `ADMIN`, `VISITOR`
+- Query paraméterek: nincs
+- Response 200: `List<LocationResponse>` — összes aktív location, `name ASC` sorrendben, lapozás nélkül
+- Kizárólag frontend dropdown feltöltésére
+
 ### `POST /api/locations`
 - Jogosultság: `ADMIN`
 - Request: `CreateLocationRequest`
@@ -92,6 +98,7 @@
 
 **Unit tesztek** (`LocationControllerTest`, MockMvc):
 - `GET /api/locations` VISITOR tokennel → 200
+- `GET /api/locations/all` VISITOR tokennel → 200, `List` típusú válasz
 - `POST /api/locations` VISITOR tokennel → 403
 - `POST /api/locations` hiányzó kötelező mezővel → 400
 - `PUT /api/locations/{id}` `roomId` megadásával → 400 (mező nem létezik a DTO-ban, deszérializáció hibát dob)

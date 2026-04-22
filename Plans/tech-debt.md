@@ -31,6 +31,17 @@ Olyan feladatok, amelyek nem tartoznak aktív feature-höz, de határidőre vagy
 
 ---
 
+### AG Grid — mobilos oszlopoptimalizálás
+
+**Érintett fájlok (frontend):**
+- `src/pages/LocationManagementPage.tsx` — AG Grid `columnDefs`
+
+**Teendő:** Kis képernyőn (`xs`/`sm` breakpoint) egyes oszlopok elrejtése, pl. `description`. Az AG Grid Community `hide` property responsive breakpointokhoz kötve, vagy CSS media query alapján dinamikusan állítva.
+
+**Forrás:** Feature 3 frontend tervezés során azonosítva — step-3.9 spec.
+
+---
+
 ## Lezárt
 
 *(még üres)*

@@ -8,12 +8,18 @@
 
 ## Metódusok
 
-### Listázás
+### Listázás (lapozott)
 - Bemenő paraméterek: `name`, `roomId` szűrők (mind opcionális) + `Pageable` (rendezés + lapozás)
 - A Specification dinamikusan épül fel: csak a nem null szűrők kerülnek be (`LIKE %value%` / UUID egyezés)
 - `active = true` feltétel mindig része a Specification-nek
 - Default sort: `name ASC` — ha a hívó nem ad meg rendezést, ez az alapértelmezett
 - `bookCount`: Feature 3-ban hardcoded `0` — a `books` tábla még nem létezik. Feature 5 (step 5.4) után bővítendő egyetlen GROUP BY query-vel (N+1 elkerülése érdekében JPA projection) — tech-debt backlog
+
+### Listázás (összes, lapozás nélkül)
+- Bemenő paraméterek: nincs
+- Visszaad minden aktív locationt (`active = true`), `name ASC` sorrendben
+- `List<LocationResponse>` — nem `Page<T>`
+- Kizárólag frontend dropdown feltöltésére szánt endpoint kiszolgálásához
 
 ### Létrehozás
 - Bemenő: `name` (kötelező), `roomId` (kötelező), `description` (opcionális)
@@ -33,7 +39,8 @@
 
 ## Elfogadási kritériumok
 
-- Listázás üres szűrőkkel az összes aktív locationt visszaadja `name ASC` sorrendben
+- Lapozott listázás üres szűrőkkel az összes aktív locationt visszaadja `name ASC` sorrendben
+- Lapozás nélküli listázás az összes aktív locationt visszaadja `List`-ként
 - `roomId` szűrővel csak az adott roomhoz tartozó locationök jelennek meg
 - Létrehozás nem létező `roomId`-val 404-et dob
 - Törlés bármely locationon sikeres (book check Feature 5-ben kerül be)

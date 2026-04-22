@@ -39,6 +39,12 @@
 - Query paraméterek: `name` (opcionális, részleges egyezés), `page` (default: 0), `size` (default: 20), `sort` (default: `name,asc`)
 - Response 200: `Page<RoomResponse>`
 
+### `GET /api/rooms/all`
+- Jogosultság: `ADMIN`, `VISITOR`
+- Query paraméterek: nincs
+- Response 200: `List<RoomResponse>` — összes aktív room, `name ASC` sorrendben, lapozás nélkül
+- Kizárólag frontend dropdown feltöltésére
+
 ### `POST /api/rooms`
 - Jogosultság: `ADMIN`
 - Request: `RoomRequest` (`version` mező figyelmen kívül hagyva)
@@ -77,6 +83,7 @@
 
 **Unit tesztek** (`RoomControllerTest`, MockMvc):
 - `GET /api/rooms` VISITOR tokennel → 200
+- `GET /api/rooms/all` VISITOR tokennel → 200, `List` típusú válasz
 - `POST /api/rooms` VISITOR tokennel → 403
 - `POST /api/rooms` hiányzó kötelező mezővel → 400
 - `DELETE /api/rooms/{id}` aktív locationnel → 409

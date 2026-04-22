@@ -31,7 +31,7 @@
 | HTTP | Axios | Standard, interceptorokkal JWT kezelés |
 | Vonalkód | react-zxing | Böngészős kamera API wrapper, mobil-optimalizált |
 | Routing | React Router v6 | Standard |
-| Grid/táblázat | TanStack Table | Headless, shadcn/ui-val natívan párosítható, sorting/filtering/pagination |
+| Grid/táblázat | AG Grid React Community | Konfigurációalapú, beépített szűrés/rendezés/lapozás/infinite scroll, dark mode támogatás (lásd ADR-009) |
 
 ### Frontend UI irányelvek
 
@@ -204,7 +204,9 @@ homelibrary-docs/                   ← GitHub repo: homelibrary-docs
 │       ├── 004-aws-compute-choice.md
 │       ├── 005-db-migration-tool.md
 │       ├── 006-sql-standard-types.md
-│       └── 007-rooms-locations-normalization.md
+│       ├── 007-rooms-locations-normalization.md
+│       ├── 008-entity-timestamp-strategy.md
+│       └── 009-grid-library-choice.md
 └── Plans/
     ├── phase1-feature-order.md
     └── specs/
