@@ -2,68 +2,95 @@
 
 ## Mit állít elő
 
-- `src/pages/LocationManagementPage.tsx` — rooms + locations lista oldal
-- `src/api/roomApi.ts` — API hívások rooms-hoz (GET, DELETE)
-- `src/api/locationApi.ts` — API hívások locations-hoz (GET, DELETE)
+- `src/pages/LocationManagementPage.tsx` — rooms panel + locations grid oldal
+- `src/api/roomApi.ts` — API hívások rooms-hoz (`GET`, `DELETE`)
+- `src/api/locationApi.ts` — API hívások locations-hoz (`GET`, `DELETE`)
+- `src/store/locationStore.ts` — Zustand store, `locationsRefreshTrigger` számlálóval
 - `src/pages/LocationManagementPage.test.tsx` — unit teszt
 
 ---
 
 ## Funkcionális követelmények
 
-### Adatlekérés (mindkét nézetben)
-- **2 párhuzamos fetch** oldal betöltésekor és szűrő/sort/lap változáskor:
-  1. `GET /api/rooms` — összes aktív room (nem lapozott, egyetlen hívás)
-  2. `GET /api/locations?page=...&size=...&sort=...&name=...` — lapozott locations, beágyazott `room` objektummal
-- A toggle **nem indít új fetch-et** — csak a megjelenítési módot váltja a már betöltött adatokon
+### Adatlekérés
 
-### Táblázat — groupolt nézet (default)
-- Kliens csoportosít `location.room.id` alapján
-- Minden aktív room megjelenik fejlécként, **üres roomok is** — a rooms fetch-ből jönnek, location nélkül
-- Location sorok oszlopai: `name`, `description`, `bookCount`
-- Room fejléc mutatja: room `name`, `locationCount`
-- Szűrők: oszlopfejlécbe integrált, hide-olható szűrősor — location `name`, `description` szűrhető; room szinten `name` szűrhető
-- Sort: location sorok `name ASC` alapértelmezetten, oszlopfejlécre kattintva váltható
-- Lapozás: location szinten
+- **3 párhuzamos fetch** oldal betöltésekor, illetve `locationsRefreshTrigger` változásakor:
+  1. `GET /api/rooms/all` — összes aktív room lapozás nélkül; a room panel adatforrása és a room dropdown szűrő feltöltéséhez
+  2. `GET /api/locations/all` — összes aktív location lapozás nélkül, a location dropdown szűrő feltöltéséhez (nem a grid adata)
+  3. `GET /api/locations?page=...&size=...&sort=...&name=...&roomId=...` — lapozott locations a gridhez, beágyazott `room` objektummal
+- Szűrő / sort / lapozás változásakor csak a grid fetch (3.) fut újra
 
-### Táblázat — flat nézet
-- Egyetlen lapozott lista az összes aktív locationről, `room.name` oszloppal kiegészítve
-- Szűrők, sort és lapozás azonos logikával mint groupolt nézetben
+### State sync — Zustand refresh trigger
 
-### Nézet váltás
-- Toggle gomb az oldal tetején: groupolt ↔ flat (csak megjelenítés vált, nincs új fetch)
+- `locationStore` egyetlen `locationsRefreshTrigger: number` értéket tárol
+- Bármilyen room vagy location mutáció (létrehozás, szerkesztés, törlés) után a mutációt indító modal incrementeli a számlálót
+- Mindhárom fetch subscribe-ol rá: számláló változásakor újrafutnak
+- Ezzel a rooms panel és a locations grid mindig szinkronban marad (pl. location törlés után a room `locationCount` frissül; room átnevezés után a grid `room.name` oszlopa frissül)
 
-### Műveletek — room szint (csak `ADMIN`)
-- Room fejlécen: **szerkesztés** ikon gomb, **Új location** gomb (step 3.10 modaljai)
-- **Törlés** ikon gomb csak akkor látható, ha `locationCount === 0` — backend 409 védelme ettől függetlenül megmarad
+### Rooms panel (csak `ADMIN` látja a művelet gombokat)
 
-### Műveletek — location szint (csak `ADMIN`)
-- Soronként: **szerkesztés** ikon gomb (step 3.11 modalja)
-- **Törlés** ikon gomb csak akkor látható, ha `bookCount === 0` — backend 409 védelme ettől függetlenül megmarad
+- Összecsukható panel az oldal tetején (shadcn `Collapsible`)
+  - Asztali nézetben alapból **nyitva**
+  - Mobilon alapból **csukva**
+- Kompakt lista: soronként egy room — `name`, `locationCount` badge, művelet gombok
+- Panel fejlécben: **Új room** gomb (step 3.10 modalja)
+- Soronként (csak `ADMIN`):
+  - **Szerkesztés** ikon gomb (step 3.10 modalja)
+  - **Törlés** ikon gomb — csak akkor látható, ha `locationCount === 0`; backend 409 védelme ettől függetlenül megmarad (step 3.10 modalja)
+  - **+ Location** ikon gomb — step 3.11 modalját nyitja, `roomId` előre kitöltve
 
-### Műveletek — oldal szint (csak `ADMIN`)
-- **Új room** gomb az oldal tetején (step 3.10 modalja)
+### Locations grid (csak `ADMIN` látja a művelet gombokat)
+
+- Flat lista, AG Grid Community Infinite Row Model
+- Oszlopok: `name`, `description`, `room.name`, `bookCount`
+- Szűrők: AG Grid custom filter komponensek (shadcn `Select`), oszlopfejlécbe integrálva
+  - `room.name` — dropdown, értékek a rooms fetch-ből; kiválasztott room szűkíti a location dropdown értékkészletét
+  - `name` — dropdown, értékek a locations fetch-ből; ha room van kiválasztva, csak az adott roomhoz tartozó locationök szerepelnek; egyébként minden
+  - `description` — szöveges szűrő (AG Grid beépített)
+- Sort: minden oszlopon, `name ASC` alapértelmezetten
+- Lapozás: AG Grid Infinite Row Model — backend `Page<T>` válasz alapján
+- Soronként (csak `ADMIN`):
+  - **Szerkesztés** ikon gomb (step 3.11 modalja)
+  - **Törlés** ikon gomb — csak akkor látható, ha `bookCount === 0`; backend 409 védelme ettől függetlenül megmarad (step 3.11 modalja)
 
 ---
 
 ## UI
 
-shadcn/ui komponensekkel:
-- `Button` — "Új room" gomb, szerkesztés/törlés ikon gombok
-- TanStack Table — oszlopfejlécbe integrált szűrősor, grouping, lapozás
+shadcn/ui + AG Grid Community:
+- `Collapsible` — rooms panel összecsukásához
+- `Button` — "Új room" gomb, szerkesztés / törlés / "+ location" ikon gombok
 - `Badge` — `locationCount` és `bookCount` megjelenítéséhez
+- AG Grid React Community — custom filter komponensek (shadcn `Select`) oszlopfejlécbe integrálva, kaszkádos room→location szűrés, lapozás (Infinite Row Model); téma (`ag-theme-quartz` / `ag-theme-quartz-dark`) az alkalmazás aktuális dark/light mode állapotából töltendő, és automatikusan reagál annak megváltozására
+
+---
+
+## Tech-debt
+
+- **Mobilos oszlopoptimalizálás:** AG Grid oszlopok priorizálása kis képernyőn (pl. `description` elrejtése) — Feature 3-ban nem prioritás, külön task-ként kezelendő
 
 ---
 
 ## Elfogadási kritériumok
 
 **Unit tesztek** (React Testing Library + Vitest, axios mock-olva):
-- Groupolt nézetben minden room fejlécként jelenik meg, beleértve az üres roomokat
-- VISITOR tokennel az "Új room", szerkesztés és törlés gombok nem láthatók
-- Toggle gomb flat/groupolt nézetváltáskor a táblázat struktúrája megváltozik
+- Rooms panel megjeleníti az összes aktív roomot `locationCount` badge-dzsel
+- VISITOR tokennel a rooms panelben egyetlen művelet gomb sem látható (`locationCount` értékétől függetlenül)
+- VISITOR tokennel a gridben egyetlen művelet gomb sem látható (`bookCount` értékétől függetlenül)
+- ADMIN tokennel, `locationCount > 0` esetén a room törlés gombja nem látható
+- ADMIN tokennel, `locationCount === 0` esetén a room törlés gombja látható
+- ADMIN tokennel, `bookCount > 0` esetén a location törlés gombja nem látható
+- ADMIN tokennel, `bookCount === 0` esetén a location törlés gombja látható
+- Room dropdown szűrőben az összes aktív room megjelenik
+- Ha room van kiválasztva, a location dropdown csak az adott roomhoz tartozó locationöket mutatja
+- Ha nincs room kiválasztva, a location dropdown az összes aktív locationt mutatja
 
 **Manuálisan:**
-- Oldal betöltésekor a rooms csoportosítva jelennek meg, locationjeikkel
-- Üres room (nincs aktív locationje) megjelenik a fejlécében, de sor nélkül
-- Szűrő beírásakor a táblázat frissül (backend hívás indul)
+- Light módban a grid `ag-theme-quartz`, dark módban `ag-theme-quartz-dark` témával jelenik meg
+- Dark/light mode váltásakor a grid téma azonnal frissül, oldal újratöltés nélkül
+- Asztali nézetben a rooms panel nyitva, mobilon csukva nyílik meg az oldal
+- Room mutáció után (create/edit/delete) a locations grid automatikusan frissül
+- Location mutáció után a rooms panel `locationCount` értékei automatikusan frissülnek
+- Locations flat listában jelennek meg, `room.name` oszloppal
+- Kaszkádos szűrés: room kiválasztása után a location dropdown értékkészlete szűkül
 - Lapozás működik

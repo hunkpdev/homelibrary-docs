@@ -149,7 +149,7 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 
 | Step | Mit állít elő |
 |------|---------------|
-| [3.9](specs/feature-locations-crud/frontend/step-3.9-rooms-locations-page.md) | Rooms + Locations oldal: rooms csoportos nézet locationökkel, TanStack Table (sort, filter, lapozás, groupolt ↔ flat toggle), `locationCount` / `bookCount` |
+| [3.9](specs/feature-locations-crud/frontend/step-3.9-rooms-locations-page.md) | Rooms + Locations oldal: flat location lista AG Grid Community-vel (sort, szöveges + kaszkádos room/location dropdown szűrő, lapozás), `bookCount` |
 | [3.10](specs/feature-locations-crud/frontend/step-3.10-room-modals.md) | Room form modalok: létrehozás / szerkesztés / törlés megerősítés |
 | [3.11](specs/feature-locations-crud/frontend/step-3.11-location-modals.md) | Location form modalok: létrehozás / szerkesztés / törlés megerősítés — `roomId` autocomplete dropdownnal (szerkeszthető placeholder), csoportfejlécből előre kitöltve |
 
@@ -208,7 +208,7 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 
 | Step | Mit állít elő |
 |------|---------------|
-| 5.7 | Könyvlista oldal: card grid, TanStack Table alapú szűrősor (státusz, helyszín, kategória, nyelv, keresés) |
+| 5.7 | Könyvlista oldal: card grid, AG Grid Community alapú szűrősor (státusz, helyszín, kategória, nyelv, keresés) |
 | 5.8 | Könyv részletek oldal/panel |
 | 5.9 | Könyv felvétel form: ISBN bevitel → lookup előtöltés (Feature 4) + kézi kitöltés |
 | 5.10 | Könyv szerkesztés form, soft delete megerősítéssel |
