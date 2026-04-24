@@ -57,6 +57,13 @@ shadcn/ui komponensekkel:
 - Sikeres submit után a modal bezárul
 
 **Manuálisan:**
-- Location létrehozás room fejlécéről: `roomId` előre kitöltve
-- Location létrehozás "Új tárolási hely" gombbal: `roomId` autocomplete működik
+- Location létrehozás room fejlécéről: modal megnyílik, `roomId` előre kitöltve és disabled, sikeres mentés után a grid frissül
+- Location szerkesztése (ActionCell ceruza): mezők előtöltve, `roomId` disabled, sikeres mentés után a grid frissül
+- Location törlése (ActionCell kuka): megerősítő modal jelenik meg, sikeres törlés után a grid frissül
 - Location törlés 409 esetén hibaüzenet látható
+
+---
+
+## Implementációs megjegyzés
+
+A tervezett "Új tárolási hely" page-szintű gomb nem lett megvalósítva. A döntés indoka: egy location mindig konkrét roomhoz tartozik, ezért természetes belépési pont a rooms panel per-room `+` gombja. Egy második, párhuzamos létrehozási útvonal UX szempontból redundáns és zavaró lenne. A `roomId` combobox (kereshető dropdown) szintén elhagyható emiatt — a room mindig előre adott, a select disabled állapotban nyílik.
