@@ -14,10 +14,11 @@
 
 ### Adatlekérés
 
-- **3 párhuzamos fetch** oldal betöltésekor, illetve `locationsRefreshTrigger` változásakor:
-  1. `GET /api/rooms/all` — összes aktív room lapozás nélkül; a room panel adatforrása és a room dropdown szűrő feltöltéséhez
-  2. `GET /api/locations/all` — összes aktív location lapozás nélkül, a location dropdown szűrő feltöltéséhez (nem a grid adata)
-  3. `GET /api/locations?page=...&size=...&sort=...&name=...&roomId=...` — lapozott locations a gridhez, beágyazott `room` objektummal
+- **3 fetch** oldal betöltésekor, illetve `locationsRefreshTrigger` változásakor:
+  1–2. `Promise.all` párhuzamosan:
+     - `GET /api/rooms/all` — összes aktív room lapozás nélkül; a room panel adatforrása és a room dropdown szűrő feltöltéséhez
+     - `GET /api/locations/all` — összes aktív location lapozás nélkül, a location dropdown szűrő feltöltéséhez (nem a grid adata)
+  3. AG Grid datasource init-kor automatikusan: `GET /api/locations?page=...&size=...&sort=...&name=...&roomId=...` — lapozott locations a gridhez, beágyazott `room` objektummal
 - Szűrő / sort / lapozás változásakor csak a grid fetch (3.) fut újra
 
 ### State sync — Zustand refresh trigger
