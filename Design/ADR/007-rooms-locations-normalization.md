@@ -5,14 +5,14 @@
 
 ## Kontextus
 
-Az eredeti tervben a `locations` tábla egyetlen táblában tárolta a helyiség (`room_name`) és a konkrét tárolási hely (`shelf_name`) adatait. Ez két problémát okozott:
+Az eredeti tervben a `locations` tábla egyetlen táblában tárolta a helyiség (`room_name`) és a konkrét helyszín (`shelf_name`) adatait. Ez két problémát okozott:
 
-1. **Üres csoport probléma:** Ha egy helyiség összes tárolási helye soft-deleted, a helyiség eltűnik a frontend csoportos nézetéből — és nincs lehetőség új tárolási helyet hozzáadni hozzá anélkül, hogy a room nevét kézzel begépelnénk.
+1. **Üres csoport probléma:** Ha egy helyiség összes helyszíne soft-deleted, a helyiség eltűnik a frontend csoportos nézetéből — és nincs lehetőség új helyszínt hozzáadni hozzá anélkül, hogy a room nevét kézzel begépelnénk.
 2. **Adatmodell pontatlanság:** A `room_name` + `shelf_name` kombináció denormalizált — a helyiség egy önálló entitás, nem egy mező.
 
 ## Döntés
 
-**A `locations` tábla mellé bevezettük a `rooms` táblát.** A `locations` tábla mostantól egy konkrét tárolási helyet (polc, szekrény, láda, stb.) reprezentál, és FK-val hivatkozik a `rooms` táblára.
+**A `locations` tábla mellé bevezettük a `rooms` táblát.** A `locations` tábla mostantól egy konkrét helyszínt (polc, szekrény, láda, stb.) reprezentál, és FK-val hivatkozik a `rooms` táblára.
 
 ```
 rooms (id, name, description, active, ...)

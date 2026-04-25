@@ -26,7 +26,7 @@ Webalapú elektronikus házi könyvtárkezelő alkalmazás, amellyel egy háztar
 - Mobilos kamerával vonalkód (ISBN) beolvasás (elsődleges)
 - Kézi ISBN bevitel (fallback, ha kamera nem működik)
 - ISBN alapján automatikus adatlehívás külső API-ból (cím, szerző, kiadó, év, kategória, borítókép)
-- Tárolási hely megadása: helyiség → szekrény/polc
+- Helyszín megadása: helyiség → szekrény/polc
 - Kezdeti státusz beállítása
 
 ### Könyvtár kezelés

@@ -12,7 +12,7 @@
 ```
 rooms (helyiség)
   │
-  └──< locations (konkrét tárolási hely: polc, szekrény, láda, stb.)
+  └──< locations (konkrét helyszín: polc, szekrény, láda, stb.)
           │
           └──< books
                 │
@@ -65,7 +65,7 @@ users
 
 ---
 
-### `locations` (konkrét tárolási helyek)
+### `locations` (konkrét helyszínek)
 
 Egy location pontosan egy roomhoz tartozik (`room_id` NOT NULL) — lásd ADR-007.
 

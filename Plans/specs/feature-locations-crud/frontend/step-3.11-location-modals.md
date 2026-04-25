@@ -15,11 +15,11 @@
 
 | Mező | Kötelező | Leírás |
 |------|----------|--------|
-| `name` | igen | Tárolási hely neve |
+| `name` | igen | Helyszín neve |
 | `roomId` | igen | Combobox: meglévő room nevek kereshetők/szűrhetők — csak listából választható, új room az oldal tetején lévő "Új room" gombbal hozható létre — POST-nál aktív, PUT-nál disabled (lásd ADR-007) |
 | `description` | nem | Opcionális megjegyzés |
 
-- Létrehozás és szerkesztés ugyanaz a modal — a title változik ("Új tárolási hely" / "Tárolási hely szerkesztése")
+- Létrehozás és szerkesztés ugyanaz a modal — a title változik ("Új helyszín" / "Helyszín szerkesztése")
 - Groupolt nézetben room fejlécéről megnyitva: `roomId` előre kitöltve és disabled
 - Szerkesztéskor a meglévő értékek előre kitöltve, `roomId` disabled
 - Submit: `POST /api/locations` (create) vagy `PUT /api/locations/{id}` (edit, `version` mezővel)
@@ -29,10 +29,10 @@
 
 ## `LocationDeleteModal`
 
-- Megerősítő modal: "Biztosan törlöd a(z) {name} tárolási helyet?"
+- Megerősítő modal: "Biztosan törlöd a(z) {name} helyszínt?"
 - Submit: `DELETE /api/locations/{id}`
 - A törlés gomb csak `bookCount === 0` esetén jelenik meg a táblázatban (UX szűrő) — a backend 409 védelme ettől függetlenül megmarad
-- 409 esetén hibaüzenet: "A tárolási helyhez aktív könyvek tartoznak"
+- 409 esetén hibaüzenet: "A helyszínhez aktív könyvek tartoznak"
 - Sikeres törlés után a lista frissül, modal bezárul
 
 ---
@@ -66,4 +66,4 @@ shadcn/ui komponensekkel:
 
 ## Implementációs megjegyzés
 
-A tervezett "Új tárolási hely" page-szintű gomb nem lett megvalósítva. A döntés indoka: egy location mindig konkrét roomhoz tartozik, ezért természetes belépési pont a rooms panel per-room `+` gombja. Egy második, párhuzamos létrehozási útvonal UX szempontból redundáns és zavaró lenne. A `roomId` combobox (kereshető dropdown) szintén elhagyható emiatt — a room mindig előre adott, a select disabled állapotban nyílik.
+A tervezett "Új helyszín" page-szintű gomb nem lett megvalósítva. A döntés indoka: egy location mindig konkrét roomhoz tartozik, ezért természetes belépési pont a rooms panel per-room `+` gombja. Egy második, párhuzamos létrehozási útvonal UX szempontból redundáns és zavaró lenne. A `roomId` combobox (kereshető dropdown) szintén elhagyható emiatt — a room mindig előre adott, a select disabled állapotban nyílik.

@@ -29,7 +29,7 @@
 
 - Megerősítő modal: "Biztosan törlöd a(z) {name} helyiséget?"
 - Submit: `DELETE /api/rooms/{id}`
-- 409 esetén hibaüzenet: "A helyiséghez aktív tárolási helyek tartoznak"
+- 409 esetén hibaüzenet: "A helyiséghez aktív helyszínek tartoznak"
 - Sikeres törlés után a lista frissül, modal bezárul
 
 ---

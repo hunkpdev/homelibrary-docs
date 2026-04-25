@@ -128,7 +128,7 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 
 ## Feature 3 – Rooms és Locations CRUD
 
-**Cél:** Teljes helyiség és tárolási hely kezelés — előfeltétele a könyvek elhelyezésének. Lásd ADR-007.
+**Cél:** Teljes helyiség és helyszín kezelés — előfeltétele a könyvek elhelyezésének. Lásd ADR-007.
 
 **Jogosultság:** GET — ADMIN, VISITOR | POST, PUT, DELETE — ADMIN
 
