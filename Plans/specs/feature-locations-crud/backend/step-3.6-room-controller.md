@@ -3,20 +3,30 @@
 ## Mit állít elő
 
 - `RoomController` — `GET /api/rooms`, `POST /api/rooms`, `PUT /api/rooms/{id}`, `DELETE /api/rooms/{id}`
-- `RoomRequest` — request DTO (létrehozás és módosítás)
+- `CreateRoomRequest` — request DTO létrehozáshoz
+- `UpdateRoomRequest` — request DTO módosításhoz
 - `RoomResponse` — response DTO
 - `RoomServiceTest` — unit teszt
 - `RoomControllerTest` — unit teszt (MockMvc)
 
 ---
 
-## `RoomRequest` DTO
+## `CreateRoomRequest` DTO
 
 | Mező | Típus | Validáció |
 |------|-------|-----------|
 | `name` | `String` | `@NotBlank` |
 | `description` | `String` | — |
-| `version` | `Long` | — (csak PUT-nál kötelező, de egységes DTO) |
+
+---
+
+## `UpdateRoomRequest` DTO
+
+| Mező | Típus | Validáció |
+|------|-------|-----------|
+| `name` | `String` | `@NotBlank` |
+| `description` | `String` | — |
+| `version` | `Long` | `@NotNull` |
 
 ---
 
@@ -47,13 +57,13 @@
 
 ### `POST /api/rooms`
 - Jogosultság: `ADMIN`
-- Request: `RoomRequest` (`version` mező figyelmen kívül hagyva)
+- Request: `CreateRoomRequest`
 - Response 201: `RoomResponse`
 - Response 400: validációs hiba
 
 ### `PUT /api/rooms/{id}`
 - Jogosultság: `ADMIN`
-- Request: `RoomRequest` (`version` kötelező az optimistic lockinghoz)
+- Request: `UpdateRoomRequest`
 - Response 200: `RoomResponse` (növelt `version`)
 - Response 404: room nem található
 - Response 409: optimistic locking ütközés
