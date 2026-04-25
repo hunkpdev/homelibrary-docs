@@ -6,6 +6,22 @@ Olyan feladatok, amelyek nem tartoznak aktív feature-höz, de határidőre vagy
 
 ## Nyitott
 
+### Strukturált hibaválasz (ErrorResponse) bevezetése
+
+**Teendő:** A `GlobalExceptionHandler` jelenleg minden hibánál üres body-jú (`ResponseEntity<Void>`) választ ad. Strukturált `ErrorResponse` record bevezetése szükséges (timestamp, status, message, path mezőkkel).
+
+**Forrás:** API_DESIGN.md „Egységes Hibastruktúra" szekció — az előírt formátum és a tényleges implementáció eltér.
+
+---
+
+### DELETE /api/locations/{id} — aktív könyvek ellenőrzése hiányzik
+
+**Teendő:** A `LocationService.delete` metódus még nem ellenőrzi, hogy a location-höz tartoznak-e aktív könyvek. Implementálandó Feature 5 step 5.4-ben: `ActiveChildException` → 409 Conflict.
+
+**Forrás:** A `books` tábla Feature 3 idején még nem létezik; szándékosan halasztva. Kódban `// TODO(step-5.4)` comment jelöli.
+
+---
+
 ### GitHub Actions — Node.js 24 migráció
 
 **Határidő:** 2026-06-02 (forced Node.js 24 default)

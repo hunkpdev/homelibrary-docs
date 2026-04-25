@@ -50,7 +50,7 @@
 
 ### `GET /api/locations`
 - Jogosultság: `ADMIN`, `VISITOR`
-- Query paraméterek: `name`, `roomId` (mind opcionális), `page` (default: 0), `size` (default: 20), `sort` (default: `name,asc`)
+- Query paraméterek: `name`, `description`, `roomId` (mind opcionális; `name` és `description` részleges egyezés, case-insensitive), `page` (default: 0), `size` (default: 20), `sort` (default: `name,asc`)
 - Response 200: `Page<LocationResponse>`
 
 ### `GET /api/locations/all`

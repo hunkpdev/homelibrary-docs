@@ -18,15 +18,20 @@
 
 ## Egységes Hibastruktúra
 
-```json
-{
-  "timestamp": "2026-03-28T14:30:00Z",
-  "status": 404,
-  "error": "NOT_FOUND",
-  "message": "Book not found with id: 550e8400",
-  "path": "/api/books/550e8400"
-}
-```
+**Jelenleg:** üres response body (Content-Length: 0). A `GlobalExceptionHandler` minden esetben `ResponseEntity<Void>`-dal tér vissza.
+
+Strukturált hibaválasz (timestamp/status/message/path) bevezetése tech-debt — lásd `Plans/tech-debt.md`.
+
+> Tervezett jövőbeli formátum (referenciaként):
+> ```json
+> {
+>   "timestamp": "2026-03-28T14:30:00Z",
+>   "status": 404,
+>   "error": "NOT_FOUND",
+>   "message": "Book not found with id: 550e8400",
+>   "path": "/api/books/550e8400"
+> }
+> ```
 
 ---
 
@@ -309,6 +314,17 @@ Az összes aktív helyiség listázása.
 
 ---
 
+### `GET /api/rooms/all`
+Lapozás nélküli teljes lista, frontend dropdown feltöltésére.
+
+**Jogosultság:** `ADMIN` vagy `VISITOR`
+
+**Query paraméterek:** nincs
+
+**Response 200:** `List<RoomResponse>` — összes aktív room, `name ASC` sorrendben
+
+---
+
 ### `POST /api/rooms`
 Új helyiség felvétele.
 
@@ -356,7 +372,7 @@ Az összes aktív location listázása.
 
 **Jogosultság:** `ADMIN` vagy `VISITOR`
 
-**Query paraméterek:** `name`, `roomId` (opcionálisak, részleges egyezés / UUID szűrő), `page`, `size`, `sort` (default: `name,asc`)
+**Query paraméterek:** `name`, `description`, `roomId` (opcionálisak; `name` és `description` részleges egyezés, case-insensitive; `roomId` UUID szűrő), `page`, `size`, `sort` (default: `name,asc`)
 
 **Response 200:** `Page<LocationResponse>`
 ```json
@@ -377,6 +393,17 @@ Az összes aktív location listázása.
   ...
 }
 ```
+
+---
+
+### `GET /api/locations/all`
+Lapozás nélküli teljes lista, frontend dropdown feltöltésére.
+
+**Jogosultság:** `ADMIN` vagy `VISITOR`
+
+**Query paraméterek:** nincs
+
+**Response 200:** `List<LocationResponse>` — összes aktív location, `name ASC` sorrendben
 
 ---
 
