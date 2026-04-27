@@ -49,6 +49,12 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
        │                                          │
        ▼                                          │
 7. Felhasználókezelés ← függ: Auth ──────────────┘
+       │
+       ▼
+8. i18n kiegészítések ← függ: Project Setup (1.6, 1.7)
+       │
+       ▼
+9. Demo role ← függ: Auth + minden controller (3–7)
 ```
 
 ---
@@ -259,3 +265,38 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 |------|---------------|
 | 7.3 | Felhasználók oldal (admin): lista, új felhasználó létrehozás, szerepkör és státusz módosítás |
 | 7.4 | Saját profil oldal: jelszó módosítás, nyelvi beállítás |
+
+---
+
+## Feature 8 – i18n kiegészítések
+
+**Cél:** Böngésző locale alapján automatikus nyelvválasztás és manuális váltási lehetőség — a meglévő i18next alap (step 1.6) és sidebar layout (step 1.7) kiegészítése.
+
+### Frontend
+
+| Step | Mit állít elő |
+|------|---------------|
+| 8.1 | `i18next-browser-languagedetector` plugin bekötése: böngésző locale detektálás, hu → `hu`, egyéb → `en` fallback, választott nyelv `localStorage`-ban perzisztálva |
+| 8.2 | `LanguageSwitcher` komponens: flag ikon gomb a sidebar alján (dark mode toggle mellé), mindig a másik nyelvet jelöli, kattintásra nyelvváltás i18next-en keresztül |
+
+---
+
+## Feature 9 – Demo role
+
+**Cél:** Portfólió bemutató célú DEMO role — minden oldal és form elérhető, de adatmódosítás GUI-n és API-n egyaránt blokkolva.
+
+**Jogosultság:** GET végpontok — DEMO role számára is elérhetők; POST/PUT/DELETE → 403
+
+### Backend
+
+| Step | Mit állít elő |
+|------|---------------|
+| 9.1 | `Role` enum bővítése `DEMO` értékkel |
+| 9.2 | Liquibase changeset: beégetett demo user seed (BCrypt hash-elt jelszó, `DEMO` role) — analóg az admin seed changeset-tel (step 1.3) |
+| 9.3 | Spring Security: DEMO role kizárása az összes POST/PUT/DELETE végpontból (method security `@PreAuthorize` vagy globális `httpSecurity` rule) |
+
+### Frontend
+
+| Step | Mit állít elő |
+|------|---------------|
+| 9.4 | DEMO role detektálás JWT payload decode alapján (nem Zustand flag) + minden mutáció gombon (mentés, törlés, küldés) `disabled` állapot DEMO role esetén — cross-cutting, az összes feature (3–7) érintett |
