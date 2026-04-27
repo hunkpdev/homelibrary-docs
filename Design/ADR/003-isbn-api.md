@@ -1,66 +1,69 @@
 # ADR-003: ISBN Lookup API Stratégia
 
-**Dátum:** 2026-03-28
+**Dátum:** 2026-03-28  
+**Frissítve:** 2026-04-27  
 **Státusz:** Elfogadva
 
 ## Kontextus
 
 A könyv felvételekor ISBN szám alapján automatikusan le kell kérni a könyv adatait
 (cím, szerző, kiadó, kiadási év, kategória, borítókép) egy külső forrásból.
-A megoldásnak ingyenesnek kell lennie.
+A megoldásnak ingyenesnek kell lennie. Az alkalmazás elsősorban magyar nyelvű könyveket kezel.
 
 ## Döntés
 
-**Kétlépéses stratégia: OpenLibrary API (elsődleges) + Google Books API (fallback)**
+**Kétlépéses stratégia: moly.hu (elsődleges, scraping) + OpenLibrary API (fallback)**
+
+Google Books API-t nem használunk — API kulcs igénylése és napi limit kezelése felesleges overhead egy demo projektben. Ha a projekt kereskedelmi útra tér, az ISBNdb (fizetős) lesz a megfelelő bővítés.
 
 ## API Összehasonlítás
 
-| Szempont | OpenLibrary | Google Books | Amazon Product API |
-|----------|-------------|--------------|-------------------|
-| Ár | Ingyenes | Ingyenes | Fizetős |
-| API kulcs | Nem kell | Kell | Kell |
-| Napi limit | Nincs | 1000 req/nap | - |
-| Adatminőség | Jó (közösségi) | Jó (Google) | Kiváló |
-| Borítókép | ✅ | ✅ | ✅ |
-| Magyar könyvek | Közepes | Jó | Jó |
+| Szempont | moly.hu | OpenLibrary | Google Books |
+|----------|---------|-------------|--------------|
+| Ár | Ingyenes | Ingyenes | Ingyenes (1000 req/nap) |
+| API kulcs | Nem kell | Nem kell | Kell |
+| Hozzáférés | HTML scraping | REST API | REST API |
+| Magyar könyvek | Kiváló | Gyenge | Közepes |
+| Stabilitás | Törékeny (UI változás) | Stabil | Stabil |
 
 ## Megvalósítás
 
-### 1. OpenLibrary API (elsődleges)
+### 1. moly.hu (elsődleges)
+```
+GET https://moly.hu/kereses?utf8=%E2%9C%93&query={isbn}
+```
+- HTML scraping Jsoup könyvtárral
+- Legjobb magyar könyv lefedettség
+- Nincs API kulcs, nincs rate limit
+- Kockázat: UI változás esetén a selectorok frissítést igényelnek
+
+### 2. OpenLibrary API (fallback)
 ```
 GET https://openlibrary.org/api/books?bibkeys=ISBN:{isbn}&format=json&jscmd=data
 ```
 - Regisztráció nélkül, API kulcs nélkül hívható
-- Ha találat van → adatok feldolgozása és visszaadása
-- Ha nincs találat → tovább a fallback-re
-
-### 2. Google Books API (fallback)
-```
-GET https://www.googleapis.com/books/v1/volumes?q=isbn:{isbn}&key={API_KEY}
-```
-- API kulcs szükséges (ingyenes, Google Cloud Console-ban igényelve)
-- API kulcs SSM Parameter Store-ban tárolva
-- 1000 req/nap limit – egy házi könyvtárnál bőven elegendő
+- Jó lefedettség nemzetközi könyveknél
+- Gyenge magyar könyv lefedettség
 
 ### 3. Manuális bevitel (végső fallback)
-Ha egyik API sem talál eredményt, a felhasználó kézzel tölti ki az adatokat.
+Ha egyik forrás sem talál eredményt, a felhasználó kézzel tölti ki az adatokat.
 
 ## Backend Implementáció
 
-A backend hívja az external API-kat (nem a frontend direktben):
+A backend hívja a külső forrásokat (nem a frontend direktben):
 - Egységes hibakezelés
-- API kulcsok biztonságban maradnak
-- Könnyen cserélhető/bővíthető (Strategy pattern)
+- Könnyen bővíthető (új provider hozzáadása minimális változtatással)
 
 ```
 GET /api/books/isbn/{isbn}
-  → OpenLibraryService.lookup(isbn)
-    → ha null: GoogleBooksService.lookup(isbn)
+  → MolyHuClient.lookup(isbn)
+    → ha null: OpenLibraryClient.lookup(isbn)
       → ha null: { found: false }
 ```
 
 ## Következmények
 
-- Google Books API kulcs SSM Parameter Store-ban: `/homelibrary/google-books-api-key`
-- A Spring Boot alkalmazásban `IsbnLookupService` interface + két implementáció
-- Ha az OpenLibrary adatminősége nem megfelelő magyar könyveknél, a sorrend felcserélhető
+- Jsoup Maven függőség szükséges a moly.hu scrapinghez
+- `IsbnSource` enum értékek: `MOLY_HU`, `OPENLIBRARY`
+- Google Books API kulcs SSM-ben **nem** szükséges
+- Ha a moly.hu HTML struktúrája változik, a `MolyHuClient` CSS selectorait frissíteni kell

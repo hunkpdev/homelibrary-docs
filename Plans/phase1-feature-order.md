@@ -163,31 +163,25 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 
 ## Feature 4 – ISBN Lookup
 
-**Cél:** Külső API integráció — ISBN beolvasás/bevitel után könyv adatok előtöltése OpenLibrary-ból vagy Google Books-ból.
+**Cél:** Külső forrás integráció — ISBN beolvasás/bevitel után könyv adatok előtöltése moly.hu-ról (elsődleges) vagy OpenLibrary-ból (fallback). Lásd ADR-003.
 
-**Jogosultság:** GET — ADMIN
+**Jogosultság:** GET — ADMIN (DEMO role is elérheti)
 
 ### Backend
 
 | Step | Mit állít elő |
 |------|---------------|
-| 4.1 | `OpenLibraryClient`: HTTP hívás, válasz leképezés belső DTO-ra |
-| 4.2 | `GoogleBooksClient`: HTTP hívás, válasz leképezés, API kulcs SSM-ből (lokálisan: application properties) |
-| 4.3 | `ISBNLookupService`: elsődleges (OpenLibrary) → fallback (Google Books) → nem található |
-| 4.4 | `ISBNLookupController`: `GET /api/books/isbn/{isbn}` |
+| [4.1](specs/feature-isbn-lookup/backend/step-4.1-molyhu-client.md) | `MolyHuClient`: moly.hu HTML scraping Jsoup-pal, `IsbnLookupResult` record + `IsbnSource` enum definiálása, azonosító `User-Agent` fejléc |
+| [4.2](specs/feature-isbn-lookup/backend/step-4.2-openlibrary-client.md) | `OpenLibraryClient`: HTTP hívás, válasz leképezés `IsbnLookupResult`-ra (`source = OPENLIBRARY`) |
+| [4.3](specs/feature-isbn-lookup/backend/step-4.3-isbn-lookup-service.md) | `IsbnLookupService`: elsődleges (moly.hu) → fallback (OpenLibrary) → nem található; ISBN formátum elővalidálás |
+| [4.4](specs/feature-isbn-lookup/backend/step-4.4-isbn-lookup-controller.md) | `IsbnLookupController`: `GET /api/books/isbn/{isbn}` |
 
 ### Frontend
 
 | Step | Mit állít elő |
 |------|---------------|
-| 4.5 | `IsbnScannerInput` React komponens: `react-zxing` integráció, kamera elérhetőség detektálás (MediaDevices API), kamera nézet elsődleges / kézi szövegmező fallback — ha a kamera elérhető, alapból az aktív |
-| 4.6 | ISBN lookup UI: trigger a scanner/mező értékéből, találat → mezők előtöltése, nem találat → üzenet |
-
-### Infra (CDK)
-
-| Step | Mit állít elő |
-|------|---------------|
-| 4.7 | SSM Parameter Store: `/homelibrary/google-books-api-key` paraméter hozzáadása a stack-hez |
+| [4.5](specs/feature-isbn-lookup/frontend/step-4.5-isbn-scanner-input.md) | `IsbnScannerInput` React komponens: `react-zxing` integráció, kamera elérhetőség detektálás (MediaDevices API), kamera nézet elsődleges / kézi szövegmező fallback — ha a kamera elérhető, alapból az aktív |
+| [4.6](specs/feature-isbn-lookup/frontend/step-4.6-isbn-lookup-ui.md) | `IsbnLookupPanel`: scanner + API hívás + eredmény megjelenítés; `onResult` callbacken adja át az adatokat a szülő (könyv form, Feature 5) számára |
 
 ---
 
