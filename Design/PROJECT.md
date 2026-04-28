@@ -2,7 +2,7 @@
 
 > **Dokumentáció repo:** `homelibrary-docs`
 > **Kód repo:** `homelibrary`
-> **Utolsó frissítés:** 2026-03-28
+> **Utolsó frissítés:** 2026-04-28
 
 ## Mi ez?
 
@@ -19,6 +19,7 @@ Webalapú elektronikus házi könyvtárkezelő alkalmazás, amellyel egy háztar
 |-----------|-----------|
 | `ADMIN` | Mindent: könyv felvétel, módosítás, törlés, áthelyezés, felhasználókezelés |
 | `VISITOR` | Böngészés, keresés, listázás – módosítás nem |
+| `DEMO` | Portfolio bemutató szerepkör — Fázis 1 minden oldal látható (Felhasználókezelés kivételével). Csak biztonságos HTTP metódusok (GET, HEAD, OPTIONS) engedélyezve — minden state-modifying művelet (POST/PUT/PATCH/DELETE) GUI-n disabled, API-n 403-mal elutasítva. |
 
 ## Főbb funkciók
 
@@ -45,8 +46,16 @@ Webalapú elektronikus házi könyvtárkezelő alkalmazás, amellyel egy háztar
 ### Autentikáció (saját "mini IDM")
 - Bejelentkezés felhasználónév + jelszóval
 - JWT access token (rövid életű) + refresh token (HttpOnly cookie)
-- Két szerepkör: `ADMIN` és `VISITOR`
+- Három szerepkör: `ADMIN`, `VISITOR` és `DEMO` (lásd Fázis 1 Demo role)
 - Jelszó visszaállítás: Fázis 2
+
+### Demo role (Fázis 1)
+- Beégetett demo user külön `DEMO` szerepkörrel — portfólió bemutatóhoz
+- Minden oldal és form látható (Felhasználókezelés kivételével)
+- Mutáció gombok (mentés, törlés, küldés) GUI-n disabled
+- State-modifying műveletek (POST/PUT/PATCH/DELETE) API-n 403-mal visszautasítva
+- Kizárólag biztonságos HTTP metódusok (GET, HEAD, OPTIONS) engedélyezve
+- Implementáció: `<MutationButton>` wrapper komponens auto-disabled DEMO role esetén; Spring Security whitelist szabály (GET/HEAD DEMO-engedélyezett, `anyRequest()` ADMIN-only)
 
 ### AI fordítás (Fázis 3)
 - Ha a mentett leírás nyelve ≠ felhasználó aktuális nyelve → AI API hívással fordítás
@@ -57,7 +66,7 @@ Webalapú elektronikus házi könyvtárkezelő alkalmazás, amellyel egy háztar
 ## Fázisok
 
 ### Fázis 1 – MVP (core funkciók)
-- [ ] Auth (bejelentkezés, JWT, két szerepkör)
+- [ ] Auth (bejelentkezés, JWT, három szerepkör)
 - [ ] ISBN lookup (OpenLibrary API + Google Books fallback) + vonalkód olvasás kamerával (react-zxing, elsődleges) / kézi bevitel (fallback)
 - [ ] Könyv CRUD (felvétel, listázás, módosítás, soft delete)
 - [ ] Helyiség/polc kezelés
@@ -66,13 +75,13 @@ Webalapú elektronikus házi könyvtárkezelő alkalmazás, amellyel egy háztar
 - [ ] Alap responsive UI (React), dark mode, i18n (hu/en): böngésző locale alapján automatikus nyelvválasztás (magyar → hu, egyéb → en fallback), manuális váltás zászló ikonnal a menüben (az ikon mindig a másik nyelvet jelöli)
 - [ ] AWS deploy (Lambda + API Gateway + S3 + CloudFront)
 - [ ] CI/CD (GitHub Actions) + SonarQube Cloud
-- [ ] Demo role (portfólió bemutató): beégetett demo user külön `DEMO` szerepkörrel — minden oldal és form elérhető (beleértve az adatfelviteli formokat és az ISBN keresőt), de a backend mutációt indító gombok (mentés, törlés, küldés) le vannak tiltva GUI-n; API szinten POST/PUT/DELETE végpontok 403-mal visszautasítják a DEMO role-t
+- [ ] Demo role (portfólió bemutató) — lásd Főbb funkciók / Demo role
 
 ### Fázis 2 – Kényelem
 - [ ] Borítókép megjelenítés (S3 pre-signed URL)
 - [ ] Jelszó visszaállítás
-- [ ] Helyszín másolása: meglévő location „Másolás" gombja előtölti a létrehozó modalt (room, name, description egyaránt), a felhasználó csak a különbséget módosítja — tipikus eset: polcos szekrény több polca
-- [ ] Témaváltó: shadcn/ui gyári témák közötti váltás (a dark/light toggle megmarad, ehhez képest külön szín-téma választó)
+- [ ] Helyszín másolása: meglévő location „Másolás" gombja előtölti a létrehozó modalt (room, name, description egyaránt), a felhasználó csak a különbséget módosítja — tipikus eset: polcos szekrény több polca. Az új location `bookCount = 0`-val jön létre (a form előtölti a többi mezőt, de a könyvszám nem másolódik).
+- [ ] Témaváltó: shadcn/ui gyári témák közötti váltás (a dark/light toggle megmarad, ehhez képest külön szín-téma választó) — perzisztencia helye (localStorage vs `users` tábla) Fázis 2 spec tervezésekor döntendő.
 
 ### Fázis 3 – AI & kiterjesztés
 - [ ] AI alapú leírás-fordítás (Gemini vagy DeepL – tesztelés után döntés)

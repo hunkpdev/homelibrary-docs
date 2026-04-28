@@ -1,7 +1,7 @@
 # 1. Fázis – Implementációs terv
 
 > **Státusz:** Tervezés alatt
-> **Utolsó frissítés:** 2026-04-04
+> **Utolsó frissítés:** 2026-04-28
 > **Hatókör:** MVP – az első működő, deployolható alkalmazáshoz szükséges core feature-ök
 
 ## Fejlesztési workflow
@@ -116,7 +116,7 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 | [2.3](specs/feature-auth/backend/step-2.3-jwt-properties-util.md) | `JwtProperties` (`@ConfigurationProperties` az `app.jwt.*` property-khez) + `JwtUtil`: access token generálás, validálás, claim kinyerés |
 | [2.4](specs/feature-auth/backend/step-2.4-jwt-authentication-filter.md) | `JwtAuthenticationFilter`: Bearer token validálás minden kérésnél |
 | [2.5](specs/feature-auth/backend/step-2.5-security-config.md) | Spring Security konfiguráció: filter chain, role hierarchia, publikus endpointok (`/api/auth/**`, `/api/health`, `/swagger-ui/**`, `/v3/api-docs/**`) |
-| [2.6](specs/feature-auth/backend/step-2.6-login-endpoint.md) | `CookieProperties` (`@ConfigurationProperties` az `app.cookie.*` property-khez) + `POST /api/auth/login`: hitelesítés, access token + refresh token cookie kibocsátás (HttpOnly, Secure, SameSite=Strict, Path=/api/auth, `app.cookie.secure=false` local profilon) |
+| [2.6](specs/feature-auth/backend/step-2.6-login-endpoint.md) | `CookieProperties` (`@ConfigurationProperties` az `app.cookie.*` property-khez) + `POST /api/auth/login`: hitelesítés, access token + refresh token cookie kibocsátás (HttpOnly, Secure, SameSite=Strict, Path=/api/auth, `app.cookie.secure=false` local profilon). Ha `user.preferred_language === NULL` (első bejelentkezés), a login endpoint az `Accept-Language` HTTP header alapján tölti ki (`hu` magyar locale-ra, `en` egyébként) — innentől a mező mindig kitöltött. |
 | [2.7](specs/feature-auth/backend/step-2.7-refresh-endpoint.md) | `POST /api/auth/refresh`: refresh token validálás, rotation (új token kibocsátás, régi érvénytelenítés DB-ben) |
 | [2.8](specs/feature-auth/backend/step-2.8-logout-integration-test.md) | `POST /api/auth/logout`: refresh token cookie törlése + DB-ben érvénytelenítés |
 
@@ -165,7 +165,7 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 
 **Cél:** Külső forrás integráció — ISBN beolvasás/bevitel után könyv adatok előtöltése moly.hu-ról (elsődleges) vagy OpenLibrary-ból (fallback). Lásd ADR-003.
 
-**Jogosultság:** GET — ADMIN (DEMO role is elérheti)
+**Jogosultság:** GET — `ADMIN` vagy `DEMO` (`hasAnyRole('ADMIN', 'DEMO')`) — VISITOR 403
 
 ### Backend
 
@@ -244,7 +244,7 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 
 **Cél:** Admin kezeli a felhasználókat (létrehozás, listázás, szerepkör/státusz módosítás). Felhasználók saját jelszavukat és nyelvi beállításukat módosíthatják.
 
-**Jogosultság:** GET, POST, DELETE — ADMIN | PUT — ADMIN (bármely user) + VISITOR (csak saját: jelszó, nyelv)
+**Jogosultság:** GET lista, POST, DELETE — ADMIN (VISITOR és DEMO kizárva) | GET saját, PUT saját (csak jelszó + preferredLanguage) — VISITOR is (`@PreAuthorize` ownership check); DEMO minden `/api/users/**` végpontból kizárva
 
 ### Backend
 
@@ -266,20 +266,22 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 
 **Cél:** Böngésző locale alapján automatikus nyelvválasztás és manuális váltási lehetőség — a meglévő i18next alap (step 1.6) és sidebar layout (step 1.7) kiegészítése.
 
+**Megjegyzés:** Technikailag már Feature 1 után implementálható (csak project setup-tól függ), de kényelmi feature — tudatos döntés, hogy a fontosabb feature-ök (3–7) után kerül sorra.
+
 ### Frontend
 
 | Step | Mit állít elő |
 |------|---------------|
-| 8.1 | `i18next-browser-languagedetector` plugin bekötése: böngésző locale detektálás, hu → `hu`, egyéb → `en` fallback, választott nyelv `localStorage`-ban perzisztálva |
+| 8.1 | `i18next-browser-languagedetector` plugin bekötése: böngésző locale detektálás, hu → `hu`, egyéb → `en` fallback. Bejelentkezett user esetén `user.preferred_language` az egyetlen forrás (`PUT /api/users/{id}` perzisztálva) — `localStorage` réteg nincs. Anonymous oldalakon (login form) csak `navigator.language` autodetect, perzisztencia nincs. |
 | 8.2 | `LanguageSwitcher` komponens: flag ikon gomb a sidebar alján (dark mode toggle mellé), mindig a másik nyelvet jelöli, kattintásra nyelvváltás i18next-en keresztül |
 
 ---
 
 ## Feature 9 – Demo role
 
-**Cél:** Portfólió bemutató célú DEMO role — minden oldal és form elérhető, de adatmódosítás GUI-n és API-n egyaránt blokkolva.
+**Cél:** Portfólió bemutató célú DEMO role — minden oldal és form látható, kizárólag biztonságos HTTP metódusok (GET/HEAD/OPTIONS) engedélyezve; minden state-modifying művelet GUI-n disabled, API-n 403-mal elutasítva.
 
-**Jogosultság:** GET végpontok — DEMO role számára is elérhetők; POST/PUT/DELETE → 403
+**Jogosultság:** GET, HEAD, OPTIONS — DEMO role számára is elérhetők; minden state-modifying metódus (POST, PUT, PATCH, DELETE) → 403
 
 ### Backend
 
@@ -287,10 +289,10 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 |------|---------------|
 | 9.1 | `Role` enum bővítése `DEMO` értékkel |
 | 9.2 | Liquibase changeset: beégetett demo user seed (BCrypt hash-elt jelszó, `DEMO` role) — analóg az admin seed changeset-tel (step 1.3) |
-| 9.3 | Spring Security: DEMO role kizárása az összes POST/PUT/DELETE végpontból (method security `@PreAuthorize` vagy globális `httpSecurity` rule) |
+| 9.3 | Spring Security: DEMO role számára kizárólag a biztonságos (GET, HEAD, OPTIONS) HTTP metódusok engedélyezve `/api/**` alatt; minden state-modifying metódus (POST, PUT, PATCH, DELETE és bármi egyéb) ADMIN-only — globális `httpSecurity` rule-lal SecurityConfig-ban (whitelist forma: GET/HEAD-re explicit role-list, `anyRequest()` ADMIN-only; nincs külön DEMO-blokk rule). Kivétel: `/api/users/**` — DEMO és VISITOR statikusan kizárva a SecurityConfig-ban; VISITOR self-access (`GET /{id}`, `PUT /{id}` saját rekordra) method-level `@PreAuthorize`-zal finomítva a controllerben (`@EnableMethodSecurity` szükséges). |
 
 ### Frontend
 
 | Step | Mit állít elő |
 |------|---------------|
-| 9.4 | DEMO role detektálás JWT payload decode alapján (nem Zustand flag) + minden mutáció gombon (mentés, törlés, küldés) `disabled` állapot DEMO role esetén — cross-cutting, az összes feature (3–7) érintett |
+| 9.4 | DEMO role detektálás a Zustand auth store `user.role === 'DEMO'` alapján — nem külön `isDemo` boolean flag a store-ban (a `user` objektumból származtatott érték, ld. Feature 2.9). Minden mutáció gombon (mentés, törlés, küldés) `disabled` állapot DEMO role esetén — cross-cutting, az összes feature (3–7) érintett. Pattern: `<MutationButton>` wrapper komponens (`src/components/common/MutationButton.tsx`) — a logika egyszer van megírva, DEMO esetén auto-disabled + tooltip ("Demo módban a mentés letiltva"); a meglévő save/delete/submit gombok cseréje erre a komponensre. A kliensoldali blokk UX cél; a tényleges biztonságot a step 9.3 szerver oldali szabálya adja, ami DevTools-tampering ellen is védett. |

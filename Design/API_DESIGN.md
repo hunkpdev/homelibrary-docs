@@ -92,7 +92,7 @@ Kijelentkezés. Törli a refresh token cookie-t.
 ### `GET /api/books`
 Könyvek listázása szűrőkkel. Lapozott.
 
-**Jogosultság:** `ADMIN` vagy `VISITOR`
+**Jogosultság:** `ADMIN`, `VISITOR` vagy `DEMO`
 
 **Query paraméterek:**
 
@@ -181,7 +181,7 @@ Könyvek listázása szűrőkkel. Lapozott.
 ### `GET /api/books/{id}`
 Egy könyv részletes adatai.
 
-**Jogosultság:** `ADMIN` vagy `VISITOR`
+**Jogosultság:** `ADMIN`, `VISITOR` vagy `DEMO`
 
 **Response 200:** Teljes book objektum (lásd fent)
 **Response 404:** Könyv nem található
@@ -259,7 +259,7 @@ Könyv áthelyezése másik polcra/helyiségbe.
 ISBN szám alapján adatlekérés külső API-ból (nem menti az adatbázisba).
 Fázis 1-ben az OpenLibrary API-t hívja, fallbackként Google Books API-t.
 
-**Jogosultság:** `ADMIN`
+**Jogosultság:** `ADMIN` vagy `DEMO`
 
 **Response 200:**
 ```json
@@ -292,7 +292,7 @@ Fázis 1-ben az OpenLibrary API-t hívja, fallbackként Google Books API-t.
 ### `GET /api/rooms`
 Az összes aktív helyiség listázása.
 
-**Jogosultság:** `ADMIN` vagy `VISITOR`
+**Jogosultság:** `ADMIN`, `VISITOR` vagy `DEMO`
 
 **Query paraméterek:** `name` (opcionális, részleges egyezés), `page`, `size`, `sort` (default: `name,asc`)
 
@@ -317,7 +317,7 @@ Az összes aktív helyiség listázása.
 ### `GET /api/rooms/all`
 Lapozás nélküli teljes lista, frontend dropdown feltöltésére.
 
-**Jogosultság:** `ADMIN` vagy `VISITOR`
+**Jogosultság:** `ADMIN`, `VISITOR` vagy `DEMO`
 
 **Query paraméterek:** nincs
 
@@ -370,7 +370,7 @@ Helyiség törlése (soft delete, csak akkor, ha nincs hozzá aktív location re
 ### `GET /api/locations`
 Az összes aktív location listázása.
 
-**Jogosultság:** `ADMIN` vagy `VISITOR`
+**Jogosultság:** `ADMIN`, `VISITOR` vagy `DEMO`
 
 **Query paraméterek:** `name`, `description`, `roomId` (opcionálisak; `name` és `description` részleges egyezés, case-insensitive; `roomId` UUID szűrő), `page`, `size`, `sort` (default: `name,asc`)
 
@@ -399,7 +399,7 @@ Az összes aktív location listázása.
 ### `GET /api/locations/all`
 Lapozás nélküli teljes lista, frontend dropdown feltöltésére.
 
-**Jogosultság:** `ADMIN` vagy `VISITOR`
+**Jogosultság:** `ADMIN`, `VISITOR` vagy `DEMO`
 
 **Query paraméterek:** nincs
 
@@ -454,7 +454,7 @@ Location törlése (soft delete, csak akkor, ha nincs hozzá aktív könyv rende
 ### `GET /api/loans`
 Aktív kölcsönzések listázása.
 
-**Jogosultság:** `ADMIN`
+**Jogosultság:** `ADMIN` vagy `DEMO`
 
 **Query paraméterek:** `active=true/false`, `bookId`, `page`, `size`
 
@@ -519,7 +519,7 @@ Könyv visszavétele.
 ### `GET /api/users`
 Felhasználók listázása.
 
-**Jogosultság:** `ADMIN`
+**Jogosultság:** `ADMIN` (VISITOR és DEMO kizárva)
 
 **Response 200:**
 ```json
@@ -541,7 +541,7 @@ Felhasználók listázása.
 ### `GET /api/users/{id}`
 Egy felhasználó adatainak lekérdezése.
 
-**Jogosultság:** `ADMIN` (bármely user lekérheti saját adatait)
+**Jogosultság:** `ADMIN`, vagy a saját ID-jára `VISITOR` is (`@PreAuthorize` ownership check a controllerben) — `DEMO` kizárva
 
 **Response 200:**
 ```json
