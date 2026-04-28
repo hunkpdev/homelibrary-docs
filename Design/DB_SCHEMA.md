@@ -37,8 +37,8 @@ users
 | `username` | `VARCHAR(50)` | UNIQUE NOT NULL | Bejelentkezési név |
 | `email` | `VARCHAR(255)` | UNIQUE NOT NULL | |
 | `password_hash` | `VARCHAR(255)` | NOT NULL | BCrypt |
-| `preferred_language` | `VARCHAR(10)` | NOT NULL | pl. `hu`, `en` |
-| `role` | `VARCHAR(20)` | NOT NULL | `ADMIN` vagy `VISITOR` |
+| `preferred_language` | `VARCHAR(10)` | NULL | `hu` vagy `en`; NULL = admin által létrehozva, első bejelentkezés még nem történt meg — login endpoint tölti ki `Accept-Language` header alapján |
+| `role` | `VARCHAR(20)` | NOT NULL | `ADMIN`, `VISITOR` vagy `DEMO` |
 | `active` | `BOOLEAN` | DEFAULT true | Soft disable felhasználóhoz |
 | `refresh_token_hash` | `VARCHAR(255)` | | BCrypt hash, NULL ha nincs aktív session |
 | `refresh_token_expires_at` | `TIMESTAMP WITH TIME ZONE` | | NULL ha nincs aktív session |
