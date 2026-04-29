@@ -47,7 +47,7 @@ users
 | `updated_at` | `TIMESTAMP WITH TIME ZONE` | NOT NULL | |
 
 > Egytáblás jogosultság-kezelés, Spring Security `@PreAuthorize`-zal kezelve.
-> Nem szükséges külön `user_roles` tábla a két szerepkörhöz.
+> Nem szükséges külön `user_roles` tábla a három szerepkörhöz.
 
 ---
 
@@ -179,6 +179,7 @@ db/changelog/
     005-create-book-descriptions.yaml
     006-create-loans.yaml
     007-add-indexes.yaml
+    008-create-demo-isbn-daily-stats.yaml
 ```
 
 ## Nyitott Kérdések

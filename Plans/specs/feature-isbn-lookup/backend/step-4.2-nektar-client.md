@@ -1,12 +1,13 @@
-# Step 4.3 – OszkNektarClient
+# Step 4.2 – OszkNektarClient
 
 ## Mit állít elő
 
 - `OszkNektarClient` Spring `@Component`
-- `IsbnLookupResult` Java record
-- `IsbnSource` enum (`OSZK`, `MANUAL`)
-- `src/main/resources/native/linux-x86_64/libyaz.so.5` (becommitelendő)
-- `src/main/resources/native/win32-x86_64/yaz5.dll` (lokális fejlesztéshez)
+- `IsbnLookupResult` Java record (package: `com.homelibrary.isbn`)
+- `IsbnSource` enum (`OSZK`, `MANUAL`) (package: `com.homelibrary.isbn`)
+- `src/main/resources/native/linux-x86_64/libyaz.so.5` (becommitelendő, lásd lent)
+- `src/main/resources/native/win32-x86_64/yaz5.dll` (becommitelendő, YAZ Windows telepítőből kimásolva)
+- `.github/workflows/extract-native-libs.yml` (manuális trigger, egyszer futtatandó — a `.so` fájlt állítja elő és commitolja)
 
 ---
 
@@ -37,6 +38,7 @@ Ha tranzitív `.so` függőség hiányzik Lambda-n: CloudWatch logban `dlopen fa
 | Adatbázis | `B1` |
 | ISBN keresés attribútum | `@attr 1=7 {ISBN}` (Bib-1) |
 | Rekord szintaxis | MARC21 (USmarc) |
+| Karakterkódolás | UTF-8 (`marc4j` default). Ha ékezetes karakterek hibásan jönnek vissza: `MarcReader.setEncoding` vagy YAZ4J `RecordSyntax.UTF8` beállítás ellenőrizendő |
 
 Kapcsolat init költséges (~3-4 sec) — a `Connection` objektum bean szinten cachelendő (ne kérésenként nyissa meg).
 
@@ -53,7 +55,7 @@ Kapcsolat init költséges (~3-4 sec) — a `Connection` objektum bean szinten c
 | `publisher` | 260 $b (záró `,` levágva) |
 | `publishYear` | 260 $c (numerikus rész kinyerve) |
 | `pageCount` | 300 $a (numerikus rész kinyerve) |
-| `language` | 041 $a (ISO 639-2, 3 betűs) |
+| `language` | 041 $a (ISO 639-2, 3 betűs — pl. `hun`; Feature 5 mapper konvertálja 2-betűsre, pl. `hu`, a `books.language` mezőhöz) |
 | `source` | `IsbnSource.OSZK` |
 
 ## `hasMinimumFields()` definíció
@@ -67,6 +69,7 @@ Kapcsolat init költséges (~3-4 sec) — a `Connection` objektum bean szinten c
 | 0 találat | `Optional.empty()` |
 | `show` hívás hit count ellenőrzés nélkül | hit count > 0 ellenőrzés `present` előtt |
 | Connection timeout | `log.warn`, `Optional.empty()` |
+| Stale connection (`IOException`/`ZRefuseException` search/show-on) | Connection bezárása, egyszeri reconnect + retry; ha az is hibázik → `log.warn`, `Optional.empty()` |
 | MARC parsing hiba | `log.warn`, `Optional.empty()` |
 | OSZK nem elérhető (bármikor) | `log.warn`, `Optional.empty()` |
 
@@ -75,4 +78,4 @@ Kapcsolat init költséges (~3-4 sec) — a `Connection` objektum bean szinten c
 - Érvényes ISBN-re MARC21 rekord visszaadása és helyes leképezés
 - Csonka rekordnál (title vagy author hiányzik) `Optional.empty()`
 - 0 találat → `Optional.empty()`
-- Unit teszt: MARC21 leképezés, időablak check, csonka rekord kezelés
+- Unit teszt: MARC21 leképezés (köztük magyar ékezetes ISBN), csonka rekord kezelés

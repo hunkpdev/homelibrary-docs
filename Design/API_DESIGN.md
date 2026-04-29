@@ -295,6 +295,8 @@ Ha az OSZK nem talál, csonka rekordot ad, vagy nem elérhető: `found: false`, 
 }
 ```
 
+> A 429 válasz strukturált body-t ad — szándékos kivétel az általános üres-body hibakonvenció alól, hogy a frontend megkülönböztethesse a rate limit-et más hibáktól.
+
 ---
 
 ## Room Endpoints

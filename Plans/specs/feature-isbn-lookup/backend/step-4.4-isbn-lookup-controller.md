@@ -1,4 +1,4 @@
-# Step 4.5 – IsbnLookupController
+# Step 4.4 – IsbnLookupController
 
 ## Mit állít elő
 
@@ -13,7 +13,7 @@
 
 **Jogosultság:** `@PreAuthorize("hasAnyRole('ADMIN', 'DEMO')")` — VISITOR 403
 
-**Path paraméter:** `isbn` — a service validálja a formátumot (4.4)
+**Path paraméter:** `isbn` — a service validálja a formátumot (4.3)
 
 **Response 200 (találat):**
 ```json
@@ -53,10 +53,11 @@
 ## Kulcs döntések
 
 - `@Operation` és `@ApiResponse` annotációk a Swagger UI-hoz (mindhárom response kódra)
-- A controller nem validálja az ISBN-t — a service (4.4) végzi
+- A controller nem validálja az ISBN-t — a service (4.3) végzi
 - `IsbnLookupResult` → `IsbnLookupResponse` leképezés: MapStruct mapper vagy kézi konstruktor
 - `source` lehetséges értékei: `OSZK` (találat esetén), null (nem találat esetén)
 - `subtitle`, `pageCount` null megengedett (nem minden MARC rekordban van meg)
+- A 429 válasz body-ja szándékosan strukturált (`found: false`, `rateLimitExceeded: true`), ellentétben a `GlobalExceptionHandler` általános üres body-jával — a frontend-nek meg kell tudnia különböztetni a rate limit-et más hibáktól
 
 ## Elfogadási kritériumok
 

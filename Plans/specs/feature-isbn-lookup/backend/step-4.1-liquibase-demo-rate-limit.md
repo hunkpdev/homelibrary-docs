@@ -1,4 +1,4 @@
-# Step 4.2 – Liquibase: demo_isbn_daily_stats tábla
+# Step 4.1 – Liquibase: demo_isbn_daily_stats tábla
 
 ## Mit állít elő
 
