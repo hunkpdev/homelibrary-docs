@@ -1,59 +1,57 @@
-# Step 4.3 – IsbnLookupService
+# Step 4.4 – IsbnLookupService
 
 ## Mit állít elő
 
 - `IsbnLookupService` interface
 - `IsbnLookupServiceImpl` implementáció
-- `IsbnUtils` segédosztály (ISBN-10 ↔ ISBN-13 konverzió + formátum validáció)
+- `IsbnUtils` segédosztály (formátum validáció)
+- `DemoIsbnRateLimitService` (session + napi limit logika)
 
 ---
 
-## Kulcs döntések
+## ISBN validáció (`IsbnUtils`)
 
-### ISBN-10 ↔ ISBN-13 konverzió (`IsbnUtils`)
+Formátum elővalidálás: 10 vagy 13 jegyű numerikus string (ISBN-10: opcionálisan záró `X`); érvénytelen → `found: false`, hívás nélkül. Konverzió nincs — az OSZK Z39.50 `@attr 1=7` ISBN-13-mal közvetlenül keres, empirikusan igazolt.
 
-- ISBN-13 → ISBN-10: csak `978` prefixű ISBN-13-ból lehetséges (az első 9 érdemi számjegyből + újraszámolt ellenőrzőjegyből)
-- ISBN-10 → ISBN-13: `978` prefix hozzáadása + újraszámolt ellenőrzőjegy
-- `979` prefixű ISBN-13-hoz nincs ISBN-10 pár — konverzió nem lehetséges, csak az eredeti formával keres
-- Ellenőrzőjegy validáció: opcionális (nem blokkoló — ha valaki rossz ISBN-t olvas be, a providers úgysem találják meg)
-
-### Orchestráció
-
-Minden providernél két körös keresés:
-1. Eredeti ISBN-nel próbál
-2. Ha nem találja → konvertált ISBN-nel próbál (ha a konverzió lehetséges)
-3. Ha így sem találja → következő provider
+## Orchestráció
 
 ```
 lookup(isbn):
-  converted = IsbnUtils.convert(isbn)   // Optional<String>
+  if !IsbnUtils.isValid(isbn): return found: false
 
-  result = MolyHuClient.lookup(isbn)
-  if empty && converted.present:
-    result = MolyHuClient.lookup(converted)
-  if found: return result
+  result = OszkNektarClient.lookup(isbn)
 
-  result = OpenLibraryClient.lookup(isbn)
-  if empty && converted.present:
-    result = OpenLibraryClient.lookup(converted)
-  if found: return result
-
-  return { found: false }
+  if result.present: return result → found: true
+  return found: false
 ```
 
-- Ha valamelyik client kivételt dob (timeout, scraping hiba): naplózás (`log.warn`), továbblép — a lookup nem bukhat meg egyetlen forrás kiesése miatt
-- Ha mindkét forrás meghibásodik: `found = false` (nem 5xx)
-- ISBN formátum elővalidálás: csak 10 vagy 13 jegyű numerikus string fogadható el (ISBN-10: opcionálisan záró `X`); érvénytelen formátum → `found = false`, hívás nélkül
+Nincs külső fallback chain — egyetlen forrás az OSZK.
 
----
+## DEMO rate limit (`DemoIsbnRateLimitService`)
+
+**Session limit (5 keresés):**
+- Spring Cache (ConcurrentHashMap alapú, in-memory) — Lambda instance szintű
+- Kulcs: JWT `jti` claim, `SecurityContextHolder`-ből kinyerve
+- Számláló növelés minden sikeres kérésnél (rate limit ellenőrzés után)
+- Lambda-újraindításkor reset — DEMO kontextusban elfogadható
+
+**Napi limit (50 keresés):**
+- `demo_isbn_daily_stats` tábla olvasása
+- Lazy reset: ha `lookup_date` ≠ ma (UTC) → `lookup_count = 0`, `lookup_date = ma`
+- Ha `lookup_count >= 50` → limit elérve
+
+**Ellenőrzési sorrend:** session limit → napi limit → lookup. Mindkét limit ellenőrzés a tényleges OSZK hívás előtt.
+
+**`DemoRateLimitExceededException`** (vagy hasonló elnevezés) — a controller 429-gel válaszol rá.
+
+Nem-DEMO felhasználóknál (`ADMIN` role) a rate limit logika kihagyandó.
 
 ## Elfogadási kritériumok
 
-- ISBN-13 beolvasás, moly.hu csak ISBN-10-zel találja → konvertálva megtalálja
-- ISBN-10 beolvasás, OpenLibrary csak ISBN-13-mal találja → konvertálva megtalálja
-- `979` prefixű ISBN-13: konverzió nem történik, csak eredeti formával keres
-- Moly.hu timeout → OpenLibrary-t próbálja (mindkét ISBN formával)
-- Mindkét forrás, mindkét ISBN forma → `found: false`, nem kivétel
 - Érvénytelen ISBN formátum → `found: false`, hívás nélkül
-- Unit teszt: `IsbnUtils` konverzió mindkét irányban + `979` eset + ellenőrzőjegy helyesség
-- Unit teszt: orchestráció — mind a releváns ágak lefedve
+- OSZK `Optional.empty()` → `found: false`, nem kivétel
+- DEMO: 5. keresés után session limit elérve → kivétel
+- DEMO: napi 50 keresés után limit elérve → kivétel
+- DEMO: új nap → lazy reset, számláló nulláról indul
+- ADMIN: rate limit nem érvényesül
+- Unit teszt: `IsbnUtils` validáció, orchestráció, rate limit mindkét ága

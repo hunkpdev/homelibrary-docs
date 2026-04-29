@@ -1,4 +1,4 @@
-# Step 4.5 – IsbnScannerInput komponens
+# Step 4.6 – IsbnScannerInput komponens
 
 ## Mit állít elő
 

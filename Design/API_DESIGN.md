@@ -257,7 +257,7 @@ Könyv áthelyezése másik polcra/helyiségbe.
 
 ### `GET /api/books/isbn/{isbn}`
 ISBN szám alapján adatlekérés az OSZK NEKTÁR Z39.50 protokollon (nem menti az adatbázisba).
-Ha az OSZK nem talál, csonka rekordot ad, vagy időablakon kívül van (23:00–03:30): `found: false`, a kliens manuális bevitelre vált.
+Ha az OSZK nem talál, csonka rekordot ad, vagy nem elérhető: `found: false`, a kliens manuális bevitelre vált.
 
 **Jogosultság:** `ADMIN` vagy `DEMO`
 

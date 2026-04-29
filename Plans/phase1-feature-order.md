@@ -169,27 +169,21 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 
 **DEMO rate limit:** 5 keresés/session (Spring Cache, JWT-hez kötve), 50 keresés/nap (DB tábla, lazy reset) — 429 Too Many Requests limit eléréskor
 
-### Infra
-
-| Step | Mit állít elő |
-|------|---------------|
-| [4.1](specs/feature-isbn-lookup/infra/step-4.1-vpc-outbound.md) | Lambda VPC outbound rule: TCP 1616 → `193.6.201.206/32` (OSZK statikus IP) |
-
 ### Backend
 
 | Step | Mit állít elő |
 |------|---------------|
-| [4.2](specs/feature-isbn-lookup/backend/step-4.2-liquibase-demo-rate-limit.md) | Liquibase: `demo_isbn_daily_stats` tábla changeset |
-| [4.3](specs/feature-isbn-lookup/backend/step-4.3-nektar-client.md) | `OszkNektarClient`: YAZ4J Z39.50 kapcsolat, `@attr 1=7` ISBN keresés, marc4j MARC21 parsing, `IsbnLookupResult` record + `IsbnSource` enum (`OSZK`, `MANUAL`), időablak check (23:00–03:30 → `Optional.empty()`) |
-| [4.4](specs/feature-isbn-lookup/backend/step-4.4-isbn-lookup-service.md) | `IsbnLookupService`: OSZK lookup → ha `Optional.empty()` → `found: false`; DEMO rate limit (session: Spring Cache JWT-kötve, napi: DB lazy reset) |
-| [4.5](specs/feature-isbn-lookup/backend/step-4.5-isbn-lookup-controller.md) | `IsbnLookupController`: `GET /api/books/isbn/{isbn}`, 429 DEMO rate limit esetén |
+| [4.1](specs/feature-isbn-lookup/backend/step-4.1-liquibase-demo-rate-limit.md) | Liquibase: `demo_isbn_daily_stats` tábla changeset |
+| [4.2](specs/feature-isbn-lookup/backend/step-4.2-nektar-client.md) | `OszkNektarClient`: YAZ4J Z39.50 kapcsolat, `@attr 1=7` ISBN keresés, marc4j MARC21 parsing, `IsbnLookupResult` record + `IsbnSource` enum (`OSZK`, `MANUAL`), időablak check (23:00–03:30 → `Optional.empty()`) |
+| [4.3](specs/feature-isbn-lookup/backend/step-4.3-isbn-lookup-service.md) | `IsbnLookupService`: OSZK lookup → ha `Optional.empty()` → `found: false`; DEMO rate limit (session: Spring Cache JWT-kötve, napi: DB lazy reset) |
+| [4.4](specs/feature-isbn-lookup/backend/step-4.4-isbn-lookup-controller.md) | `IsbnLookupController`: `GET /api/books/isbn/{isbn}`, 429 DEMO rate limit esetén |
 
 ### Frontend
 
 | Step | Mit állít elő |
 |------|---------------|
-| [4.6](specs/feature-isbn-lookup/frontend/step-4.6-isbn-scanner-input.md) | `IsbnScannerInput` React komponens: `react-zxing` integráció, kamera elérhetőség detektálás (MediaDevices API), kamera nézet elsődleges / kézi szövegmező fallback — ha a kamera elérhető, alapból az aktív |
-| [4.7](specs/feature-isbn-lookup/frontend/step-4.7-isbn-lookup-ui.md) | `IsbnLookupPanel`: scanner + API hívás + eredmény megjelenítés; `onResult` callbacken adja át az adatokat a szülő (könyv form, Feature 5) számára |
+| [4.5](specs/feature-isbn-lookup/frontend/step-4.5-isbn-scanner-input.md) | `IsbnScannerInput` React komponens: `react-zxing` integráció, kamera elérhetőség detektálás (MediaDevices API), kamera nézet elsődleges / kézi szövegmező fallback — ha a kamera elérhető, alapból az aktív |
+| [4.6](specs/feature-isbn-lookup/frontend/step-4.6-isbn-lookup-ui.md) | `IsbnLookupPanel`: scanner + API hívás + eredmény megjelenítés; `onResult` callbacken adja át az adatokat a szülő (könyv form, Feature 5) számára |
 
 ---
 

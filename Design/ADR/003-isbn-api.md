@@ -28,11 +28,11 @@ Az OSZK (Országos Széchényi Könyvtár) NEKTÁR adatbázisa Z39.50 protokollo
 | Host | `tagetes2.oszk.hu` |
 | Port | `1616` |
 | Adatbázis | `B1` |
-| Elérhetőség | 03:30–23:00 helyi idő, 7/7 |
+| Elérhetőség | Hivatalosan 03:30–23:00, empirikusan azon kívül is válaszol |
 | Rekord szintaxis | MARC21 |
 | ISBN keresés | `@attr 1=7 {ISBN}` (Bib-1 attribútum) |
 
-**Időablakon kívüli hívás (23:00–03:30):** az OSZK client azonnal `Optional.empty()`-t ad vissza → a service réteg manuális bevitelre irányít.
+**Kiesés kezelése:** connection timeout vagy hiba esetén a client `Optional.empty()`-t ad vissza → a service réteg manuális bevitelre irányít. Időablak-ellenőrzés nincs — empirikus teszt alapján az OSZK a hivatalos 03:30–23:00 ablakon kívül is válaszol.
 
 ## MARC21 → IsbnLookupResult mapping
 
@@ -72,6 +72,5 @@ A beégetett DEMO felhasználó ISBN lookup hívásai limitáltak:
 - Java Z39.50 client: YAZ4J + natív bináris (részletek: ADR-010)
 - MARC parser: `marc4j` Maven függőség
 - `IsbnSource` enum értékek: `OSZK`, `MANUAL`
-- Lambda VPC outbound: TCP 1616 → `193.6.201.206/32` (OSZK statikus IP)
 - DEMO napi limit: új DB tábla szükséges a napi számlálóhoz
 - `cover_image_url` Fázis 1-ben nem töltjük (MARC21 nem tartalmaz)

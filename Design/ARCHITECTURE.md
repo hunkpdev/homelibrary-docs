@@ -84,8 +84,7 @@ S3 Bucket            API Gateway      ← always free: 1M req/hó
                ▼          ▼                    ▼
          Neon PostgreSQL  SSM Parameter Store  OSZK NEKTÁR Z39.50
          (külső SaaS,     (Neon conn string,   tagetes2.oszk.hu:1616
-          ingyenes)        JWT secret)          TCP outbound (VPC rule)
-                                               Elérhetőség: 03:30–23:00
+          ingyenes)        JWT secret)          TCP outbound (internet)
 ```
 
 ### AWS Szolgáltatások és költségek
@@ -303,10 +302,9 @@ A CloudWatch free tier szintje elegendő — tudatos döntés, elsősorban AWS t
 
 1. **OSZK NEKTÁR Z39.50** (egyetlen külső forrás) – ingyenes, API kulcs nélkül
    - Endpoint: `tagetes2.oszk.hu:1616`, adatbázis: `B1`, rekord szintaxis: MARC21
-   - Elérhetőség: 03:30–23:00 helyi idő — időablakon kívül azonnal manuális fallback
+   - Hivatalos elérhetőség: 03:30–23:00, empirikusan azon kívül is válaszol — időablak-ellenőrzés nincs
    - Java client: YAZ4J + `libyaz.so.5` natív bináris (fat jar-ba csomagolva) — lásd ADR-010
-   - Lambda VPC outbound rule szükséges: TCP 1616 → `193.6.201.206/32`
-2. **Manuális bevitel** – ha az OSZK nem talál, csonka rekordot ad, vagy időablakon kívül van
+2. **Manuális bevitel** – ha az OSZK nem talál, csonka rekordot ad, vagy nem elérhető
 
 ---
 
