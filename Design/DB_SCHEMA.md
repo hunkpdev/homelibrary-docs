@@ -1,7 +1,7 @@
 # HomeLibrary – Adatbázis Séma
 
 > **Státusz:** v2 – SQL szabvány típusok
-> **Utolsó frissítés:** 2026-04-03
+> **Utolsó frissítés:** 2026-04-29
 > **DB:** PostgreSQL 15 (Neon SaaS)
 > **Migráció eszköz:** Liquibase (lásd ADR-005)
 
@@ -94,10 +94,10 @@ Egy location pontosan egy roomhoz tartozik (`room_id` NOT NULL) — lásd ADR-00
 | `publish_year` | `INTEGER` | | |
 | `language` | `VARCHAR(10)` | | Az eredeti könyv nyelve, pl. `hu`, `en` |
 | `categories` | `VARCHAR(500)` | | JSON string, pl. `["Fantasy", "Fiction"]` |
-| `cover_image_url` | `VARCHAR(500)` | | Fázis 1: külső forrás borítókép URL-je (OpenLibrary/Google Books). Fázis 2: Liquibase migráció — `cover_image_key` (S3 object key) mező kerül be helyette, a service réteg generálja a pre-signed URL-t. |
+| `cover_image_url` | `VARCHAR(500)` | | Fázis 1: null (OSZK MARC21 nem tartalmaz cover URL-t). Fázis 2: Liquibase migráció — `cover_image_key` (S3 object key) mező kerül be helyette, a service réteg generálja a pre-signed URL-t. |
 | `status` | `VARCHAR(20)` | NOT NULL | `AT_HOME`, `LOANED`, `DELETED` |
 | `location_id` | `UUID` | FK → locations | Ahol a könyv éppen van |
-| `source` | `VARCHAR(20)` | | `OPENLIBRARY`, `GOOGLE_BOOKS`, `MANUAL` |
+| `source` | `VARCHAR(20)` | | `OSZK`, `MANUAL` |
 | `added_by` | `UUID` | FK → users | Ki vette fel a rendszerbe |
 | `version` | `BIGINT` | NOT NULL DEFAULT 0 | JPA optimistic locking (`@Version`) |
 | `created_at` | `TIMESTAMP WITH TIME ZONE` | NOT NULL | |
@@ -149,6 +149,20 @@ Az AI fordítás is ide kerül, `AI_TRANSLATED` source-szal.
 | `loaned_at` | `TIMESTAMP WITH TIME ZONE` | NOT NULL | |
 | `returned_at` | `TIMESTAMP WITH TIME ZONE` | | NULL = még nincs visszahozva |
 | `note` | `TEXT` | | Opcionális megjegyzés |
+
+---
+
+### `demo_isbn_daily_stats`
+
+DEMO felhasználó napi ISBN lookup limitjének nyilvántartása. Lazy reset: ellenőrzéskor az aktuális dátumot összehasonlítja a tárolttal — ha eltért, nulláz és dátumot frissít. Nincs szükség éjféli scheduled taskra (Lambda-n nem megbízható).
+
+| Oszlop | Típus | Megszorítás | Leírás |
+|--------|-------|-------------|--------|
+| `id` | `UUID` | PK | |
+| `lookup_date` | `DATE` | NOT NULL | Az aktuális nap (UTC) |
+| `lookup_count` | `INTEGER` | NOT NULL DEFAULT 0 | Keresések száma ezen a napon |
+
+> Egyszerre egy sor van a táblában (a DEMO user napi számlálója). Ha `lookup_date` ≠ ma → nulláz + dátumot frissít.
 
 ---
 

@@ -1,7 +1,7 @@
 # 1. Fázis – Implementációs terv
 
 > **Státusz:** Tervezés alatt
-> **Utolsó frissítés:** 2026-04-28
+> **Utolsó frissítés:** 2026-04-29
 > **Hatókör:** MVP – az első működő, deployolható alkalmazáshoz szükséges core feature-ök
 
 ## Fejlesztési workflow
@@ -163,18 +163,20 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 
 ## Feature 4 – ISBN Lookup
 
-**Cél:** Külső forrás integráció — ISBN beolvasás/bevitel után könyv adatok előtöltése moly.hu-ról (elsődleges) vagy OpenLibrary-ból (fallback). Lásd ADR-003.
+**Cél:** OSZK NEKTÁR Z39.50 integráció — ISBN beolvasás/bevitel után könyv adatok előtöltése. Manuális bevitel mint fallback. Lásd ADR-003, ADR-010.
 
 **Jogosultság:** GET — `ADMIN` vagy `DEMO` (`hasAnyRole('ADMIN', 'DEMO')`) — VISITOR 403
+
+**DEMO rate limit:** 5 keresés/session (Spring Cache, JWT-hez kötve), 50 keresés/nap (DB tábla, lazy reset) — 429 Too Many Requests limit eléréskor
 
 ### Backend
 
 | Step | Mit állít elő |
 |------|---------------|
-| [4.1](specs/feature-isbn-lookup/backend/step-4.1-molyhu-client.md) | `MolyHuClient`: moly.hu HTML scraping Jsoup-pal, `IsbnLookupResult` record + `IsbnSource` enum definiálása, azonosító `User-Agent` fejléc |
-| [4.2](specs/feature-isbn-lookup/backend/step-4.2-openlibrary-client.md) | `OpenLibraryClient`: HTTP hívás, válasz leképezés `IsbnLookupResult`-ra (`source = OPENLIBRARY`) |
-| [4.3](specs/feature-isbn-lookup/backend/step-4.3-isbn-lookup-service.md) | `IsbnLookupService`: elsődleges (moly.hu) → fallback (OpenLibrary) → nem található; ISBN formátum elővalidálás |
-| [4.4](specs/feature-isbn-lookup/backend/step-4.4-isbn-lookup-controller.md) | `IsbnLookupController`: `GET /api/books/isbn/{isbn}` |
+| [4.1](specs/feature-isbn-lookup/backend/step-4.1-liquibase-demo-rate-limit.md) | Liquibase: `demo_isbn_daily_stats` tábla changeset |
+| [4.2](specs/feature-isbn-lookup/backend/step-4.2-nektar-client.md) | `OszkNektarClient`: YAZ4J Z39.50 kapcsolat, `@attr 1=7` ISBN keresés, marc4j MARC21 parsing, `IsbnLookupResult` record + `IsbnSource` enum (`OSZK`, `MANUAL`), időablak check (23:00–03:30 → `Optional.empty()`) |
+| [4.3](specs/feature-isbn-lookup/backend/step-4.3-isbn-lookup-service.md) | `IsbnLookupService`: OSZK lookup → ha `Optional.empty()` → `found: false`; DEMO rate limit (session: Spring Cache JWT-kötve, napi: DB lazy reset) |
+| [4.4](specs/feature-isbn-lookup/backend/step-4.4-isbn-lookup-controller.md) | `IsbnLookupController`: `GET /api/books/isbn/{isbn}`, 429 DEMO rate limit esetén |
 
 ### Frontend
 

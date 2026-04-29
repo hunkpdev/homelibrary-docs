@@ -1,6 +1,6 @@
 # HomeLibrary – Architektúra
 
-> **Utolsó frissítés:** 2026-04-04
+> **Utolsó frissítés:** 2026-04-29
 > **Státusz:** v3 – végleges, Lambda + Neon PostgreSQL stack
 
 ## Tech Stack
@@ -80,12 +80,11 @@ S3 Bucket            API Gateway      ← always free: 1M req/hó
                     (Spring Boot JAR     SnapStart: hidegindítás ~200-600ms
                      Java 21)
                           │
-               ┌──────────┴──────────┐
-               ▼                     ▼
-         Neon PostgreSQL        SSM Parameter Store   ← ingyenes
-         (külső SaaS,           (Neon conn string,
-          ingyenes)              JWT secret,
-                                 Google Books API key)
+               ┌──────────┬────────────────────┐
+               ▼          ▼                    ▼
+         Neon PostgreSQL  SSM Parameter Store  OSZK NEKTÁR Z39.50
+         (külső SaaS,     (Neon conn string,   tagetes2.oszk.hu:1616
+          ingyenes)        JWT secret)          TCP outbound (internet)
 ```
 
 ### AWS Szolgáltatások és költségek
@@ -206,7 +205,9 @@ homelibrary-docs/                   ← GitHub repo: homelibrary-docs
 │       ├── 006-sql-standard-types.md
 │       ├── 007-rooms-locations-normalization.md
 │       ├── 008-entity-timestamp-strategy.md
-│       └── 009-grid-library-choice.md
+│       ├── 009-grid-library-choice.md
+│       ├── 010-z3950-client-library.md
+│       └── 011-license-change.md
 └── Plans/
     ├── phase1-feature-order.md
     └── specs/
@@ -299,11 +300,11 @@ A CloudWatch free tier szintje elegendő — tudatos döntés, elsősorban AWS t
 
 ## ISBN Lookup Stratégia
 
-1. **OpenLibrary API** (elsődleges) – ingyenes, API kulcs nélkül
-   `GET https://openlibrary.org/api/books?bibkeys=ISBN:{isbn}&format=json&jscmd=data`
-2. **Google Books API** (fallback) – ingyenes, API key kell (SSM-ben tárolva), 1000 req/nap
-   `GET https://www.googleapis.com/books/v1/volumes?q=isbn:{isbn}`
-3. **Manuális bevitel** – ha egyik API sem talál eredményt
+1. **OSZK NEKTÁR Z39.50** (egyetlen külső forrás) – ingyenes, API kulcs nélkül
+   - Endpoint: `tagetes2.oszk.hu:1616`, adatbázis: `B1`, rekord szintaxis: MARC21
+   - Hivatalos elérhetőség: 03:30–23:00, empirikusan azon kívül is válaszol — időablak-ellenőrzés nincs
+   - Java client: YAZ4J + `libyaz.so.5` natív bináris (fat jar-ba csomagolva) — lásd ADR-010
+2. **Manuális bevitel** – ha az OSZK nem talál, csonka rekordot ad, vagy nem elérhető
 
 ---
 

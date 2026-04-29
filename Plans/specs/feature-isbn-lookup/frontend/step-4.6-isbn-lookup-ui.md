@@ -13,6 +13,7 @@
 3. Eredmény alapján:
    - `found: true` → `onResult` callback meghívása a kitöltött adatokkal (szülő tölti elő a könyv formot)
    - `found: false` → figyelmeztető üzenet megjelenítése, újrapróbálkozás lehetősége
+   - `rateLimitExceeded: true` (429) → tájékoztató üzenet DEMO rate limit elérésről, újrapróbálkozás nem lehetséges
    - Hálózati hiba → hibaüzenet, újrapróbálkozás
 
 ---
@@ -24,6 +25,7 @@
 - API hívás közben `isLoading` állapot → `IsbnScannerInput` letiltva + spinner
 - `IsbnLookupResult` TypeScript interface: megfelel a backend `IsbnLookupResponse` struktúrájának (4.4)
 - Nem kerül önálló route-ra — beágyazott komponens, Feature 5 könyv felvétel formjába illesztve
+- DEMO rate limit üzenet (429): egyértelmű tájékoztatás, ne legyen generikus hibaüzenet
 
 ---
 
@@ -31,6 +33,7 @@
 
 - ISBN scan / bevitel után API hívás indul, közben input letiltva
 - `found: true` → `onResult` meghívódik a helyes adatokkal
-- `found: false` → felhasználóbarát üzenet jelenik meg
+- `found: false` → felhasználóbarát üzenet jelenik meg, újrapróbálkozás lehetséges
+- 429 rate limit → tájékoztató üzenet jelenik meg (nem generikus hiba)
 - Hálózati hiba → hibaüzenet + újrapróbálkozás gomb
 - DEMO role esetén a panel és a lookup funkció elérhető (GET hívás megengedett)
