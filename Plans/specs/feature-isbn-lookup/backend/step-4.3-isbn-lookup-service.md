@@ -1,4 +1,4 @@
-# Step 4.4 – IsbnLookupService
+# Step 4.3 – IsbnLookupService
 
 ## Mit állít elő
 
@@ -11,7 +11,7 @@
 
 ## ISBN validáció (`IsbnUtils`)
 
-Formátum elővalidálás: 10 vagy 13 jegyű numerikus string (ISBN-10: opcionálisan záró `X`); érvénytelen → `found: false`, hívás nélkül. Konverzió nincs — az OSZK Z39.50 `@attr 1=7` ISBN-13-mal közvetlenül keres, empirikusan igazolt.
+Normalizálás a validáció előtt: `-` és whitespace karakterek strip-elése (`raw.replaceAll("[\\s-]", "")`). Formátum elővalidálás a normalizált stringre: 10 vagy 13 jegyű numerikus string (ISBN-10: opcionálisan záró `X`); érvénytelen → `found: false`, hívás nélkül. Konverzió nincs — az OSZK Z39.50 `@attr 1=7` ISBN-13-mal közvetlenül keres, empirikusan igazolt.
 
 ## Orchestráció
 
@@ -42,12 +42,15 @@ Nincs külső fallback chain — egyetlen forrás az OSZK.
 
 **Ellenőrzési sorrend:** session limit → napi limit → lookup. Mindkét limit ellenőrzés a tényleges OSZK hívás előtt.
 
+**Atomicitás:** a napi limit read-increment-write nem atomikus. Párhuzamos Lambda instance-ok esetén a limit 1-2-vel csúszhat — tudatosan elfogadott (DEMO felhasználónál párhuzamos kérés gyakorlatilag kizárt).
+
 **`DemoRateLimitExceededException`** (vagy hasonló elnevezés) — a controller 429-gel válaszol rá.
 
-Nem-DEMO felhasználóknál (`ADMIN` role) a rate limit logika kihagyandó.
+DEMO role esetén alkalmazandó a rate limit; ADMIN-nál kihagyandó. (VISITOR az endpointot nem éri el — 403 a SecurityConfig szintjén.)
 
 ## Elfogadási kritériumok
 
+- Kötőjeles vagy szóközös ISBN → normalizálás (strip), majd validáció — érvényes ISBN-re lookup
 - Érvénytelen ISBN formátum → `found: false`, hívás nélkül
 - OSZK `Optional.empty()` → `found: false`, nem kivétel
 - DEMO: 5. keresés után session limit elérve → kivétel

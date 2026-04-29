@@ -71,6 +71,6 @@ A beégetett DEMO felhasználó ISBN lookup hívásai limitáltak:
 
 - Java Z39.50 client: YAZ4J + natív bináris (részletek: ADR-010)
 - MARC parser: `marc4j` Maven függőség
-- `IsbnSource` enum értékek: `OSZK`, `MANUAL`
+- `IsbnSource` enum értékek: `OSZK` (lookup endpoint által visszaadott érték), `MANUAL` (Feature 5 könyv POST body-jában a frontend küldi, nem az ISBN lookup endpoint adja vissza)
 - DEMO napi limit: új DB tábla szükséges a napi számlálóhoz
 - `cover_image_url` Fázis 1-ben nem töltjük (MARC21 nem tartalmaz)

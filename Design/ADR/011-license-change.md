@@ -35,5 +35,10 @@ BSD-3-Clause egyirányúan permissive — semmilyen extra megkötés nincs a saj
 
 - `LICENSE` fájl cseréje a PolyForm Personal Use 1.0.0 standard szövegére
 - `README.md` licenc-szekció frissítése
-- Új `THIRD_PARTY_LICENSES.md` fájl (YAZ, YAZ4J, marc4j, native-lib-loader) — részletes kitöltés a Feature 4 implementáció során
+- Új `THIRD_PARTY_LICENSES.md` fájl — érintett library-k (licenc verifikálandó implementáció zárásáig):
+  - `yaz4j` (BSD-3-Clause), `libyaz` upstream (BSD-3-Clause) — Index Data copyright
+  - `marc4j` (Apache-2.0) — NOTICE attribution
+  - `native-lib-loader` (BSD-2-Clause — verifikálandó)
+  - `react-zxing` + `@zxing/library` (Apache-2.0 vagy MIT — verifikálandó) — frontend bundle-be kerül, itt is dokumentálandó
+- Feature 4 implementáció zárásaikor: minden függőség licence verifikálva és attribution beillesztve
 - A licencváltás a `homelibrary` (forráskód) repót érinti

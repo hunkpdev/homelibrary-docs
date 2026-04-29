@@ -174,9 +174,9 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 | Step | Mit állít elő |
 |------|---------------|
 | [4.1](specs/feature-isbn-lookup/backend/step-4.1-liquibase-demo-rate-limit.md) | Liquibase: `demo_isbn_daily_stats` tábla changeset |
-| [4.2](specs/feature-isbn-lookup/backend/step-4.2-nektar-client.md) | `OszkNektarClient`: YAZ4J Z39.50 kapcsolat, `@attr 1=7` ISBN keresés, marc4j MARC21 parsing, `IsbnLookupResult` record + `IsbnSource` enum (`OSZK`, `MANUAL`), időablak check (23:00–03:30 → `Optional.empty()`) |
+| [4.2](specs/feature-isbn-lookup/backend/step-4.2-nektar-client.md) | `OszkNektarClient`: YAZ4J Z39.50 kapcsolat, `@attr 1=7` ISBN keresés, marc4j MARC21 parsing, `IsbnLookupResult` record + `IsbnSource` enum (`OSZK`, `MANUAL`); időablak-ellenőrzés nincs (connection timeout fedezi a kiesést) |
 | [4.3](specs/feature-isbn-lookup/backend/step-4.3-isbn-lookup-service.md) | `IsbnLookupService`: OSZK lookup → ha `Optional.empty()` → `found: false`; DEMO rate limit (session: Spring Cache JWT-kötve, napi: DB lazy reset) |
-| [4.4](specs/feature-isbn-lookup/backend/step-4.4-isbn-lookup-controller.md) | `IsbnLookupController`: `GET /api/books/isbn/{isbn}`, 429 DEMO rate limit esetén |
+| [4.4](specs/feature-isbn-lookup/backend/step-4.4-isbn-lookup-controller.md) | `IsbnLookupController`: `GET /api/books/isbn/{isbn}` — 200 `found:true`, 200 `found:false`, 429 DEMO rate limit esetén |
 
 ### Frontend
 

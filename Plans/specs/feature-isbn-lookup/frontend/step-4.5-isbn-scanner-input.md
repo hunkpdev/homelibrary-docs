@@ -1,10 +1,8 @@
-# Step 4.6 – IsbnScannerInput komponens
+# Step 4.5 – IsbnScannerInput komponens
 
 ## Mit állít elő
 
 - `src/components/isbn/IsbnScannerInput.tsx` — ISBN beviteli komponens (kamera + kézi)
-
----
 
 ## Működés
 
@@ -17,8 +15,6 @@ Két mód, automatikusan váltva:
 
 Ha a kamera elérhető, alapból aktív — nincs szükség felhasználói váltásra.
 
----
-
 ## Kulcs döntések
 
 - Barcode könyvtár: `react-zxing` (`useZxing` hook)
@@ -27,8 +23,6 @@ Ha a kamera elérhető, alapból aktív — nincs szükség felhasználói vált
 - A komponens **nem** hívja a backend API-t — csak az ISBN értéket adja vissza
 - Kamera módban sikeres felismerés után a komponens megáll (nem folytatja a szkennelést) — újraindítás szülő komponens általi reset-tel
 - `isLoading` prop: szkennelés letiltása API hívás idejére (szülő vezérli)
-
----
 
 ## Elfogadási kritériumok
 
