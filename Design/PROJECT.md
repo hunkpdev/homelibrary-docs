@@ -2,7 +2,7 @@
 
 > **Dokumentáció repo:** `homelibrary-docs`
 > **Kód repo:** `homelibrary`
-> **Utolsó frissítés:** 2026-04-28
+> **Utolsó frissítés:** 2026-04-29
 
 ## Mi ez?
 
@@ -67,7 +67,7 @@ Webalapú elektronikus házi könyvtárkezelő alkalmazás, amellyel egy háztar
 
 ### Fázis 1 – MVP (core funkciók)
 - [ ] Auth (bejelentkezés, JWT, három szerepkör)
-- [ ] ISBN lookup (OpenLibrary API + Google Books fallback) + vonalkód olvasás kamerával (react-zxing, elsődleges) / kézi bevitel (fallback)
+- [ ] ISBN lookup (OSZK NEKTÁR Z39.50 + manuális fallback) + vonalkód olvasás kamerával (react-zxing, elsődleges) / kézi bevitel (fallback)
 - [ ] Könyv CRUD (felvétel, listázás, módosítás, soft delete)
 - [ ] Helyiség/polc kezelés
 - [ ] Státusz kezelés (AT_HOME, LOANED, DELETED)
@@ -99,10 +99,9 @@ Webalapú elektronikus házi könyvtárkezelő alkalmazás, amellyel egy háztar
 
 ## Külső API függőségek
 
-| API | Mire | Limit | Kulcs kell? |
-|-----|------|-------|-------------|
-| [OpenLibrary](https://openlibrary.org/developers/api) | ISBN lookup (elsődleges) | Ingyenes, nincs limit | Nem |
-| [Google Books API](https://developers.google.com/books) | ISBN lookup (fallback) | Ingyenes, 1000 req/nap | Igen |
+| API / Protokoll | Mire | Limit | Kulcs kell? |
+|-----------------|------|-------|-------------|
+| OSZK NEKTÁR Z39.50 (`tagetes2.oszk.hu:1616`) | ISBN lookup | Ingyenes, 03:30–23:00 | Nem |
 | Google Gemini API vagy DeepL | Leírás fordítás (Fázis 3) | Ingyenes tier | Igen |
 
 ## Repók

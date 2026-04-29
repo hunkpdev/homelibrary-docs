@@ -1,7 +1,7 @@
 # HomeLibrary – API Design
 
 > **Státusz:** v1 – Draft
-> **Utolsó frissítés:** 2026-03-28
+> **Utolsó frissítés:** 2026-04-29
 > **Base URL (prod):** `https://api.[cloudfront-domain]/api`
 > **Base URL (local):** `http://localhost:8080/api`
 
@@ -164,7 +164,7 @@ Könyvek listázása szűrőkkel. Lapozott.
   "descriptionLanguage": "hu",
   "locationId": "550e8400-...",
   "status": "AT_HOME",
-  "source": "OPENLIBRARY"
+  "source": "OSZK"
 }
 ```
 
@@ -256,23 +256,25 @@ Könyv áthelyezése másik polcra/helyiségbe.
 ## ISBN Lookup Endpoint
 
 ### `GET /api/books/isbn/{isbn}`
-ISBN szám alapján adatlekérés külső API-ból (nem menti az adatbázisba).
-Fázis 1-ben az OpenLibrary API-t hívja, fallbackként Google Books API-t.
+ISBN szám alapján adatlekérés az OSZK NEKTÁR Z39.50 protokollon (nem menti az adatbázisba).
+Ha az OSZK nem talál, csonka rekordot ad, vagy időablakon kívül van (23:00–03:30): `found: false`, a kliens manuális bevitelre vált.
 
 **Jogosultság:** `ADMIN` vagy `DEMO`
 
-**Response 200:**
+**DEMO rate limit:** 5 keresés/session (Spring Cache, JWT-hez kötve), 50 keresés/nap (DB tábla, lazy reset). Limit eléréskor: `429 Too Many Requests`.
+
+**Response 200 (találat):**
 ```json
 {
-  "isbn": "9780261102354",
-  "title": "The Lord of the Rings",
-  "authors": ["Tolkien, J.R.R."],
-  "publisher": "HarperCollins",
-  "publishYear": 1991,
-  "language": "en",
-  "categories": ["Fantasy", "Fiction"],
-  "coverImageUrl": "https://covers.openlibrary.org/...",
-  "source": "OPENLIBRARY",
+  "isbn": "9789636091996",
+  "title": "Szülői generációk harca",
+  "subtitle": "hogyan értsük meg magunkat?",
+  "authors": ["Steigervald Krisztián"],
+  "publisher": "Partvonal",
+  "publishYear": 2026,
+  "language": "hun",
+  "pageCount": 311,
+  "source": "OSZK",
   "found": true
 }
 ```
@@ -282,6 +284,14 @@ Fázis 1-ben az OpenLibrary API-t hívja, fallbackként Google Books API-t.
 {
   "isbn": "9780000000000",
   "found": false
+}
+```
+
+**Response 429 (DEMO rate limit elérve):**
+```json
+{
+  "found": false,
+  "rateLimitExceeded": true
 }
 ```
 
