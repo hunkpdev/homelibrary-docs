@@ -1,69 +1,77 @@
-# ADR-003: ISBN Lookup API Stratégia
+# ADR-003: ISBN Lookup Adatforrás-stratégia
 
 **Dátum:** 2026-03-28  
-**Frissítve:** 2026-04-27  
-**Státusz:** Elfogadva
+**Frissítve:** 2026-04-29  
+**Státusz:** Elfogadva (felváltja a korábbi moly.hu + OpenLibrary verziót)
 
 ## Kontextus
 
-A könyv felvételekor ISBN szám alapján automatikusan le kell kérni a könyv adatait
-(cím, szerző, kiadó, kiadási év, kategória, borítókép) egy külső forrásból.
-A megoldásnak ingyenesnek kell lennie. Az alkalmazás elsősorban magyar nyelvű könyveket kezel.
+A könyv felvételekor ISBN szám alapján automatikusan le kell kérni a könyv adatait (cím, szerző, kiadó, kiadási év). A megoldásnak ingyenesnek kell lennie. Az alkalmazás 90%+ arányban magyar kiadású könyveket kezel, ezért a magyar lefedettség kritikus.
+
+2026 áprilisában elvégzett manuális lefedettségi teszt (13 saját ISBN) és TOS/robots.txt ellenőrzés alapján az eredetileg tervezett moly.hu + OpenLibrary stratégia nem tartható:
+
+- **moly.hu:** `robots.txt` tiltja a `/kereses` útvonal scrape-jét (`Disallow: /`, a `/kereses` nincs az Allow listán). A tervezett kétlépéses lookup első lépése tiltott.
+- **antikvarium.hu:** TOS tiltja a tartalom felhasználását előzetes írásbeli engedély nélkül; non-commercial kivétel nincs.
+- **OpenLibrary:** az Internet Archive 3–9%-os dokumentált downtime-ja és empirikus teszt (első 6 ISBN: 0 találat) alapján megbízhatatlan a magyar könyveknél.
+- **Google Books:** API kulcs igényes, a 90%+ magyar lefedettségi célhoz gyenge.
 
 ## Döntés
 
-**Kétlépéses stratégia: moly.hu (elsődleges, scraping) + OpenLibrary API (fallback)**
+**OSZK NEKTÁR Z39.50 protokollon mint egyetlen külső forrás; manuális bevitel mint fallback.**
 
-Google Books API-t nem használunk — API kulcs igénylése és napi limit kezelése felesleges overhead egy demo projektben. Ha a projekt kereskedelmi útra tér, az ISBNdb (fizetős) lesz a megfelelő bővítés.
+Az OSZK (Országos Széchényi Könyvtár) NEKTÁR adatbázisa Z39.50 protokollon keresztül elérhető. Mért lefedettség (13-as ISBN minta): ~85% találat / ~77% teljes adattal (a 2 hiányzó ISBN mindkét esetben német kiadás — várható). Külső API fallback chain nincs.
 
-## API Összehasonlítás
+## OSZK NEKTÁR Z39.50 endpoint
 
-| Szempont | moly.hu | OpenLibrary | Google Books |
-|----------|---------|-------------|--------------|
-| Ár | Ingyenes | Ingyenes | Ingyenes (1000 req/nap) |
-| API kulcs | Nem kell | Nem kell | Kell |
-| Hozzáférés | HTML scraping | REST API | REST API |
-| Magyar könyvek | Kiváló | Gyenge | Közepes |
-| Stabilitás | Törékeny (UI változás) | Stabil | Stabil |
+| | |
+|---|---|
+| Host | `tagetes2.oszk.hu` |
+| Port | `1616` |
+| Adatbázis | `B1` |
+| Elérhetőség | 03:30–23:00 helyi idő, 7/7 |
+| Rekord szintaxis | MARC21 |
+| ISBN keresés | `@attr 1=7 {ISBN}` (Bib-1 attribútum) |
 
-## Megvalósítás
+**Időablakon kívüli hívás (23:00–03:30):** az OSZK client azonnal `Optional.empty()`-t ad vissza → a service réteg manuális bevitelre irányít.
 
-### 1. moly.hu (elsődleges)
-```
-GET https://moly.hu/kereses?utf8=%E2%9C%93&query={isbn}
-```
-- HTML scraping Jsoup könyvtárral
-- Legjobb magyar könyv lefedettség
-- Nincs API kulcs, nincs rate limit
-- Kockázat: UI változás esetén a selectorok frissítést igényelnek
+## MARC21 → IsbnLookupResult mapping
 
-### 2. OpenLibrary API (fallback)
-```
-GET https://openlibrary.org/api/books?bibkeys=ISBN:{isbn}&format=json&jscmd=data
-```
-- Regisztráció nélkül, API kulcs nélkül hívható
-- Jó lefedettség nemzetközi könyveknél
-- Gyenge magyar könyv lefedettség
+| HomeLibrary mező | MARC tag |
+|---|---|
+| Cím | 245 $a |
+| Alcím | 245 $b |
+| Szerző | 100 $a + $j |
+| Kiadó | 260 $b |
+| Kiadási év | 260 $c |
+| Oldalszám | 300 $a |
+| Nyelv | 041 $a (ISO 639-2, 3 betűs) |
 
-### 3. Manuális bevitel (végső fallback)
-Ha egyik forrás sem talál eredményt, a felhasználó kézzel tölti ki az adatokat.
+Borítókép: MARC21 nem tartalmaz cover URL-t — Fázis 1-ben nincs.
 
-## Backend Implementáció
+**`hasMinimumFields()` definíció:** kötelező a `title` és `author`. Ha az OSZK csonka rekordot ad, a service `Optional.empty()`-ként kezeli → manuális bevitelre irányít.
 
-A backend hívja a külső forrásokat (nem a frontend direktben):
-- Egységes hibakezelés
-- Könnyen bővíthető (új provider hozzáadása minimális változtatással)
+## DEMO szerepkör korlátozás
 
-```
-GET /api/books/isbn/{isbn}
-  → MolyHuClient.lookup(isbn)
-    → ha null: OpenLibraryClient.lookup(isbn)
-      → ha null: { found: false }
-```
+A beégetett DEMO felhasználó ISBN lookup hívásai limitáltak:
+
+- **Session limit: 5 keresés** — Spring Cache-ben tárolva, kulcs a JWT token ID (`jti` claim). Lambda-újraindítás esetén reset; DEMO kontextusban elfogadható.
+- **Napi limit: 50 keresés** — DB-táblában tárolva, lazy reset stratégiával: ellenőrzéskor az aktuális dátumot összehasonlítja a tárolt dátummal; ha eltért, nulláz és frissíti a dátumot. Nincs szükség éjféli scheduled taskra (Lambda-n nem megbízható).
+
+## Alternatívák elutasítva
+
+| Forrás | Ok |
+|---|---|
+| moly.hu | robots.txt tiltja a `/kereses` scrape-jét |
+| antikvarium.hu | TOS: előzetes írásbeli engedély kell |
+| OpenLibrary | instabilitás + gyenge magyar lefedettség |
+| Google Books | API kulcs + gyenge magyar lefedettség |
+| ISBNdb | fizetős |
 
 ## Következmények
 
-- Jsoup Maven függőség szükséges a moly.hu scrapinghez
-- `IsbnSource` enum értékek: `MOLY_HU`, `OPENLIBRARY`
-- Google Books API kulcs SSM-ben **nem** szükséges
-- Ha a moly.hu HTML struktúrája változik, a `MolyHuClient` CSS selectorait frissíteni kell
+- Java Z39.50 client: YAZ4J + natív bináris (részletek: ADR-010)
+- MARC parser: `marc4j` Maven függőség
+- `IsbnSource` enum értékek: `OSZK`, `MANUAL`
+- Lambda VPC outbound: TCP 1616 → `193.6.201.206/32` (OSZK statikus IP)
+- DEMO napi limit: új DB tábla szükséges a napi számlálóhoz
+- `cover_image_url` Fázis 1-ben nem töltjük (MARC21 nem tartalmaz)
