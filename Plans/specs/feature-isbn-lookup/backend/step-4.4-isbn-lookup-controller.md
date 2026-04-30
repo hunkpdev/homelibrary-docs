@@ -34,12 +34,13 @@
 **Response 429 (DEMO rate limit elérve):**
 ```json
 {
-  "rateLimitExceeded": true
+  "reason": "DEMO_RATE_LIMIT_EXCEEDED"
 }
 ```
 
 > Nem találat esetén 204 — a "nincs elérhető adat" üzleti állapot, nem hiba (ezért nem 404).
 > `DemoRateLimitExceededException` → `@ExceptionHandler` 429-et ad vissza.
+> A body azért szükséges, hogy a frontend meg tudja különböztetni az alkalmazás szintű DEMO limitet az infrastruktúra szintű 429-től (pl. API Gateway throttling).
 
 ## Kulcs döntések
 
@@ -48,7 +49,7 @@
 - `IsbnLookupResult` → `IsbnLookupResponse` leképezés: MapStruct mapper vagy kézi konstruktor
 - `source` lehetséges értékei: `OSZK` (találat esetén) — nem találatnál nincs response body
 - `subtitle`, `pageCount` null megengedett (nem minden MARC rekordban van meg)
-- A 429 válasz body-ja szándékosan strukturált (`rateLimitExceeded: true`), ellentétben a `GlobalExceptionHandler` általános üres body-jával — a frontend-nek meg kell tudnia különböztetni a rate limit-et más hibáktól
+- A 429 válasz body-ja szándékosan strukturált (`reason: "DEMO_RATE_LIMIT_EXCEEDED"`), hogy a frontend meg tudja különböztetni az alkalmazás szintű DEMO limitet az infrastruktúra szintű throttlingtól (pl. API Gateway 429)
 - Az `isbn` mező nem szerepel a response body-ban — a kliens a path paraméterből ismeri
 
 ## Elfogadási kritériumok
@@ -57,6 +58,6 @@
 - Nem található ISBN → 204, üres body
 - Hitelesítés nélkül → 401
 - VISITOR role → 403
-- DEMO session limit elérve → 429, `{ rateLimitExceeded: true }`
-- DEMO napi limit elérve → 429, `{ rateLimitExceeded: true }`
+- DEMO session limit elérve → 429, `{ "reason": "DEMO_RATE_LIMIT_EXCEEDED" }`
+- DEMO napi limit elérve → 429, `{ "reason": "DEMO_RATE_LIMIT_EXCEEDED" }`
 - Swagger UI-on mindhárom response kód megjelenik
