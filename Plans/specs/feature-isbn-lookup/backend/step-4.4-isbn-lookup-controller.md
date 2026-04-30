@@ -18,7 +18,6 @@
 **Response 200 (találat):**
 ```json
 {
-  "isbn": "9789636091996",
   "title": "Szülői generációk harca",
   "subtitle": "hogyan értsük meg magunkat?",
   "authors": ["Steigervald Krisztián"],
@@ -26,28 +25,20 @@
   "publishYear": 2026,
   "language": "hun",
   "pageCount": 311,
-  "source": "OSZK",
-  "found": true
+  "source": "OSZK"
 }
 ```
 
-**Response 200 (nem található):**
-```json
-{
-  "isbn": "9780000000000",
-  "found": false
-}
-```
+**Response 204 (nem található):** — üres body
 
 **Response 429 (DEMO rate limit elérve):**
 ```json
 {
-  "found": false,
   "rateLimitExceeded": true
 }
 ```
 
-> Nem találat esetén is 200 a válasz (nem 404) — a "nem található" üzleti állapot, nem hiba.
+> Nem találat esetén 204 — a "nincs elérhető adat" üzleti állapot, nem hiba (ezért nem 404).
 > `DemoRateLimitExceededException` → `@ExceptionHandler` 429-et ad vissza.
 
 ## Kulcs döntések
@@ -55,16 +46,17 @@
 - `@Operation` és `@ApiResponse` annotációk a Swagger UI-hoz (mindhárom response kódra)
 - A controller nem validálja az ISBN-t — a service (4.3) végzi
 - `IsbnLookupResult` → `IsbnLookupResponse` leképezés: MapStruct mapper vagy kézi konstruktor
-- `source` lehetséges értékei: `OSZK` (találat esetén), null (nem találat esetén)
+- `source` lehetséges értékei: `OSZK` (találat esetén) — nem találatnál nincs response body
 - `subtitle`, `pageCount` null megengedett (nem minden MARC rekordban van meg)
-- A 429 válasz body-ja szándékosan strukturált (`found: false`, `rateLimitExceeded: true`), ellentétben a `GlobalExceptionHandler` általános üres body-jával — a frontend-nek meg kell tudnia különböztetni a rate limit-et más hibáktól
+- A 429 válasz body-ja szándékosan strukturált (`rateLimitExceeded: true`), ellentétben a `GlobalExceptionHandler` általános üres body-jával — a frontend-nek meg kell tudnia különböztetni a rate limit-et más hibáktól
+- Az `isbn` mező nem szerepel a response body-ban — a kliens a path paraméterből ismeri
 
 ## Elfogadási kritériumok
 
-- `GET /api/books/isbn/{isbn}` → 200, kitöltött response
-- Nem található ISBN → 200, `found: false`
+- `GET /api/books/isbn/{isbn}` → 200, kitöltött response body
+- Nem található ISBN → 204, üres body
 - Hitelesítés nélkül → 401
 - VISITOR role → 403
-- DEMO session limit elérve → 429, `rateLimitExceeded: true`
-- DEMO napi limit elérve → 429, `rateLimitExceeded: true`
+- DEMO session limit elérve → 429, `{ rateLimitExceeded: true }`
+- DEMO napi limit elérve → 429, `{ rateLimitExceeded: true }`
 - Swagger UI-on mindhárom response kód megjelenik
