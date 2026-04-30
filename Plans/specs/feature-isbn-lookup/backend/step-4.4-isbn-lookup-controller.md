@@ -18,6 +18,7 @@
 **Response 200 (találat):**
 ```json
 {
+  "isbn": "9789636091996",
   "title": "Szülői generációk harca",
   "subtitle": "hogyan értsük meg magunkat?",
   "authors": ["Steigervald Krisztián"],
@@ -46,11 +47,9 @@
 
 - `@Operation` és `@ApiResponse` annotációk a Swagger UI-hoz (mindhárom response kódra)
 - A controller nem validálja az ISBN-t — a service (4.3) végzi
-- `IsbnLookupResult` → `IsbnLookupResponse` leképezés: MapStruct mapper vagy kézi konstruktor
 - `source` lehetséges értékei: `OSZK` (találat esetén) — nem találatnál nincs response body
 - `subtitle`, `pageCount` null megengedett (nem minden MARC rekordban van meg)
 - A 429 válasz body-ja szándékosan strukturált (`reason: "DEMO_RATE_LIMIT_EXCEEDED"`), hogy a frontend meg tudja különböztetni az alkalmazás szintű DEMO limitet az infrastruktúra szintű throttlingtól (pl. API Gateway 429)
-- Az `isbn` mező nem szerepel a response body-ban — a kliens a path paraméterből ismeri
 
 ## Elfogadási kritériumok
 
