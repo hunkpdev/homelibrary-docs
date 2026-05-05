@@ -34,6 +34,8 @@ Az OSZK (Országos Széchényi Könyvtár) NEKTÁR adatbázisa Z39.50 protokollo
 
 **Kiesés kezelése:** connection timeout vagy hiba esetén a client `Optional.empty()`-t ad vissza → a service réteg manuális bevitelre irányít. Időablak-ellenőrzés nincs — empirikus teszt alapján az OSZK a hivatalos 03:30–23:00 ablakon kívül is válaszol.
 
+> **Kapcsolat-élettartam:** a yaz4j `Connection` egyetlen lookup-burst alatt újrahasznosított, 1 perc tétlenség után lezárt. Indok: az OSZK NEKTÁR ingyenes közkönyvtári szolgáltatás — nem tartunk nyitva tétlen socketet feleslegesen, de burst-en belül a 3-4 sec init-cost megspórolása legitim.
+
 ## MARC21 → IsbnLookupResult mapping
 
 | HomeLibrary mező | MARC tag |

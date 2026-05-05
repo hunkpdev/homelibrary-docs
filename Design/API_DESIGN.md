@@ -257,7 +257,7 @@ Könyv áthelyezése másik polcra/helyiségbe.
 
 ### `GET /api/books/isbn/{isbn}`
 ISBN szám alapján adatlekérés az OSZK NEKTÁR Z39.50 protokollon (nem menti az adatbázisba).
-Ha az OSZK nem talál, csonka rekordot ad, vagy nem elérhető: `found: false`, a kliens manuális bevitelre vált.
+Ha az OSZK nem talál, csonka rekordot ad, vagy nem elérhető: 204 No Content választ ad, a kliens manuális bevitelre vált.
 
 **Jogosultság:** `ADMIN` vagy `DEMO`
 
@@ -274,28 +274,22 @@ Ha az OSZK nem talál, csonka rekordot ad, vagy nem elérhető: `found: false`, 
   "publishYear": 2026,
   "language": "hun",
   "pageCount": 311,
-  "source": "OSZK",
-  "found": true
+  "source": "OSZK"
 }
 ```
 
-**Response 200 (nem található):**
-```json
-{
-  "isbn": "9780000000000",
-  "found": false
-}
-```
+**Response 204 (nem található):** üres body
+
+**Response 422 (érvénytelen ISBN formátum):** üres body
 
 **Response 429 (DEMO rate limit elérve):**
 ```json
 {
-  "found": false,
-  "rateLimitExceeded": true
+  "reason": "DEMO_RATE_LIMIT_EXCEEDED"
 }
 ```
 
-> A 429 válasz strukturált body-t ad — szándékos kivétel az általános üres-body hibakonvenció alól, hogy a frontend megkülönböztethesse a rate limit-et más hibáktól.
+> A 429 válasz strukturált body-t ad — szándékos kivétel az általános üres-body hibakonvenció alól, hogy a frontend megkülönböztethesse az alkalmazásszintű DEMO limitet az infrastruktúra-szintű throttlingtól.
 
 ---
 
@@ -632,4 +626,5 @@ Felhasználó deaktiválása (soft delete – `active` → `false`).
 | `403 Forbidden` | Nincs jogosultság |
 | `404 Not Found` | Az erőforrás nem létezik |
 | `409 Conflict` | Üzleti logika ütközés (pl. dupla kölcsönzés, konkurens módosítás – verziószám ütközés) |
+| `422 Unprocessable Entity` | Érvénytelen üzleti adat (pl. érvénytelen ISBN formátum) |
 | `500 Internal Server Error` | Szerver oldali hiba |

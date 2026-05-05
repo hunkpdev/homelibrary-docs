@@ -30,7 +30,11 @@
 }
 ```
 
-**Response 204 (nem található):** — üres body
+**Response 204 (nem található):** üres body
+
+> A 204 üzleti állapot, nem hiba — az OSZK nem találta a könyvet, vagy a rekord csonka. A frontend manuális beviteli módra vált.
+
+**Response 422 (érvénytelen ISBN formátum):** üres body
 
 **Response 429 (DEMO rate limit elérve):**
 ```json
@@ -39,24 +43,25 @@
 }
 ```
 
-> Nem találat esetén 204 — a "nincs elérhető adat" üzleti állapot, nem hiba (ezért nem 404).
-> `DemoRateLimitExceededException` → `@ExceptionHandler` 429-et ad vissza.
-> A body azért szükséges, hogy a frontend meg tudja különböztetni az alkalmazás szintű DEMO limitet az infrastruktúra szintű 429-től (pl. API Gateway throttling).
+> A 429 válasz strukturált body-t ad — szándékos kivétel az általános üres-body hibakonvenció alól, hogy a frontend megkülönböztethesse az alkalmazásszintű DEMO limitet az infrastruktúra-szintű throttlingtól.
+> `DemoRateLimitExceededException` → `GlobalExceptionHandler` 429-et ad vissza strukturált body-val.
 
 ## Kulcs döntések
 
-- `@Operation` és `@ApiResponse` annotációk a Swagger UI-hoz (mindhárom response kódra)
+- `@Operation` és `@ApiResponse` annotációk a Swagger UI-hoz (200, 204, 422, 429 response kódokra)
 - A controller nem validálja az ISBN-t — a service (4.3) végzi
 - `source` lehetséges értékei: `OSZK` (találat esetén) — nem találatnál nincs response body
 - `subtitle`, `pageCount` null megengedett (nem minden MARC rekordban van meg)
-- A 429 válasz body-ja szándékosan strukturált (`reason: "DEMO_RATE_LIMIT_EXCEEDED"`), hogy a frontend meg tudja különböztetni az alkalmazás szintű DEMO limitet az infrastruktúra szintű throttlingtól (pl. API Gateway 429)
+- A 429 válasz body-ja szándékosan strukturált (`{"reason": "DEMO_RATE_LIMIT_EXCEEDED"}`), ellentétben a `GlobalExceptionHandler` általános üres body-jával — a frontend-nek meg kell tudnia különböztetni a rate limit-et más hibáktól
+- `source` lehetséges értéke: `OSZK` (találat esetén)
 
 ## Elfogadási kritériumok
 
-- `GET /api/books/isbn/{isbn}` → 200, kitöltött response body
+- `GET /api/books/isbn/{isbn}` → 200, kitöltött response (nincs `found` mező)
 - Nem található ISBN → 204, üres body
+- Érvénytelen ISBN formátum → 422, üres body
 - Hitelesítés nélkül → 401
 - VISITOR role → 403
-- DEMO session limit elérve → 429, `{ "reason": "DEMO_RATE_LIMIT_EXCEEDED" }`
-- DEMO napi limit elérve → 429, `{ "reason": "DEMO_RATE_LIMIT_EXCEEDED" }`
-- Swagger UI-on mindhárom response kód megjelenik
+- DEMO session limit elérve → 429, `{"reason": "DEMO_RATE_LIMIT_EXCEEDED"}`
+- DEMO napi limit elérve → 429, `{"reason": "DEMO_RATE_LIMIT_EXCEEDED"}`
+- Swagger UI-on 200, 204, 422, 429 response kódok megjelennek
