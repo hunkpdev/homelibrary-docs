@@ -64,6 +64,22 @@ Olyan feladatok, amelyek nem tartoznak aktív feature-höz, de határidőre vagy
 
 ---
 
+### DEMO ISBN napi limit race condition
+
+**Teendő:** A `DemoIsbnRateLimitService.incrementDaily()` `findAll → setLookupCount → save` szekvenciája nem atomikus. Két párhuzamos Lambda instance esetén a számláló 1-2-vel csúszhat (50 helyett 51-52-nek hagyhatja a napi limitet).
+
+**Forrás:** v2 spec review (2026-04-29), elfogadott race condition pályázati átadás miatt — DEMO felhasználónál párhuzamos kérés gyakorlatilag kizárt (ADR-003 elemzés alapján). Optimistic locking (`@Version`) vagy atomic SQL UPDATE bevezetése Feature 5 utáni iterációban.
+
+---
+
+### `OszkNektarClient` tesztelhetőség
+
+**Teendő:** A natív lib betöltést és Z39.50 connection-managementet tartalmazó osztály unit teszt nélküli, és a Sonar coverage exclusion alá esik (`pom.xml` `<sonar.coverage.exclusions>`). A `loadNativeLibrary()` extrakciója + factory pattern bevezetése (`Connection` factory injektálással) javítaná a tesztelhetőséget.
+
+**Forrás:** Feature 4 backend code review (2026-05-05). Az integrációs tesztelés MARC/Z39.50 mock nélkül komplex — pályázati átadás után újragondolandó.
+
+---
+
 ## Lezárt
 
 *(még üres)*

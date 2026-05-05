@@ -3,7 +3,6 @@
 ## Mit állít elő
 
 - `OszkNektarClient` Spring `@Component`
-- `IsbnLookupResult` Java record (package: `com.homelibrary.isbn`)
 - `IsbnSource` enum (`OSZK`, `MANUAL`) (package: `com.homelibrary.isbn`)
 - `src/main/resources/native/linux-x86_64/libyaz.so.5` (becommitelendő, lásd lent)
 - `src/main/resources/native/win32-x86_64/yaz5.dll` (becommitelendő, YAZ Windows telepítőből kimásolva)
@@ -15,7 +14,6 @@
 
 - `yaz4j` — Z39.50 Java client (BSD-3-Clause)
 - `marc4j` — MARC21 parser (Apache 2.0)
-- `org.scijava:native-lib-loader` — natív bináris automatikus extract és betöltés
 
 ## Natív bináris megszerzése (egyszeri, GitHub Actions workflow)
 
@@ -40,13 +38,15 @@ Ha tranzitív `.so` függőség hiányzik Lambda-n: CloudWatch logban `dlopen fa
 | Rekord szintaxis | MARC21 (USmarc) |
 | Karakterkódolás | UTF-8 (`marc4j` default). Ha ékezetes karakterek hibásan jönnek vissza: `MarcReader.setEncoding` vagy YAZ4J `RecordSyntax.UTF8` beállítás ellenőrizendő |
 
-Kapcsolat init költséges (~3-4 sec) — a `Connection` objektum bean szinten cachelendő (ne kérésenként nyissa meg).
+Kapcsolat init költséges (~3-4 sec) — a `Connection` objektum újrahasználandó közeli, egymás utáni kéréseknél. Mivel az OSZK NEKTÁR ingyenes közkönyvtári szolgáltatás, a kapcsolatot nem tartjuk nyitva indokolatlanul: 1 perc tétlenség után automatikusan zárandó (a következő kérésen lazy módon újranyitva). A `Connection` natív szinten egyszálú; az osztály a Lambda single-request-per-container modelljére épít.
 
 > Az OSZK hivatalos elérhetőségi ablaka 03:30–23:00, de empirikus teszt alapján azon kívül is válaszol. Időablak-ellenőrzés nincs implementálva — a meglévő hibakezelés (connection timeout → `Optional.empty()`) fedezi a kiesési eseteket.
 
-## MARC21 → IsbnLookupResult mapping
+## MARC21 → IsbnLookupResponse mapping
 
-| `IsbnLookupResult` mező | MARC tag |
+> `IsbnLookupResult` külön record nincs — az `OszkNektarClient` és a `Marc21Util` egységesen az `IsbnLookupResponse` controller DTO-t használja visszatérési típusként.
+
+| `IsbnLookupResponse` mező | MARC tag |
 |---|---|
 | `isbn` | 020 $a (első érték, kötőjelek nélkül) |
 | `title` | 245 $a (záró ` /` levágva) |
@@ -60,7 +60,7 @@ Kapcsolat init költséges (~3-4 sec) — a `Connection` objektum bean szinten c
 
 ## `hasMinimumFields()` definíció
 
-`title` és legalább egy `author` kötelező. Ha az OSZK csonka rekordot ad (hiányzik title vagy author): `Optional.empty()` → service rétegben `found: false`.
+`title` és legalább egy `author` kötelező. Ha az OSZK csonka rekordot ad (hiányzik title vagy author): `Optional.empty()` → service rétegben 204 No Content.
 
 ## Hibakezelés
 

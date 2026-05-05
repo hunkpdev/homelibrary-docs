@@ -2,27 +2,26 @@
 
 ## Mit állít elő
 
-- `IsbnLookupService` interface
-- `IsbnLookupServiceImpl` implementáció
-- `IsbnUtils` segédosztály (formátum validáció)
+- `IsbnLookupService` (konkrét osztály — interface/impl szétválasztás nincs, konzisztens a többi service-szel)
+- `IsbnUtils` segédosztály (formátum validáció + normalizálás)
 - `DemoIsbnRateLimitService` (session + napi limit logika)
 
 ---
 
 ## ISBN validáció (`IsbnUtils`)
 
-Normalizálás a validáció előtt: `-` és whitespace karakterek strip-elése (`raw.replaceAll("[\\s-]", "")`). Formátum elővalidálás a normalizált stringre: 10 vagy 13 jegyű numerikus string (ISBN-10: opcionálisan záró `X`); érvénytelen → `found: false`, hívás nélkül. Konverzió nincs — az OSZK Z39.50 `@attr 1=7` ISBN-13-mal közvetlenül keres, empirikusan igazolt.
+Normalizálás és validáció: `IsbnUtils.normalize(isbn)` — kötőjelek és whitespace strip, majd formátum-ellenőrzés (10 vagy 13 jegyű numerikus string; ISBN-10: opcionálisan záró `X`). Érvénytelen formátum esetén `InvalidIsbnException`-t dob → `GlobalExceptionHandler` 422 Unprocessable Entity választ ad, hívás nélkül. Konverzió nincs — az OSZK Z39.50 `@attr 1=7` ISBN-13-mal közvetlenül keres, empirikusan igazolt.
 
 ## Orchestráció
 
 ```
 lookup(isbn):
-  if !IsbnUtils.isValid(isbn): return found: false
+  normalized = IsbnUtils.normalize(isbn)   // dob InvalidIsbnException ha érvénytelen → 422
 
-  result = OszkNektarClient.lookup(isbn)
+  result = OszkNektarClient.lookup(normalized)
 
-  if result.present: return result → found: true
-  return found: false
+  if result.present: return 200 with body
+  return 204 No Content
 ```
 
 Nincs külső fallback chain — egyetlen forrás az OSZK.
@@ -51,8 +50,8 @@ DEMO role esetén alkalmazandó a rate limit; ADMIN-nál kihagyandó. (VISITOR a
 ## Elfogadási kritériumok
 
 - Kötőjeles vagy szóközös ISBN → normalizálás (strip), majd validáció — érvényes ISBN-re lookup
-- Érvénytelen ISBN formátum → `found: false`, hívás nélkül
-- OSZK `Optional.empty()` → `found: false`, nem kivétel
+- Érvénytelen ISBN formátum → `InvalidIsbnException` → 422, hívás nélkül
+- OSZK `Optional.empty()` → 204 No Content, nem kivétel
 - DEMO: 5. keresés után session limit elérve → kivétel
 - DEMO: napi 50 keresés után limit elérve → kivétel
 - DEMO: új nap → lazy reset, számláló nulláról indul
