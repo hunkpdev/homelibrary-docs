@@ -50,8 +50,7 @@
 
 - `@Operation` és `@ApiResponse` annotációk a Swagger UI-hoz (200, 204, 422, 429 response kódokra)
 - A controller nem validálja az ISBN-t — a service (4.3) végzi
-- `IsbnLookupResult` → `IsbnLookupResponse` leképezés: MapStruct mapper vagy kézi konstruktor
-- `source` lehetséges értékei: `OSZK` (találat esetén), null (nem találat esetén)
+- `source` lehetséges értékei: `OSZK` (találat esetén) — nem találatnál nincs response body
 - `subtitle`, `pageCount` null megengedett (nem minden MARC rekordban van meg)
 - A 429 válasz body-ja szándékosan strukturált (`{"reason": "DEMO_RATE_LIMIT_EXCEEDED"}`), ellentétben a `GlobalExceptionHandler` általános üres body-jával — a frontend-nek meg kell tudnia különböztetni a rate limit-et más hibáktól
 - `source` lehetséges értéke: `OSZK` (találat esetén)
