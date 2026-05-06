@@ -198,25 +198,24 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 
 | Step | Mit állít elő |
 |------|---------------|
-| 5.1 | Liquibase: beégetett demo user seed changeset (BCrypt hash-elt jelszó, `DEMO` role) — analóg az admin seed changeset-tel (step 1.3) |
-| 5.2 | Spring Security: DEMO role számára kizárólag GET/HEAD/OPTIONS engedélyezve `/api/**` alatt; POST/PUT/PATCH/DELETE ADMIN-only — globális `httpSecurity` rule a `SecurityConfig`-ban. Kivétel: `/api/users/**` — DEMO és VISITOR statikusan kizárva; VISITOR self-access (`GET /{id}`, `PUT /{id}`) method-level `@PreAuthorize`-zal a controllerben (`@EnableMethodSecurity` szükséges) |
-| 5.3 | Liquibase: `books`, `book_descriptions` tábla changeset + indexek |
-| 5.4 | `Book` entitás + `BookRepository` (szűrő query metódusokkal) |
-| 5.5 | `BookDescription` entitás + `BookDescriptionRepository` |
-| 5.6 | `BookService`: létrehozás, lekérés id alapján, szűrős listázás (keresés, státusz, helyszín, kategória, nyelv, év), módosítás, soft delete |
-| 5.7 | `BookController`: `GET /api/books`, `GET /{id}`, `POST`, `PUT /{id}`, `DELETE /{id}` |
-| 5.8 | `BookController`: `PUT /{id}/status`, `PUT /{id}/location` |
+| [5.1](specs/feature-books-crud/backend/step-5.1-liquibase-demo-seed.md) | Liquibase: beégetett demo user seed changeset (BCrypt hash-elt jelszó, `DEMO` role) — analóg az admin seed changeset-tel (step 1.3) |
+| [5.2](specs/feature-books-crud/backend/step-5.2-security-demo-rules.md) | Spring Security: DEMO role számára kizárólag GET/HEAD/OPTIONS engedélyezve `/api/**` alatt; POST/PUT/PATCH/DELETE ADMIN-only — globális `httpSecurity` rule a `SecurityConfig`-ban. Kivétel: `/api/users/**` — DEMO és VISITOR statikusan kizárva; VISITOR self-access (`GET /{id}`, `PUT /{id}`) method-level `@PreAuthorize`-zal a controllerben (`@EnableMethodSecurity` szükséges) |
+| [5.3](specs/feature-books-crud/backend/step-5.3-liquibase-books.md) | Liquibase: `books`, `book_descriptions` tábla changeset + indexek |
+| [5.4](specs/feature-books-crud/backend/step-5.4-book-entity-repository.md) | `Book` entitás + `BookRepository` (szűrő query metódusokkal) |
+| [5.5](specs/feature-books-crud/backend/step-5.5-book-description-entity-repository.md) | `BookDescription` entitás + `BookDescriptionRepository` |
+| [5.6](specs/feature-books-crud/backend/step-5.6-book-service.md) | `BookService`: létrehozás, lekérés id alapján, szűrős listázás (keresés, státusz, helyszín, kategória, nyelv, év), módosítás, soft delete |
+| [5.7](specs/feature-books-crud/backend/step-5.7-book-controller.md) | `BookController`: `GET /api/books`, `GET /{id}`, `POST`, `PUT /{id}`, `DELETE /{id}` |
+| [5.8](specs/feature-books-crud/backend/step-5.8-book-controller-status-location.md) | `BookController`: `PUT /{id}/status`, `PUT /{id}/location` |
 
 ### Frontend
 
 | Step | Mit állít elő |
 |------|---------------|
-| 5.9 | `MutationButton` wrapper komponens (`src/components/common/MutationButton.tsx`): DEMO role detektálás (`user.role === 'DEMO'` a Zustand store-ból), DEMO esetén auto-disabled + tooltip; a könyv form-ok save/delete/submit gombjai ezt használják — a pattern itt kerül meghatározásra, Feature 6–7 örökli |
-| 5.10 | Könyvlista oldal: card grid, AG Grid Community alapú szűrősor (státusz, helyszín, kategória, nyelv, keresés) |
-| 5.11 | Könyv részletek oldal/panel |
-| 5.12 | Könyv felvétel form: ISBN bevitel → lookup előtöltés (Feature 4) + kézi kitöltés |
-| 5.13 | Könyv szerkesztés form, soft delete megerősítéssel |
-| 5.14 | Státusz és helyszín módosítás (inline akciók a card-on vagy részletek oldalon) |
+| [5.9](specs/feature-books-crud/frontend/step-5.9-mutation-button.md) | `MutationButton` wrapper komponens (`src/components/common/MutationButton.tsx`): DEMO role detektálás (`user.role === 'DEMO'` a Zustand store-ból), DEMO esetén auto-disabled + tooltip; a könyv form-ok save/delete/submit gombjai ezt használják — a pattern itt kerül meghatározásra, Feature 6–7 örökli |
+| [5.10](specs/feature-books-crud/frontend/step-5.10-book-list-page.md) | Könyvlista oldal: AG Grid Community táblázat (isbn, cím, szerző(k), kiadási év), szűrősor (keresés, státusz, helyszín), sorra kattintás → részletek panel |
+| [5.11](specs/feature-books-crud/frontend/step-5.11-book-detail-panel.md) | Könyv részletek panel (shadcn Sheet): teljes adatlap read-only, szerkesztés és törlés gomb (ADMIN) |
+| [5.12](specs/feature-books-crud/frontend/step-5.12-book-add-form.md) | Könyv felvétel form (shadcn Dialog): ISBN bevitel → lookup előtöltés (Feature 4) + kézi kitöltés |
+| [5.13](specs/feature-books-crud/frontend/step-5.13-book-edit-delete.md) | Könyv szerkesztés form (shadcn Dialog) + soft delete megerősítő Dialog |
 
 ---
 

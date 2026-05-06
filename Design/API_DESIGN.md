@@ -116,13 +116,14 @@ Könyvek listázása szűrőkkel. Lapozott.
       "id": "550e8400-...",
       "isbn": "9780261102354",
       "title": "The Lord of the Rings",
+      "subtitle": null,
       "authors": ["Tolkien, J.R.R."],
       "publisher": "HarperCollins",
       "publishYear": 1991,
+      "pageCount": 1178,
       "language": "en",
       "categories": ["Fantasy", "Fiction"],
-      "coverImageUrl": "https://covers.openlibrary.org/...",
-      // Fázis 1: a DB cover_image_url mezőjéből (külső forrás URL). Fázis 2-től: S3 pre-signed URL, a service réteg generálja a cover_image_key alapján on-the-fly.
+      "coverImageUrl": null,
       "status": "AT_HOME",
       "location": {
         "id": "...",
@@ -133,6 +134,7 @@ Könyvek listázása szűrőkkel. Lapozott.
         }
       },
       "description": "Egy hobbit kalandjai...",
+      "version": 1,
       "createdAt": "2026-03-28T14:30:00Z"
     }
   ],
@@ -142,6 +144,9 @@ Könyvek listázása szűrőkkel. Lapozott.
   "totalPages": 8
 }
 ```
+
+> `coverImageUrl` Fázis 1-ben mindig null (OSZK MARC21 nem tartalmaz cover URL-t). Fázis 2-től: S3 pre-signed URL.
+> `status` szűrő: `AT_HOME` vagy `LOANED` — `DELETED` értékre a backend üres lapot ad vissza (a service mindig kizárja a törölt könyveket).
 
 ---
 
@@ -155,9 +160,11 @@ Könyvek listázása szűrőkkel. Lapozott.
 {
   "isbn": "9780261102354",
   "title": "The Lord of the Rings",
+  "subtitle": null,
   "authors": ["Tolkien, J.R.R."],
   "publisher": "HarperCollins",
   "publishYear": 1991,
+  "pageCount": 1178,
   "language": "en",
   "categories": ["Fantasy", "Fiction"],
   "description": "Egy hobbit kalandjai...",
@@ -267,14 +274,17 @@ Ha az OSZK nem talál, csonka rekordot ad, vagy nem elérhető: 204 No Content v
 ```json
 {
   "isbn": "9789636091996",
-  "title": "Szülői generációk harca",
-  "subtitle": "hogyan értsük meg magunkat?",
-  "authors": ["Steigervald Krisztián"],
-  "publisher": "Partvonal",
-  "publishYear": 2026,
-  "language": "hun",
-  "pageCount": 311,
-  "source": "OSZK"
+  "result": {
+    "isbn": "9789636091996",
+    "title": "Szülői generációk harca",
+    "subtitle": "hogyan értsük meg magunkat?",
+    "authors": ["Steigervald Krisztián", "Matyus Dóra"],
+    "publisher": "Partvonal",
+    "publishYear": 2026,
+    "pageCount": 311,
+    "language": "hun",
+    "source": "OSZK"
+  }
 }
 ```
 
