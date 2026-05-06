@@ -89,10 +89,12 @@ Egy location pontosan egy roomhoz tartozik (`room_id` NOT NULL) — lásd ADR-00
 | `id` | `UUID` | PK | |
 | `isbn` | `VARCHAR(20)` | UNIQUE, NULL megengedett | ISBN-10 vagy ISBN-13. NULL ha a könyv vonalkód nélkül kerül felvételre (antik, ritka, saját kiadású). PostgreSQL több NULL értéket megenged UNIQUE constraint esetén. |
 | `title` | `VARCHAR(500)` | NOT NULL | |
+| `subtitle` | `VARCHAR(500)` | | Alcím, pl. `"hogyan értsük meg magunkat?"` — OSZK MARC21-ből érkezhet |
 | `authors` | `VARCHAR(1000)` | | JSON string, pl. `["Tolkien, J.R.R."]` |
 | `publisher` | `VARCHAR(255)` | | |
 | `publish_year` | `INTEGER` | | |
-| `language` | `VARCHAR(10)` | | Az eredeti könyv nyelve, pl. `hu`, `en` |
+| `page_count` | `INTEGER` | | Oldalszám — OSZK MARC21-ből érkezhet |
+| `language` | `VARCHAR(10)` | | Az eredeti könyv nyelve, pl. `hu`, `en`, `hun` |
 | `categories` | `VARCHAR(500)` | | JSON string, pl. `["Fantasy", "Fiction"]` |
 | `cover_image_url` | `VARCHAR(500)` | | Fázis 1: null (OSZK MARC21 nem tartalmaz cover URL-t). Fázis 2: Liquibase migráció — `cover_image_key` (S3 object key) mező kerül be helyette, a service réteg generálja a pre-signed URL-t. |
 | `status` | `VARCHAR(20)` | NOT NULL | `AT_HOME`, `LOANED`, `DELETED` |
