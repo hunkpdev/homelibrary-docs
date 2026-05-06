@@ -1,7 +1,7 @@
 # 1. Fázis – Implementációs terv
 
 > **Státusz:** Tervezés alatt
-> **Utolsó frissítés:** 2026-04-29
+> **Utolsó frissítés:** 2026-05-06
 > **Hatókör:** MVP – az első működő, deployolható alkalmazáshoz szükséges core feature-ök
 
 ## Fejlesztési workflow
@@ -43,18 +43,17 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
        │                                          │
        ▼                                          │
 5. Books CRUD ← függ: Locations + Auth + ISBN     │
+   (demo user seed + Security DEMO rules +        │
+    MutationButton itt kerül be)                  │
        │                                          │
        ▼                                          │
-6. Loans ← függ: Books + Auth                    │
+6. Loans ← függ: Books + Auth                     │
        │                                          │
        ▼                                          │
-7. Felhasználókezelés ← függ: Auth ──────────────┘
+7. Felhasználókezelés ← függ: Auth ───────────────┘
        │
        ▼
 8. i18n kiegészítések ← függ: Project Setup (1.6, 1.7)
-       │
-       ▼
-9. Demo role ← függ: Auth + minden controller (3–7)
 ```
 
 ---
@@ -189,9 +188,9 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 
 ## Feature 5 – Books CRUD
 
-**Cél:** Core könyvkezelés — felvétel (kézi + ISBN lookup előtöltéssel), szűrős listázás, módosítás, soft delete, státusz és helyszín változtatás.
+**Cél:** Core könyvkezelés — felvétel (kézi + ISBN lookup előtöltéssel), szűrős listázás, módosítás, soft delete, státusz és helyszín változtatás. Ebben a feature-ben kerül bevezetésre a DEMO role infrastruktúra (user seed, globális Security rule, frontend MutationButton pattern).
 
-**Jogosultság:** GET — ADMIN, VISITOR | POST, PUT, DELETE — ADMIN
+**Jogosultság:** GET — ADMIN, VISITOR, DEMO | POST, PUT, DELETE — ADMIN
 
 **Integrációs teszt:** `@SpringBootTest` — könyv státuszátmenetek (AT_HOME → LOANED → AT_HOME → DELETED).
 
@@ -199,22 +198,25 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 
 | Step | Mit állít elő |
 |------|---------------|
-| 5.1 | Liquibase: `books`, `book_descriptions` tábla changeset + indexek |
-| 5.2 | `Book` entitás + `BookRepository` (szűrő query metódusokkal) |
-| 5.3 | `BookDescription` entitás + `BookDescriptionRepository` |
-| 5.4 | `BookService`: létrehozás, lekérés id alapján, szűrős listázás (keresés, státusz, helyszín, kategória, nyelv, év), módosítás, soft delete |
-| 5.5 | `BookController`: `GET /api/books`, `GET /{id}`, `POST`, `PUT /{id}`, `DELETE /{id}` |
-| 5.6 | `BookController`: `PUT /{id}/status`, `PUT /{id}/location` |
+| 5.1 | Liquibase: beégetett demo user seed changeset (BCrypt hash-elt jelszó, `DEMO` role) — analóg az admin seed changeset-tel (step 1.3) |
+| 5.2 | Spring Security: DEMO role számára kizárólag GET/HEAD/OPTIONS engedélyezve `/api/**` alatt; POST/PUT/PATCH/DELETE ADMIN-only — globális `httpSecurity` rule a `SecurityConfig`-ban. Kivétel: `/api/users/**` — DEMO és VISITOR statikusan kizárva; VISITOR self-access (`GET /{id}`, `PUT /{id}`) method-level `@PreAuthorize`-zal a controllerben (`@EnableMethodSecurity` szükséges) |
+| 5.3 | Liquibase: `books`, `book_descriptions` tábla changeset + indexek |
+| 5.4 | `Book` entitás + `BookRepository` (szűrő query metódusokkal) |
+| 5.5 | `BookDescription` entitás + `BookDescriptionRepository` |
+| 5.6 | `BookService`: létrehozás, lekérés id alapján, szűrős listázás (keresés, státusz, helyszín, kategória, nyelv, év), módosítás, soft delete |
+| 5.7 | `BookController`: `GET /api/books`, `GET /{id}`, `POST`, `PUT /{id}`, `DELETE /{id}` |
+| 5.8 | `BookController`: `PUT /{id}/status`, `PUT /{id}/location` |
 
 ### Frontend
 
 | Step | Mit állít elő |
 |------|---------------|
-| 5.7 | Könyvlista oldal: card grid, AG Grid Community alapú szűrősor (státusz, helyszín, kategória, nyelv, keresés) |
-| 5.8 | Könyv részletek oldal/panel |
-| 5.9 | Könyv felvétel form: ISBN bevitel → lookup előtöltés (Feature 4) + kézi kitöltés |
-| 5.10 | Könyv szerkesztés form, soft delete megerősítéssel |
-| 5.11 | Státusz és helyszín módosítás (inline akciók a card-on vagy részletek oldalon) |
+| 5.9 | `MutationButton` wrapper komponens (`src/components/common/MutationButton.tsx`): DEMO role detektálás (`user.role === 'DEMO'` a Zustand store-ból), DEMO esetén auto-disabled + tooltip; a könyv form-ok save/delete/submit gombjai ezt használják — a pattern itt kerül meghatározásra, Feature 6–7 örökli |
+| 5.10 | Könyvlista oldal: card grid, AG Grid Community alapú szűrősor (státusz, helyszín, kategória, nyelv, keresés) |
+| 5.11 | Könyv részletek oldal/panel |
+| 5.12 | Könyv felvétel form: ISBN bevitel → lookup előtöltés (Feature 4) + kézi kitöltés |
+| 5.13 | Könyv szerkesztés form, soft delete megerősítéssel |
+| 5.14 | Státusz és helyszín módosítás (inline akciók a card-on vagy részletek oldalon) |
 
 ---
 
@@ -277,24 +279,3 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 | 8.1 | `i18next-browser-languagedetector` plugin bekötése: böngésző locale detektálás, hu → `hu`, egyéb → `en` fallback. Bejelentkezett user esetén `user.preferred_language` az egyetlen forrás (`PUT /api/users/{id}` perzisztálva) — `localStorage` réteg nincs. Anonymous oldalakon (login form) csak `navigator.language` autodetect, perzisztencia nincs. |
 | 8.2 | `LanguageSwitcher` komponens: flag ikon gomb a sidebar alján (dark mode toggle mellé), mindig a másik nyelvet jelöli, kattintásra nyelvváltás i18next-en keresztül |
 
----
-
-## Feature 9 – Demo role
-
-**Cél:** Portfólió bemutató célú DEMO role — minden oldal és form látható, kizárólag biztonságos HTTP metódusok (GET/HEAD/OPTIONS) engedélyezve; minden state-modifying művelet GUI-n disabled, API-n 403-mal elutasítva.
-
-**Jogosultság:** GET, HEAD, OPTIONS — DEMO role számára is elérhetők; minden state-modifying metódus (POST, PUT, PATCH, DELETE) → 403
-
-### Backend
-
-| Step | Mit állít elő |
-|------|---------------|
-| 9.1 | `Role` enum bővítése `DEMO` értékkel |
-| 9.2 | Liquibase changeset: beégetett demo user seed (BCrypt hash-elt jelszó, `DEMO` role) — analóg az admin seed changeset-tel (step 1.3) |
-| 9.3 | Spring Security: DEMO role számára kizárólag a biztonságos (GET, HEAD, OPTIONS) HTTP metódusok engedélyezve `/api/**` alatt; minden state-modifying metódus (POST, PUT, PATCH, DELETE és bármi egyéb) ADMIN-only — globális `httpSecurity` rule-lal SecurityConfig-ban (whitelist forma: GET/HEAD-re explicit role-list, `anyRequest()` ADMIN-only; nincs külön DEMO-blokk rule). Kivétel: `/api/users/**` — DEMO és VISITOR statikusan kizárva a SecurityConfig-ban; VISITOR self-access (`GET /{id}`, `PUT /{id}` saját rekordra) method-level `@PreAuthorize`-zal finomítva a controllerben (`@EnableMethodSecurity` szükséges). |
-
-### Frontend
-
-| Step | Mit állít elő |
-|------|---------------|
-| 9.4 | DEMO role detektálás a Zustand auth store `user.role === 'DEMO'` alapján — nem külön `isDemo` boolean flag a store-ban (a `user` objektumból származtatott érték, ld. Feature 2.9). Minden mutáció gombon (mentés, törlés, küldés) `disabled` állapot DEMO role esetén — cross-cutting, az összes feature (3–7) érintett. Pattern: `<MutationButton>` wrapper komponens (`src/components/common/MutationButton.tsx`) — a logika egyszer van megírva, DEMO esetén auto-disabled + tooltip ("Demo módban a mentés letiltva"); a meglévő save/delete/submit gombok cseréje erre a komponensre. A kliensoldali blokk UX cél; a tényleges biztonságot a step 9.3 szerver oldali szabálya adja, ami DevTools-tampering ellen is védett. |
