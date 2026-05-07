@@ -16,11 +16,9 @@ rooms (helyiség)
           │
           └──< books
                 │
-                ├──< loans (kölcsönzések)
-                │       │
-                │       └── users (kölcsönző)
-                │
-                └──< book_descriptions (i18n leírások)
+                └──< loans (kölcsönzések)
+                        │
+                        └── users (kölcsönző)
 
 users
   ├──< loans (loaned_by)
@@ -96,6 +94,7 @@ Egy location pontosan egy roomhoz tartozik (`room_id` NOT NULL) — lásd ADR-00
 | `page_count` | `INTEGER` | | Oldalszám — OSZK MARC21-ből érkezhet |
 | `language` | `VARCHAR(10)` | | Az eredeti könyv nyelve, pl. `hu`, `en`, `hun` |
 | `categories` | `VARCHAR(500)` | | JSON string, pl. `["Fantasy", "Fiction"]` |
+| `description` | `TEXT` | | Könyv leírása — amilyen nyelven érkezik (OSZK vagy manuális), úgy tárolva |
 | `cover_image_url` | `VARCHAR(500)` | | Fázis 1: null (OSZK MARC21 nem tartalmaz cover URL-t). Fázis 2: Liquibase migráció — `cover_image_key` (S3 object key) mező kerül be helyette, a service réteg generálja a pre-signed URL-t. |
 | `status` | `VARCHAR(20)` | NOT NULL | `AT_HOME`, `LOANED`, `DELETED` |
 | `location_id` | `UUID` | FK → locations | Ahol a könyv éppen van |
@@ -114,26 +113,6 @@ Egy location pontosan egy roomhoz tartozik (`room_id` NOT NULL) — lásd ADR-00
 > **Megjegyzés:** Az `authors` és `categories` mezők JSON string-ként vannak tárolva (`VARCHAR`).
 > A háztartási méretskálán (max. néhány ezer könyv) LIKE-alapú keresés bőven elegendő, külön index nem szükséges.
 > Normalizált tábla Fázis 2-ben mérlegelendő.
-
----
-
-### `book_descriptions`
-
-A könyv leírását i18n-nel tároljuk: könyvenként és nyelvenként egy sor.
-Az AI fordítás is ide kerül, `AI_TRANSLATED` source-szal.
-
-| Oszlop | Típus | Megszorítás | Leírás |
-|--------|-------|-------------|--------|
-| `id` | `UUID` | PK | |
-| `book_id` | `UUID` | FK → books NOT NULL | |
-| `language` | `VARCHAR(10)` | NOT NULL | pl. `hu`, `en` |
-| `description` | `TEXT` | | |
-| `source` | `VARCHAR(20)` | | `ORIGINAL`, `AI_TRANSLATED`, `MANUAL` |
-| `created_at` | `TIMESTAMP WITH TIME ZONE` | NOT NULL | |
-| `updated_at` | `TIMESTAMP WITH TIME ZONE` | NOT NULL | |
-
-> **Unique constraint:** `(book_id, language)` – könyvenként egy leírás per nyelv
-> Ha az AI fordít, új sor kerül be `AI_TRANSLATED` source-szal (nem felülírja az eredetit).
 
 ---
 
@@ -178,10 +157,9 @@ db/changelog/
     002-create-rooms.yaml
     003-create-locations.yaml
     004-create-books.yaml
-    005-create-book-descriptions.yaml
     006-create-loans.yaml
-    007-add-indexes.yaml
     008-create-demo-isbn-daily-stats.yaml
+    009-seed-demo-user.yaml
 ```
 
 ## Nyitott Kérdések

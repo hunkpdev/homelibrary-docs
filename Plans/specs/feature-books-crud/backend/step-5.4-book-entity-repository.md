@@ -19,7 +19,7 @@
 
 ## `Book` entitás
 
-Mezők a [`Design/DB_SCHEMA.md`](../../../Design/DB_SCHEMA.md) `books` tábla szerint, beleértve a `subtitle` (`String`, nullable) és `pageCount` (`Integer`, nullable) mezőket — az OSZK MARC21 response-ból érkezhetnek (ld. Feature 4 élő response).
+Mezők a [`Design/DB_SCHEMA.md`](../../../Design/DB_SCHEMA.md) `books` tábla szerint, beleértve a `subtitle` (`String`, nullable), `pageCount` (`Integer`, nullable) és `description` (`String`, nullable) mezőket — `subtitle` és `pageCount` az OSZK MARC21 response-ból érkezhetnek (ld. Feature 4 élő response), `description` közvetlenül a books táblán tárolódik.
 
 **Kapcsolatok:**
 - `location` — `@ManyToOne(fetch = FetchType.LAZY)` → `Location`, nullable (könyv helyszín nélkül is felvehető)
