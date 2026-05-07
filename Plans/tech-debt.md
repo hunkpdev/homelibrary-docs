@@ -80,6 +80,14 @@ Olyan feladatok, amelyek nem tartoznak aktív feature-höz, de határidőre vagy
 
 ---
 
+### IsbnLookupPanel reset pattern
+
+**Teendő:** A scanner / panel UI újrapróbálkozás-állapot-átmeneteinek pattern-je nem egységes (`isLoading`, hibaüzenet, ISBN újragépelés vs. újrabeolvasás scenariók). A Feature 5 `BookAddModal` "Kézi bevitel" linkkel megkerülhető, de a panel saját retry UX-e még nincs lezárva.
+
+**Forrás:** Feature 4 frontend code review F-W4.
+
+---
+
 ### `OszkNektarClient` tesztelhetőség
 
 **Teendő:** A natív lib betöltést és Z39.50 connection-managementet tartalmazó osztály unit teszt nélküli, és a Sonar coverage exclusion alá esik (`pom.xml` `<sonar.coverage.exclusions>`). A `loadNativeLibrary()` extrakciója + factory pattern bevezetése (`Connection` factory injektálással) javítaná a tesztelhetőséget.
