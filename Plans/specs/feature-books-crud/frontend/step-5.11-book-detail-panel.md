@@ -56,14 +56,15 @@ Shadcn `Sheet` (slide-in panel), nem külön route — a felhasználó a könyvl
 ## Kulcs döntések
 
 - **Panel read-only** — státusz és helyszín módosítás az edit formba (5.13) kerül; a detail panel egyetlen felelőssége az adatok megjelenítése és a modal-ok indítása
-- DEMO user: látja az összes adatot; szerkesztés és törlés gombok nem jelennek meg (ADMIN-only)
+- DEMO user: látja az összes adatot; szerkesztés és törlés gombok láthatók, de `MutationButton` auto-disabled tooltip-pal — egységes a grid műveletek oszlopával (5.10)
 
 ---
 
 ## Elfogadási kritériumok
 
 - Sorra kattintás → panel megnyílik, `GET /api/books/{id}` adat megjelenik
-- ADMIN: szerkesztés és törlés gomb látható
-- DEMO és VISITOR: akció gombok nem láthatók
+- ADMIN: szerkesztés és törlés gomb látható és aktív
+- DEMO: szerkesztés és törlés gomb látható, de disabled (`MutationButton` tooltip-pal)
+- VISITOR: akció gombok nem láthatók
 - Szerkesztés után panel automatikusan frissül
 - Soft delete után panel bezárul, könyv eltűnik a gridből

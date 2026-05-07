@@ -41,7 +41,7 @@ A predikátumok `and`-del láncolódnak. **`status != DELETED` mindig benne van*
 ### `create(BookCreateRequest request, UUID addedByUserId) → BookResponse`
 - `locationId` megadva → `locationRepository.findById` + aktív ellenőrzés → nem található vagy inaktív esetén 404
 - `authors` és `categories`: `List<String>` → JSON string (Jackson `ObjectMapper`)
-- `status` alapértelmezetten `AT_HOME` ha a request nem adja meg
+- `status` mindig `AT_HOME` — a request nem tartalmazza, a service állítja be
 - `addedBy` beállítása a paraméterből
 - `description` közvetlenül a `books` táblára kerül (nullable)
 

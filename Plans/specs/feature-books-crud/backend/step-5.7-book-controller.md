@@ -25,9 +25,10 @@
 | `language` | `String` | `@Size(max = 10)`, nullable |
 | `categories` | `List<String>` | nullable |
 | `locationId` | `UUID` | nullable |
-| `status` | `BookStatus` | nullable (service default: `AT_HOME`) |
 | `source` | `BookSource` | nullable |
 | `description` | `String` | nullable |
+
+> `status` nem szerepel a request body-ban — a service mindig `AT_HOME`-ra állítja létrehozáskor. Státuszváltozás kizárólag a `PUT /api/books/{id}/status` endpointon keresztül lehetséges (`DELETED` értéket az is visszautasítja — soft delete csak `DELETE /api/books/{id}` végponton).
 
 ### `BookUpdateRequest`
 
