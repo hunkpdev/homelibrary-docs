@@ -156,10 +156,10 @@ db/changelog/
     001-create-users.yaml
     002-create-rooms.yaml
     003-create-locations.yaml
-    004-create-books.yaml
     006-create-loans.yaml
     008-create-demo-isbn-daily-stats.yaml
     009-seed-demo-user.yaml
+    010-create-books.yaml
 ```
 
 ## Nyitott Kérdések

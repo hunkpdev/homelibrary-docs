@@ -2,8 +2,8 @@
 
 ## Mit állít elő
 
-- `db/changelog/changes/004-create-books.yaml` — `books` tábla + indexek
-- bekötve a `db.changelog-master.yaml`-ba (008 után, a sor végére)
+- `db/changelog/changes/010-create-books.yaml` — `books` tábla + indexek
+- bekötve a `db.changelog-master.yaml`-ba (009 után, a sor végére)
 
 ---
 
@@ -45,7 +45,7 @@ Teljes séma: [`Design/DB_SCHEMA.md`](../../../Design/DB_SCHEMA.md). Az alábbia
 
 ## Kulcs döntések
 
-- A changeset száma 004 — a DB_SCHEMA.md-ben tervezett sorrend szerint; a master changelog-ban 008 után kerül bekötésre (Liquibase a master sorrendjében futtatja)
+- A changeset száma 010 — fájlnév egyezik a végrehajtási sorrenddel; a master changelog-ban 009 (demo user seed) után kerül bekötésre
 - A `DB_SCHEMA.md`-ben tervezett `007-add-indexes.yaml` feleslegessé válik: az indexek a táblalétrehozó changeset-ekbe kerülnek bele, nem külön fájlba
 - `isbn` NULL megengedett: PostgreSQL UNIQUE constraint több NULL értéket enged (vonalkód nélküli könyvekhez)
 - `authors` és `categories` JSON string (`VARCHAR`) — ADR-006, háztartási méretskálán LIKE-keresés elegendő
