@@ -72,6 +72,14 @@ Olyan feladatok, amelyek nem tartoznak aktív feature-höz, de határidőre vagy
 
 ---
 
+### Location bookCount badge — books lista előszűrése helyszínre
+
+**Ötlet:** A Locations oldalon a `bookCount` badge kattinthatóvá tehető — navigál a Books listára, ahol a `locationId` szűrő előre be van állítva az adott helyszínre. Ez implicit helyszín szerinti szűrést ad a Books listán anélkül, hogy a Books grid szűrősorában helyszín szűrőt kellene fenntartani.
+
+**Állapot:** Fázis 1-ben nincs szűrősor a Books gridon — ötletként rögzítve Fázis 2-re.
+
+---
+
 ### `OszkNektarClient` tesztelhetőség
 
 **Teendő:** A natív lib betöltést és Z39.50 connection-managementet tartalmazó osztály unit teszt nélküli, és a Sonar coverage exclusion alá esik (`pom.xml` `<sonar.coverage.exclusions>`). A `loadNativeLibrary()` extrakciója + factory pattern bevezetése (`Connection` factory injektálással) javítaná a tesztelhetőséget.

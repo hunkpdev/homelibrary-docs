@@ -21,24 +21,9 @@
 ## Adatlekérés
 
 Oldal betöltésekor és `booksRefreshTrigger` változásakor:
-- `GET /api/locations/all` — helyszín szűrő dropdown-hoz (párhuzamosan a grid datasource init-tel)
-- AG Grid Infinite Row Model datasource automatikusan: `GET /api/books?page=...&size=...&sort=...&search=...&status=...&locationId=...`
+- AG Grid Infinite Row Model datasource automatikusan: `GET /api/books?page=...&size=...&sort=...&search=...&category=...`
 
 Szűrő / sort / lapozás változásakor csak a grid datasource fetch fut újra.
-
----
-
-## Szűrősor
-
-Shadcn/ui komponensek a grid felett (a Locations oldal filter sávjával egységes vizuális elrendezés):
-
-| Mező | Komponens | API paraméter |
-|------|-----------|---------------|
-| Keresés (cím, szerző) | `Input` | `search` |
-| Státusz | `Select` | `status` (`AT_HOME` / `LOANED` — `DELETED` nem szerepel) |
-| Helyszín | `Select` | `locationId` (értékek: `GET /api/locations/all`) |
-
-Szűrőváltozáskor a datasource `page=0`-ra reset-el.
 
 ---
 
@@ -48,13 +33,14 @@ Szűrőváltozáskor a datasource `page=0`-ra reset-el.
 
 **Oszlopok:**
 
-| Oszlop | Mező | Rendezés |
-|--------|------|----------|
-| ISBN | `isbn` | igen |
-| Cím | `title` | igen |
-| Szerző(k) | `authors` (vesszővel elválasztva) | igen |
-| Kiadási év | `publishYear` | igen |
-| Műveletek | — | nem |
+| Oszlop | Mező | Rendezés | Embedded szűrő |
+|--------|------|----------|----------------|
+| ISBN | `isbn` | igen | szöveges |
+| Cím | `title` | igen | szöveges |
+| Szerző(k) | `authors` (vesszővel elválasztva) | igen | szöveges |
+| Kiadási év | `publishYear` | igen | szöveges |
+| Kategóriák | `categories` (vesszővel elválasztva) | nem | szöveges |
+| Műveletek | — | nem | — |
 
 **Műveletek oszlop** (csak `ADMIN` és `DEMO` látja — `DEMO`-nál `MutationButton` auto-disabled):
 - **Szerkesztés** ikon gomb → step 5.13 form modal
@@ -78,9 +64,9 @@ Szűrőváltozáskor a datasource `page=0`-ra reset-el.
 
 ## Kulcs döntések
 
-- AG Grid Infinite Row Model — egységes a Locations oldallal; a `category`, `language`, `publishYear` szűrők nem kerülnek a szűrősorba (a részletek panelen kereshető, MVP-ben elegendő a három fő szűrő)
+- AG Grid Infinite Row Model — egységes a Locations oldallal; szűrés kizárólag embedded column filtereken keresztül, külső szűrősor nincs
 - DEMO: látja a listát, a műveletek oszlopban `MutationButton` auto-disabled tooltip-pal
-- `DELETED` státusz a szűrőből kizárva — konzisztens a backend Specification viselkedésével (step 5.6)
+- `DELETED` könyvek sosem jelennek meg — a backend Specification mindig kizárja (step 5.6), a frontend nem küld `status` paramétert
 
 ---
 
@@ -98,5 +84,4 @@ Szűrőváltozáskor a datasource `page=0`-ra reset-el.
 | ADMIN: szerkesztés és törlés gomb látható | gombok jelen vannak |
 | VISITOR: műveletek oszlop nem látható | gombok hiányoznak |
 | DEMO: gombok láthatók de disabled | `MutationButton` disabled állapot |
-| Keresési szűrő alkalmazása → `search` query param megjelenik | API hívás ellenőrzése |
-| Státusz szűrőben `DELETED` nem szerepel | Select options ellenőrzése |
+| Kategória szűrő alkalmazása → `category` query param megjelenik | API hívás ellenőrzése |
