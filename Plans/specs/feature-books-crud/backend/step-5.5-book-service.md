@@ -1,4 +1,4 @@
-# Step 5.6 – BookService
+# Step 5.5 – BookService
 
 ## Mit állít elő
 
@@ -73,13 +73,11 @@ A predikátumok `and`-del láncolódnak. **`status != DELETED` mindig benne van*
 
 ---
 
-## Unit tesztek (`BookServiceTest`)
+## Elfogadási kritériumok
 
-| Teszt | Mit ellenőriz |
-|-------|---------------|
-| `create_validRequest_savesBook` | book létrejön, description elmentve |
-| `create_invalidLocationId_throws404` | nem létező location → 404 |
-| `update_optimisticLockConflict_throws409` | verziószám ütközés → 409 |
-| `softDelete_setsStatusAndDeletedAt` | status DELETED, deletedAt kitöltött |
-| `search_withStatusFilter_returnsFilteredResults` | Specification szűr |
-| `authors_serializationRoundtrip` | List<String> → JSON String → List<String> |
+- Könyv létrehozásakor `status` mindig `AT_HOME`, `description` elmentve
+- Nem létező vagy inaktív `locationId` → 404
+- Konkurens módosítás (`ObjectOptimisticLockingFailureException`) → 409 Conflict
+- Soft delete után `status = DELETED`, `deletedAt` kitöltött
+- `BookSpecification` kombinált szűrők esetén AND kapcsolatban szűr; `status != DELETED` mindig érvényes
+- `authors` és `categories`: `List<String>` ↔ JSON String konverzió veszteségmentes

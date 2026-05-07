@@ -1,4 +1,4 @@
-# Step 5.10 – Könyvlista oldal
+# Step 5.9 – Könyvlista oldal
 
 ## Mit állít elő
 
@@ -43,10 +43,10 @@ Szűrő / sort / lapozás változásakor csak a grid datasource fetch fut újra.
 | Műveletek | — | nem | — |
 
 **Műveletek oszlop** (csak `ADMIN` és `DEMO` látja — `DEMO`-nál `MutationButton` auto-disabled):
-- **Szerkesztés** ikon gomb → step 5.13 form modal
-- **Törlés** ikon gomb → step 5.13 törlés megerősítő modal
+- **Szerkesztés** ikon gomb → step 5.12 form modal
+- **Törlés** ikon gomb → step 5.12 törlés megerősítő modal
 
-**Sorra kattintás** (bárhol a műveletek oszlopon kívül) → step 5.11 `BookDetailPanel` megnyitása.
+**Sorra kattintás** (bárhol a műveletek oszlopon kívül) → step 5.10 `BookDetailPanel` megnyitása.
 
 **Téma:** `ag-theme-quartz` / `ag-theme-quartz-dark` — az alkalmazás aktuális dark/light mode állapotából, változásra automatikusan reagál.
 
@@ -66,7 +66,7 @@ Szűrő / sort / lapozás változásakor csak a grid datasource fetch fut újra.
 
 - AG Grid Infinite Row Model — egységes a Locations oldallal; szűrés kizárólag embedded column filtereken keresztül, külső szűrősor nincs
 - DEMO: látja a listát, a műveletek oszlopban `MutationButton` auto-disabled tooltip-pal
-- `DELETED` könyvek sosem jelennek meg — a backend Specification mindig kizárja (step 5.6), a frontend nem küld `status` paramétert
+- `DELETED` könyvek sosem jelennek meg — a backend Specification mindig kizárja (step 5.5), a frontend nem küld `status` paramétert
 
 ---
 
@@ -76,12 +76,11 @@ Szűrő / sort / lapozás változásakor csak a grid datasource fetch fut újra.
 
 ---
 
-## Unit tesztek (React Testing Library + Vitest, axios mock-olva)
+## Elfogadási kritériumok
 
-| Teszt | Elvárt |
-|-------|--------|
-| Könyvek megjelennek az API mock válasz alapján | grid sorok renderelve |
-| ADMIN: szerkesztés és törlés gomb látható | gombok jelen vannak |
-| VISITOR: műveletek oszlop nem látható | gombok hiányoznak |
-| DEMO: gombok láthatók de disabled | `MutationButton` disabled állapot |
-| Kategória szűrő alkalmazása → `category` query param megjelenik | API hívás ellenőrzése |
+- Grid sorok renderelve az API válasz alapján
+- ADMIN: szerkesztés és törlés gomb látható és aktív
+- VISITOR: műveletek oszlop nem látható
+- DEMO: szerkesztés és törlés gomb látható, `MutationButton` disabled tooltip-pal
+- Kategória szűrő alkalmazásakor `category` query param megjelenik az API hívásban
+- Default sort: `title,asc`

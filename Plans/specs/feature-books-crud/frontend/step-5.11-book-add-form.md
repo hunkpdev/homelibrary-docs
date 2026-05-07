@@ -1,4 +1,4 @@
-# Step 5.12 – Könyv felvétel form
+# Step 5.11 – Könyv felvétel form
 
 ## Mit állít elő
 
@@ -62,7 +62,7 @@ DEMO user: az `IsbnLookupPanel` elérhető (GET hívás megengedett); a form sub
 
 ## Submit
 
-- `MutationButton` (step 5.9) — DEMO esetén auto-disabled, tooltip-pal
+- `MutationButton` (step 5.8) — DEMO esetén auto-disabled, tooltip-pal
 - `POST /api/books` — sikeres válasz (201) után:
   - Dialog bezárul
   - `booksRefreshTrigger` increment → lista frissül
@@ -72,7 +72,7 @@ DEMO user: az `IsbnLookupPanel` elérhető (GET hívás megengedett); a form sub
 
 ## Kulcs döntések
 
-- `Dialog` (nem `Sheet`) — a sok mező scrollozható Dialog-ot igényel; a részletek panel (5.11) Sheet marad, egységes megkülönböztetés: olvasás = Sheet, szerkesztés = Dialog
+- `Dialog` (nem `Sheet`) — a sok mező scrollozható Dialog-ot igényel; a részletek panel (5.10) Sheet marad, egységes megkülönböztetés: olvasás = Sheet, szerkesztés = Dialog
 - Szerzők és kategóriák: vesszővel elválasztott szövegből `List<String>` — `"Tolkien, J.R.R."` → `["Tolkien, J.R.R."]`; egyszerű MVP megoldás, tag-alapú input Fázis 2-ban
 - `source` automatikusan kerül be a requestbe az ISBN fázis eredménye alapján — a felhasználó nem látja
 

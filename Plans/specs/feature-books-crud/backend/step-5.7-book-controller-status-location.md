@@ -1,8 +1,8 @@
-# Step 5.8 – BookController: státusz és helyszín módosítás
+# Step 5.7 – BookController: státusz és helyszín módosítás
 
 ## Mit állít elő
 
-- `BookController` kiegészítése (step 5.7-ben jött létre): `PUT /api/books/{id}/status`, `PUT /api/books/{id}/location`
+- `BookController` kiegészítése (step 5.6-ban jött létre): `PUT /api/books/{id}/status`, `PUT /api/books/{id}/location`
 - `BookStatusRequest` — request DTO
 - `BookLocationRequest` — request DTO
 - `BookService` kiegészítése: `updateStatus` és `updateLocation` metódusok

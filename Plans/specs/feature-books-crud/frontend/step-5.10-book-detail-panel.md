@@ -1,4 +1,4 @@
-# Step 5.11 – Könyv részletek panel
+# Step 5.10 – Könyv részletek panel
 
 ## Mit állít elő
 
@@ -11,7 +11,7 @@
 
 Shadcn `Sheet` (slide-in panel), nem külön route — a felhasználó a könyvlistán marad, a panel jobb oldalról csúszik be. Mobilon a Sheet full-screen overlay-ként működik. Közvetlen linkelés nem követelmény (MVP).
 
-**Read-only:** minden szerkesztés a 5.13 edit formban (Dialog) történik — egységes, egyetlen hely minden módosításra.
+**Read-only:** minden szerkesztés a 5.12 edit formban (Dialog) történik — egységes, egyetlen hely minden módosításra.
 
 ---
 
@@ -41,22 +41,22 @@ Shadcn `Sheet` (slide-in panel), nem külön route — a felhasználó a könyvl
 
 ### Akciók (csak `ADMIN` látja)
 
-- **Szerkesztés** gomb → step 5.13 edit Dialog (panel nyitva marad mögötte)
-- **Törlés** gomb → step 5.13 törlés megerősítő Dialog → sikeres törlés után panel bezárul, lista frissül
+- **Szerkesztés** gomb → step 5.12 edit Dialog (panel nyitva marad mögötte)
+- **Törlés** gomb → step 5.12 törlés megerősítő Dialog → sikeres törlés után panel bezárul, lista frissül
 
 ---
 
 ## Adatlekérés
 
 - Panel megnyitáskor: `GET /api/books/{id}` — friss adat a szerverről
-- Sikeres szerkesztés (5.13) után: `GET /api/books/{id}` újrahívás → panel frissül
+- Sikeres szerkesztés (5.12) után: `GET /api/books/{id}` újrahívás → panel frissül
 
 ---
 
 ## Kulcs döntések
 
-- **Panel read-only** — státusz és helyszín módosítás az edit formba (5.13) kerül; a detail panel egyetlen felelőssége az adatok megjelenítése és a modal-ok indítása
-- DEMO user: látja az összes adatot; szerkesztés és törlés gombok láthatók, de `MutationButton` auto-disabled tooltip-pal — egységes a grid műveletek oszlopával (5.10)
+- **Panel read-only** — státusz és helyszín módosítás az edit formba (5.12) kerül; a detail panel egyetlen felelőssége az adatok megjelenítése és a modal-ok indítása
+- DEMO user: látja az összes adatot; szerkesztés és törlés gombok láthatók, de `MutationButton` auto-disabled tooltip-pal — egységes a grid műveletek oszlopával (5.9)
 
 ---
 

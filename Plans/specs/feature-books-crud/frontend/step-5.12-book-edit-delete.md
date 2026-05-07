@@ -1,11 +1,11 @@
-# Step 5.13 – Könyv szerkesztés form és soft delete megerősítés
+# Step 5.12 – Könyv szerkesztés form és soft delete megerősítés
 
 ## Mit állít elő
 
 - `src/components/books/BookEditModal.tsx` — shadcn `Dialog` alapú szerkesztés form
 - `src/components/books/BookDeleteConfirmModal.tsx` — shadcn `Dialog` alapú törlés megerősítés
 
-Mindkettő megnyitható a grid akció oszlopából (5.10) és a részletek panelből (5.11).
+Mindkettő megnyitható a grid akció oszlopából (5.9) és a részletek panelből (5.10).
 
 ---
 
@@ -17,7 +17,7 @@ A modal nyitásakor a hívó a `BookResponse` objektumot adja át propként — 
 
 ### Form mezők
 
-Az 5.12 add formmal megegyező mezők, ISBN lookup fázis nélkül. Értékek a meglévő `BookResponse`-ból töltődnek elő:
+Az 5.11 add formmal megegyező mezők, ISBN lookup fázis nélkül. Értékek a meglévő `BookResponse`-ból töltődnek elő:
 
 | Mező | Előtöltés |
 |------|-----------|
