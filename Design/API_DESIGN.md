@@ -168,7 +168,6 @@ Könyvek listázása szűrőkkel. Lapozott.
   "language": "en",
   "categories": ["Fantasy", "Fiction"],
   "description": "Egy hobbit kalandjai...",
-  "descriptionLanguage": "hu",
   "locationId": "550e8400-...",
   "status": "AT_HOME",
   "source": "OSZK"
@@ -274,17 +273,14 @@ Ha az OSZK nem talál, csonka rekordot ad, vagy nem elérhető: 204 No Content v
 ```json
 {
   "isbn": "9789636091996",
-  "result": {
-    "isbn": "9789636091996",
-    "title": "Szülői generációk harca",
-    "subtitle": "hogyan értsük meg magunkat?",
-    "authors": ["Steigervald Krisztián", "Matyus Dóra"],
-    "publisher": "Partvonal",
-    "publishYear": 2026,
-    "pageCount": 311,
-    "language": "hun",
-    "source": "OSZK"
-  }
+  "title": "Szülői generációk harca",
+  "subtitle": "hogyan értsük meg magunkat?",
+  "authors": ["Steigervald Krisztián", "Matyus Dóra"],
+  "publisher": "Partvonal",
+  "publishYear": 2026,
+  "pageCount": 311,
+  "language": "hun",
+  "source": "OSZK"
 }
 ```
 

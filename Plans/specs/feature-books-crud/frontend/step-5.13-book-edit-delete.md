@@ -32,8 +32,7 @@ Az 5.12 add formmal megegyező mezők, ISBN lookup fázis nélkül. Értékek a 
 | Kategóriák | `book.categories` |
 | Státusz | `Select` (AT_HOME / LOANED) — `book.status` |
 | Helyszín | `Select` (aktív locationök) — `book.location.id` |
-| Leírás | aktuális leírás (`preferred_language` szerinti) |
-| Leírás nyelve | a betöltött leírás nyelve |
+| Leírás | `book.description` |
 
 **`version`** rejtett — a requestben elküldi, a felhasználó nem látja.  
 **`source`** nem módosítható — a requestben a jelenlegi érték kerül be.

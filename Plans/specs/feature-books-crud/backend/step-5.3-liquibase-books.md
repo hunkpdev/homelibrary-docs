@@ -1,9 +1,8 @@
-# Step 5.3 – Liquibase: books és book_descriptions tábla
+# Step 5.3 – Liquibase: books tábla
 
 ## Mit állít elő
 
 - `db/changelog/changes/004-create-books.yaml` — `books` tábla + indexek
-- `db/changelog/changes/005-create-book-descriptions.yaml` — `book_descriptions` tábla
 - bekötve a `db.changelog-master.yaml`-ba (008 után, a sor végére)
 
 ---
@@ -26,6 +25,7 @@ Teljes séma: [`Design/DB_SCHEMA.md`](../../../Design/DB_SCHEMA.md). Az alábbia
 | `page_count` | `INTEGER` | — |
 | `language` | `VARCHAR(10)` | — |
 | `categories` | `VARCHAR(500)` | — (JSON string) |
+| `description` | `TEXT` | — |
 | `cover_image_url` | `VARCHAR(500)` | — |
 | `status` | `VARCHAR(20)` | NOT NULL |
 | `location_id` | `UUID` | FK → locations |
@@ -41,25 +41,11 @@ Teljes séma: [`Design/DB_SCHEMA.md`](../../../Design/DB_SCHEMA.md). Az alábbia
 - `status` — szűrő lekérdezésekhez
 - `location_id` — JOIN-okhoz
 
-### `book_descriptions`
-
-| Oszlop | Típus | Megszorítás |
-|--------|-------|-------------|
-| `id` | `UUID` | PK |
-| `book_id` | `UUID` | FK → books NOT NULL |
-| `language` | `VARCHAR(10)` | NOT NULL |
-| `description` | `TEXT` | — |
-| `source` | `VARCHAR(20)` | — |
-| `created_at` | `TIMESTAMP WITH TIME ZONE` | NOT NULL |
-| `updated_at` | `TIMESTAMP WITH TIME ZONE` | NOT NULL |
-
-**Unique constraint:** `(book_id, language)` — implicit indexet hoz létre
-
 ---
 
 ## Kulcs döntések
 
-- A changeset-ek száma 004 és 005 — a DB_SCHEMA.md-ben tervezett sorrend szerint; a master changelog-ban 008 után kerülnek bekötésre (Liquibase a master sorrendjében futtatja)
+- A changeset száma 004 — a DB_SCHEMA.md-ben tervezett sorrend szerint; a master changelog-ban 008 után kerül bekötésre (Liquibase a master sorrendjében futtatja)
 - A `DB_SCHEMA.md`-ben tervezett `007-add-indexes.yaml` feleslegessé válik: az indexek a táblalétrehozó changeset-ekbe kerülnek bele, nem külön fájlba
 - `isbn` NULL megengedett: PostgreSQL UNIQUE constraint több NULL értéket enged (vonalkód nélküli könyvekhez)
 - `authors` és `categories` JSON string (`VARCHAR`) — ADR-006, háztartási méretskálán LIKE-keresés elegendő
@@ -70,6 +56,6 @@ Teljes séma: [`Design/DB_SCHEMA.md`](../../../Design/DB_SCHEMA.md). Az alábbia
 
 ## Elfogadási kritériumok
 
-- App indításkor Liquibase lefuttatja mindkét changesetet hibák nélkül
-- `books` és `book_descriptions` táblák létrejönnek HSQLDB-ben és Neon PostgreSQL-en
-- `status`, `location_id` indexek és a `(book_id, language)` unique constraint létrejön
+- App indításkor Liquibase lefuttatja a changesetet hibák nélkül
+- `books` tábla létrejön HSQLDB-ben és Neon PostgreSQL-en
+- `status` és `location_id` indexek létrejönnek

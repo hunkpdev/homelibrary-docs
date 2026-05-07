@@ -28,9 +28,6 @@
 | `status` | `BookStatus` | nullable (service default: `AT_HOME`) |
 | `source` | `BookSource` | nullable |
 | `description` | `String` | nullable |
-| `descriptionLanguage` | `String` | `@Size(max = 10)`, nullable |
-
-> Ha `description` megadott de `descriptionLanguage` null → 400; a service elvárja mindkettőt együtt. Cross-field validáció `@AssertTrue` metódussal a DTO-n.
 
 ### `BookUpdateRequest`
 
@@ -96,6 +93,5 @@ Megegyezik `BookCreateRequest`-tel, kiegészítve:
 | `POST /api/books` VISITOR tokennel | 403 |
 | `POST /api/books` DEMO tokennel | 403 |
 | `POST /api/books` hiányzó `title` | 400 |
-| `POST /api/books` `description` megadva, `descriptionLanguage` null | 400 |
 | `PUT /api/books/{id}` VISITOR tokennel | 403 |
 | `DELETE /api/books/{id}` VISITOR tokennel | 403 |

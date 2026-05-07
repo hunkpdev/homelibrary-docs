@@ -41,18 +41,17 @@ DEMO user: az `IsbnLookupPanel` elérhető (GET hívás megengedett); a form sub
 
 | Mező | Komponens | Kötelező | Előtöltés OSZK-ból |
 |------|-----------|----------|-------------------|
-| Cím | `Input` | igen | `result.title` |
-| Alcím | `Input` | nem | `result.subtitle` |
-| ISBN | `Input` | nem | `result.isbn` |
-| Szerzők | tag input (vesszővel elválasztott) | nem | `result.authors` |
-| Kiadó | `Input` | nem | `result.publisher` |
-| Kiadási év | `Input` (number) | nem | `result.publishYear` |
-| Oldalszám | `Input` (number) | nem | `result.pageCount` |
-| Nyelv | `Input` | nem | `result.language` |
+| Cím | `Input` | igen | `title` |
+| Alcím | `Input` | nem | `subtitle` |
+| ISBN | `Input` | nem | `isbn` |
+| Szerzők | tag input (vesszővel elválasztott) | nem | `authors` |
+| Kiadó | `Input` | nem | `publisher` |
+| Kiadási év | `Input` (number) | nem | `publishYear` |
+| Oldalszám | `Input` (number) | nem | `pageCount` |
+| Nyelv | `Input` | nem | `language` |
 | Kategóriák | tag input (vesszővel elválasztott) | nem | — |
 | Helyszín | `Select` | nem | — |
 | Leírás | `Textarea` | nem | — |
-| Leírás nyelve | `Select` (hu / en) | ha leírás megadva | — |
 
 > `source` rejtett mező — értékét az ISBN fázis eredménye határozza meg, a felhasználó nem szerkeszti.
 > `status` nem jelenik meg a formon — a service `AT_HOME`-ra állítja alapértelmezetten.

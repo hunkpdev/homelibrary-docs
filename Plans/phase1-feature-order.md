@@ -200,9 +200,8 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 |------|---------------|
 | [5.1](specs/feature-books-crud/backend/step-5.1-liquibase-demo-seed.md) | Liquibase: beégetett demo user seed changeset (BCrypt hash-elt jelszó, `DEMO` role) — analóg az admin seed changeset-tel (step 1.3) |
 | [5.2](specs/feature-books-crud/backend/step-5.2-security-demo-rules.md) | Spring Security: DEMO role számára kizárólag GET/HEAD/OPTIONS engedélyezve `/api/**` alatt; POST/PUT/PATCH/DELETE ADMIN-only — globális `httpSecurity` rule a `SecurityConfig`-ban. Kivétel: `/api/users/**` — DEMO és VISITOR statikusan kizárva; VISITOR self-access (`GET /{id}`, `PUT /{id}`) method-level `@PreAuthorize`-zal a controllerben (`@EnableMethodSecurity` szükséges) |
-| [5.3](specs/feature-books-crud/backend/step-5.3-liquibase-books.md) | Liquibase: `books`, `book_descriptions` tábla changeset + indexek |
+| [5.3](specs/feature-books-crud/backend/step-5.3-liquibase-books.md) | Liquibase: `books` tábla changeset + indexek |
 | [5.4](specs/feature-books-crud/backend/step-5.4-book-entity-repository.md) | `Book` entitás + `BookRepository` (szűrő query metódusokkal) |
-| [5.5](specs/feature-books-crud/backend/step-5.5-book-description-entity-repository.md) | `BookDescription` entitás + `BookDescriptionRepository` |
 | [5.6](specs/feature-books-crud/backend/step-5.6-book-service.md) | `BookService`: létrehozás, lekérés id alapján, szűrős listázás (keresés, státusz, helyszín, kategória, nyelv, év), módosítás, soft delete |
 | [5.7](specs/feature-books-crud/backend/step-5.7-book-controller.md) | `BookController`: `GET /api/books`, `GET /{id}`, `POST`, `PUT /{id}`, `DELETE /{id}` |
 | [5.8](specs/feature-books-crud/backend/step-5.8-book-controller-status-location.md) | `BookController`: `PUT /{id}/status`, `PUT /{id}/location` |
