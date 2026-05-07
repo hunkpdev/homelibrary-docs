@@ -36,7 +36,7 @@ Teljes séma: [`Design/DB_SCHEMA.md`](../../../Design/DB_SCHEMA.md). Az alábbia
 | `updated_at` | `TIMESTAMP WITH TIME ZONE` | NOT NULL |
 | `deleted_at` | `TIMESTAMP WITH TIME ZONE` | — |
 
-**Indexek** (004-create-books.yaml-ban, createIndex changeSet-ként):
+**Indexek** (010-create-books.yaml-ban, createIndex changeSet-ként):
 - `isbn` — az UNIQUE constraint implicit indexet hoz létre
 - `status` — szűrő lekérdezésekhez
 - `location_id` — JOIN-okhoz
