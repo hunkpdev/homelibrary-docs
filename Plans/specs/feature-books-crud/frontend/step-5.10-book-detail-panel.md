@@ -18,7 +18,7 @@ Shadcn `Sheet` (slide-in panel), nem külön route — a felhasználó a könyvl
 ## Panel tartalma
 
 ### Fejléc
-- Borítókép (ha van)
+- Borítókép (ha van) — Phase 1-ben `coverImageUrl` mindig `null`, a hely üres marad
 - Cím, szerzők
 - Státusz badge
 - Bezárás gomb (X)
