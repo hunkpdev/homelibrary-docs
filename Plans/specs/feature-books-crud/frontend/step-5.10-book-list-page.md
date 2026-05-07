@@ -72,6 +72,8 @@ Szűrőváltozáskor a datasource `page=0`-ra reset-el.
 
 `bookStore.ts` egyetlen `booksRefreshTrigger: number` értékkel — mutáció (létrehozás, szerkesztés, törlés) után a modalok incrementelik. Szűrő állapot helyi React state-ben él (`useState`).
 
+`booksRefreshTrigger` változásakor: `gridApi.purgeInfiniteCache()` — a datasource objektum megmarad, a cache invalidálódik és a grid az elejéről tölt újra. Szűrőváltozáskor szintén `purgeInfiniteCache()` (egységes a Locations oldal implementációjával).
+
 ---
 
 ## Kulcs döntések
