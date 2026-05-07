@@ -28,7 +28,7 @@ Statikus factory metódusok, `Specification<Book>` típust adnak vissza. Minden 
 | `search` | `LIKE %value%` a `title`-n ÉS `authors`-on (OR) |
 | `status` | exact egyezés |
 | `locationId` | exact egyezés |
-| `category` | `LIKE %value%` a `categories` JSON string-en |
+| `category` | `LIKE %"value"%` a `categories` JSON string-en — dupla idézőjelek biztosítják a JSON elemhatáron való illesztést; a value-ban szereplő `"` karakter escape-elendő (SQL injection védelem) |
 | `language` | exact egyezés |
 | `publishYear` | exact egyezés |
 
