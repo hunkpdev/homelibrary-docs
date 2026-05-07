@@ -37,9 +37,9 @@ Szűrő / sort / lapozás változásakor csak a grid datasource fetch fut újra.
 |--------|------|----------|----------------|
 | ISBN | `isbn` | igen | szöveges |
 | Cím | `title` | igen | szöveges |
-| Szerző(k) | `authors` (vesszővel elválasztva) | igen | szöveges |
+| Szerző(k) | `authors` (pontosvesszővel elválasztva) | igen | szöveges |
 | Kiadási év | `publishYear` | igen | szöveges |
-| Kategóriák | `categories` (vesszővel elválasztva) | nem | szöveges |
+| Kategóriák | `categories` (pontosvesszővel elválasztva) | nem | szöveges |
 | Műveletek | — | nem | — |
 
 **Műveletek oszlop** (csak `ADMIN` és `DEMO` látja — `DEMO`-nál `MutationButton` auto-disabled):
