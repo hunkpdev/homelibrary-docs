@@ -72,6 +72,22 @@ Olyan feladatok, amelyek nem tartoznak aktív feature-höz, de határidőre vagy
 
 ---
 
+### Location bookCount badge — books lista előszűrése helyszínre
+
+**Ötlet:** A Locations oldalon a `bookCount` badge kattinthatóvá tehető — navigál a Books listára, ahol a `locationId` szűrő előre be van állítva az adott helyszínre. Ez implicit helyszín szerinti szűrést ad a Books listán anélkül, hogy a Books grid szűrősorában helyszín szűrőt kellene fenntartani.
+
+**Állapot:** Fázis 1-ben nincs szűrősor a Books gridon — ötletként rögzítve Fázis 2-re.
+
+---
+
+### IsbnLookupPanel reset pattern
+
+**Teendő:** A scanner / panel UI újrapróbálkozás-állapot-átmeneteinek pattern-je nem egységes (`isLoading`, hibaüzenet, ISBN újragépelés vs. újrabeolvasás scenariók). A Feature 5 `BookAddModal` "Kézi bevitel" linkkel megkerülhető, de a panel saját retry UX-e még nincs lezárva.
+
+**Forrás:** Feature 4 frontend code review F-W4.
+
+---
+
 ### `OszkNektarClient` tesztelhetőség
 
 **Teendő:** A natív lib betöltést és Z39.50 connection-managementet tartalmazó osztály unit teszt nélküli, és a Sonar coverage exclusion alá esik (`pom.xml` `<sonar.coverage.exclusions>`). A `loadNativeLibrary()` extrakciója + factory pattern bevezetése (`Connection` factory injektálással) javítaná a tesztelhetőséget.

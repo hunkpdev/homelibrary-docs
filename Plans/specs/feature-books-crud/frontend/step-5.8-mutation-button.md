@@ -1,4 +1,4 @@
-# Step 5.9 – MutationButton komponens és DEMO role detektálás
+# Step 5.8 – MutationButton komponens és DEMO role detektálás
 
 ## Mit állít elő
 

@@ -147,21 +147,6 @@ DEMO felhasználó napi ISBN lookup limitjének nyilvántartása. Lazy reset: el
 
 ---
 
-## Liquibase Changelog Struktúra
-
-```
-db/changelog/
-  db.changelog-master.yaml
-  changes/
-    001-create-users.yaml
-    002-create-rooms.yaml
-    003-create-locations.yaml
-    004-create-books.yaml
-    006-create-loans.yaml
-    008-create-demo-isbn-daily-stats.yaml
-    009-seed-demo-user.yaml
-```
-
 ## Nyitott Kérdések
 
 - [ ] `authors` és `categories` maradjon tömb, vagy kerüljön külön normalizált táblába? (MVP-hez tömb elegendő)

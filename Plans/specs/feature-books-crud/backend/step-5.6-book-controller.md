@@ -1,4 +1,4 @@
-# Step 5.7 – BookController: CRUD endpointok
+# Step 5.6 – BookController: CRUD endpointok
 
 ## Mit állít elő
 
@@ -25,9 +25,10 @@
 | `language` | `String` | `@Size(max = 10)`, nullable |
 | `categories` | `List<String>` | nullable |
 | `locationId` | `UUID` | nullable |
-| `status` | `BookStatus` | nullable (service default: `AT_HOME`) |
 | `source` | `BookSource` | nullable |
 | `description` | `String` | nullable |
+
+> `status` nem szerepel a request body-ban — a service mindig `AT_HOME`-ra állítja létrehozáskor. Státuszváltozás kizárólag a `PUT /api/books/{id}/status` endpointon keresztül lehetséges (`DELETED` értéket az is visszautasítja — soft delete csak `DELETE /api/books/{id}` végponton).
 
 ### `BookUpdateRequest`
 
@@ -83,15 +84,10 @@ Megegyezik `BookCreateRequest`-tel, kiegészítve:
 
 ---
 
-## Unit tesztek (`BookControllerTest`, MockMvc)
+## Elfogadási kritériumok
 
-| Teszt | Elvárt |
-|-------|--------|
-| `GET /api/books` VISITOR tokennel | 200 |
-| `GET /api/books` DEMO tokennel | 200 |
-| `GET /api/books/{id}` DEMO tokennel | 200 |
-| `POST /api/books` VISITOR tokennel | 403 |
-| `POST /api/books` DEMO tokennel | 403 |
-| `POST /api/books` hiányzó `title` | 400 |
-| `PUT /api/books/{id}` VISITOR tokennel | 403 |
-| `DELETE /api/books/{id}` VISITOR tokennel | 403 |
+- `GET /api/books` és `GET /api/books/{id}` VISITOR és DEMO tokennel → 200
+- `POST /api/books` VISITOR vagy DEMO tokennel → 403
+- `PUT /api/books/{id}` és `DELETE /api/books/{id}` VISITOR tokennel → 403
+- `POST /api/books` hiányzó `title` → 400
+- `GET /api/books` `size > 100` → 400

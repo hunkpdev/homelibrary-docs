@@ -1,4 +1,4 @@
-# Step 5.6 – BookService
+# Step 5.5 – BookService
 
 ## Mit állít elő
 
@@ -28,7 +28,7 @@ Statikus factory metódusok, `Specification<Book>` típust adnak vissza. Minden 
 | `search` | `LIKE %value%` a `title`-n ÉS `authors`-on (OR) |
 | `status` | exact egyezés |
 | `locationId` | exact egyezés |
-| `category` | `LIKE %value%` a `categories` JSON string-en |
+| `category` | `LIKE %"value"%` a `categories` JSON string-en — dupla idézőjelek biztosítják a JSON elemhatáron való illesztést; a value-ban szereplő `"` karakter escape-elendő (SQL injection védelem) |
 | `language` | exact egyezés |
 | `publishYear` | exact egyezés |
 
@@ -41,7 +41,7 @@ A predikátumok `and`-del láncolódnak. **`status != DELETED` mindig benne van*
 ### `create(BookCreateRequest request, UUID addedByUserId) → BookResponse`
 - `locationId` megadva → `locationRepository.findById` + aktív ellenőrzés → nem található vagy inaktív esetén 404
 - `authors` és `categories`: `List<String>` → JSON string (Jackson `ObjectMapper`)
-- `status` alapértelmezetten `AT_HOME` ha a request nem adja meg
+- `status` mindig `AT_HOME` — a request nem tartalmazza, a service állítja be
 - `addedBy` beállítása a paraméterből
 - `description` közvetlenül a `books` táblára kerül (nullable)
 
@@ -73,13 +73,11 @@ A predikátumok `and`-del láncolódnak. **`status != DELETED` mindig benne van*
 
 ---
 
-## Unit tesztek (`BookServiceTest`)
+## Elfogadási kritériumok
 
-| Teszt | Mit ellenőriz |
-|-------|---------------|
-| `create_validRequest_savesBook` | book létrejön, description elmentve |
-| `create_invalidLocationId_throws404` | nem létező location → 404 |
-| `update_optimisticLockConflict_throws409` | verziószám ütközés → 409 |
-| `softDelete_setsStatusAndDeletedAt` | status DELETED, deletedAt kitöltött |
-| `search_withStatusFilter_returnsFilteredResults` | Specification szűr |
-| `authors_serializationRoundtrip` | List<String> → JSON String → List<String> |
+- Könyv létrehozásakor `status` mindig `AT_HOME`, `description` elmentve
+- Nem létező vagy inaktív `locationId` → 404
+- Konkurens módosítás (`ObjectOptimisticLockingFailureException`) → 409 Conflict
+- Soft delete után `status = DELETED`, `deletedAt` kitöltött
+- `BookSpecification` kombinált szűrők esetén AND kapcsolatban szűr; `status != DELETED` mindig érvényes
+- `authors` és `categories`: `List<String>` ↔ JSON String konverzió veszteségmentes

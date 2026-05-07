@@ -11,7 +11,7 @@
 3. Eredmény alapján:
    - `found: true` → `onResult` callback meghívása a kitöltött adatokkal (szülő tölti elő a könyv formot)
    - `found: false` → tájékoztató üzenet (*„Nem találtuk az adatbázisban, töltsd ki kézzel"*) + `onResult` callback meghívása `null`-lal, hogy a szülő (Feature 5 könyv felvétel form) üres állapotban, manuális kitöltésre nyitva jelenjen meg, az ISBN előtöltve. Újrapróbálkozás gomb is megjelenik (ha a felhasználó újra akarja gépelni az ISBN-t).
-   - `rateLimitExceeded: true` (429) → tájékoztató üzenet DEMO rate limit elérésről, újrapróbálkozás nem lehetséges
+   - 429 Too Many Requests (`body.reason === "DEMO_RATE_LIMIT_EXCEEDED"`) → tájékoztató üzenet DEMO rate limit elérésről, újrapróbálkozás nem lehetséges
    - Hálózati hiba → hibaüzenet, újrapróbálkozás
 
 ## Kulcs döntések

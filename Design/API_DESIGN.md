@@ -169,10 +169,11 @@ Könyvek listázása szűrőkkel. Lapozott.
   "categories": ["Fantasy", "Fiction"],
   "description": "Egy hobbit kalandjai...",
   "locationId": "550e8400-...",
-  "status": "AT_HOME",
   "source": "OSZK"
 }
 ```
+
+> `status` nem szerepel a request body-ban — a service mindig `AT_HOME`-ra állítja létrehozáskor. Státuszváltozás kizárólag a `PUT /api/books/{id}/status` endpointon keresztül lehetséges.
 
 **Response 201:**
 ```json
