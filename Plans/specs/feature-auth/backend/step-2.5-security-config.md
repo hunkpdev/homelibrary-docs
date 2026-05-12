@@ -26,7 +26,7 @@
 `@Configuration` + `@EnableWebSecurity`.
 
 **Filter chain:**
-- CSRF: disabled — stateless JWT + `SameSite=Strict` cookie véd a CSRF ellen; a `SecurityConfig` osztályon `@SuppressWarnings("java:S4502")` annotáció szükséges, különben SonarQube S4502 rule-t triggerel
+- CSRF: disabled — stateless JWT + HttpOnly cookie + CORS `allowCredentials` + konkrét origin véd a CSRF ellen; prod környezetben `SameSite=None` (cross-origin szükséges), local/test környezetben `SameSite=Strict`; a `SecurityConfig` osztályon `@SuppressWarnings("java:S4502")` annotáció szükséges, különben SonarQube S4502 rule-t triggerel
 - Session management: `STATELESS`
 - CORS: `.cors(withDefaults())` — `CorsConfigurationSource` bean-ből olvassa a konfigurációt
 - `JwtAuthenticationFilter` hozzáadva `UsernamePasswordAuthenticationFilter` elé

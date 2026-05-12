@@ -20,6 +20,7 @@
 | Property | Java mező | Típus | Default |
 |---|---|---|---|
 | `app.cookie.secure` | `secure` | `boolean` | `true` |
+| `app.cookie.same-site` | `sameSite` | `String` | `"None"` |
 
 ---
 
@@ -56,7 +57,7 @@
 |---|---|---|
 | `HttpOnly` | igen | XSS védelem |
 | `Secure` | `cookieProperties.isSecure()` | HTTPS-en megy csak ki; `local` profilon `false` |
-| `SameSite` | `Strict` | CSRF védelem |
+| `SameSite` | `cookieProperties.getSameSite()` | `None` prod (cross-origin CloudFront→API GW); `Strict` local/test |
 | `Path` | `/api/auth` | Csak az auth endpointokra megy ki a cookie |
 | `Max-Age` | `jwtProperties.getRefreshTokenExpirationMs() / 1000` | Számított érték a `JwtProperties`-ből, nem hardcoded |
 
@@ -68,6 +69,10 @@ A cookie összeállítása `ResponseCookie` builderrel történik — önálló 
 
 **`application-local.yml`:**
 - `app.cookie.secure: false` *(HTTP localhost-on a Secure cookie nem megy el)*
+- `app.cookie.same-site: Strict` *(lokálon same-origin, Strict elegendő)*
+
+**`application-prod.yml`** (vagy SSM/env override):
+- `app.cookie.same-site: None` *(CloudFront és API Gateway különböző domain — cross-origin POST-hoz szükséges)*
 
 ---
 
@@ -78,7 +83,7 @@ A cookie összeállítása `ResponseCookie` builderrel történik — önálló 
 - Érvénytelen credentials → `AuthenticationManager` kivételt dob, nem kerül mentés a DB-be
 
 **Unit tesztek** (`AuthControllerTest`, MockMvc):
-- `POST /api/auth/login` érvényes credentials → `200 OK`, body tartalmaz `accessToken`-t és `expiresIn`-t, `Set-Cookie` header tartalmaz `refreshToken`-t `HttpOnly`, `SameSite=Strict`, `Path=/api/auth`, `Max-Age=604800` attribútumokkal
+- `POST /api/auth/login` érvényes credentials → `200 OK`, body tartalmaz `accessToken`-t és `expiresIn`-t, `Set-Cookie` header tartalmaz `refreshToken`-t `HttpOnly`, `SameSite=Strict`, `Path=/api/auth`, `Max-Age=604800` attribútumokkal *(tesztek local profillal futnak → SameSite=Strict)*
 - `POST /api/auth/login` érvénytelen credentials → `401`
 
 **Manuálisan:**
