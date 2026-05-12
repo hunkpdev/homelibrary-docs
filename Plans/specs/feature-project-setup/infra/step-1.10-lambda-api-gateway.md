@@ -19,6 +19,7 @@
   - `SPRING_DATASOURCE_URL` — SSM-ből (step 1.12)
   - `JWT_SECRET` — SSM-ből (step 1.12)
   - `ADMIN_PASSWORD_HASH` — SSM-ből (step 1.12)
+  - `LD_LIBRARY_PATH=/var/task/lib` — yaz4j tranzitív natív könyvtárak (libyaz, libgnutls stb.) elérési útja; nélküle a Z39.50 client `UnsatisfiedLinkError`-ral indul (→ `Plans/postmortems/yaz4j-lambda-linux.md`)
 
 ---
 

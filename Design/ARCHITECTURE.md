@@ -210,9 +210,11 @@ homelibrary-docs/                   ← GitHub repo: homelibrary-docs
 │       └── 011-license-change.md
 └── Plans/
     ├── phase1-feature-order.md
-    └── specs/
-        └── feature-auth/
-            └── refresh-token-rotation.md
+    ├── specs/
+    │   └── feature-auth/
+    │       └── refresh-token-rotation.md
+    └── postmortems/
+        └── yaz4j-lambda-linux.md
 ```
 
 > A dokumentáció szándékosan külön repóban van a kódtól.
