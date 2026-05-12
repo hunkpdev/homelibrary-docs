@@ -12,16 +12,19 @@
 ## Oldal struktúra
 
 ```
-[ Szűrősor                              ] [ + Új könyv gomb ]
-[ AG Grid Community táblázat            ]
+[ AG Grid Community táblázat (embedded column filterekkel) ]
 ```
+
+Az „+ Új könyv" gomb step 5.12-ben kerül be, amikor a form modal is elkészül. Külső szűrősor nincs.
 
 ---
 
 ## Adatlekérés
 
 Oldal betöltésekor és `booksRefreshTrigger` változásakor:
-- AG Grid Infinite Row Model datasource automatikusan: `GET /api/books?page=...&size=...&sort=...&search=...&category=...`
+- AG Grid Infinite Row Model datasource automatikusan: `GET /api/books?page=...&size=...&sort=...&isbn=...&title=...&authors=...&category=...&publishYear=...`
+
+Az összevont `search` paraméter három önálló paraméterre bontva: `isbn` (prefix), `title` (contains), `authors` (contains). A `publishYear` típusa `String`, hogy prefix LIKE keresés legyen lehetséges (pl. `"202"` → 2020–2029).
 
 Szűrő / sort / lapozás változásakor csak a grid datasource fetch fut újra.
 
@@ -33,20 +36,20 @@ Szűrő / sort / lapozás változásakor csak a grid datasource fetch fut újra.
 
 **Oszlopok:**
 
-| Oszlop | Mező | Rendezés | Embedded szűrő |
-|--------|------|----------|----------------|
-| ISBN | `isbn` | igen | szöveges |
-| Cím | `title` | igen | szöveges |
-| Szerző(k) | `authors` (pontosvesszővel elválasztva) | igen | szöveges |
-| Kiadási év | `publishYear` | igen | szöveges |
-| Kategóriák | `categories` (pontosvesszővel elválasztva) | nem | szöveges |
-| Műveletek | — | nem | — |
+| Oszlop | Mező | Rendezés | Embedded szűrő | Matching |
+|--------|------|----------|----------------|---------|
+| ISBN | `isbn` | igen | `ClearableTextFloatingFilter` | `startsWith`, case-insensitive |
+| Cím | `title` | igen | szöveges | `contains`, case-insensitive |
+| Szerző(k) | `authors` (pontosvesszővel elválasztva) | igen | szöveges | `contains`, case-insensitive |
+| Kiadási év | `publishYear` (String) | igen | szöveges | `startsWith` |
+| Kategóriák | `categories` (pontosvesszővel elválasztva) | nem | szöveges | `contains`, case-insensitive |
+| Műveletek | — | nem | — | — |
 
 **Műveletek oszlop** (csak `ADMIN` és `DEMO` látja — `DEMO`-nál `MutationButton` auto-disabled):
-- **Szerkesztés** ikon gomb → step 5.12 form modal
-- **Törlés** ikon gomb → step 5.12 törlés megerősítő modal
+- **Törlés** ikon gomb → step 5.9-ben teljesen bekötve (`DeleteModal` + `deleteBook` API hívás)
+- **Szerkesztés** ikon gomb → gomb megjelenik, de step 5.12-ig nem nyit modalt
 
-**Sorra kattintás** (bárhol a műveletek oszlopon kívül) → step 5.10 `BookDetailPanel` megnyitása.
+**Sorra kattintás** (bárhol a műveletek oszlopon kívül) → `onRowClicked` handler step 5.10-ben kerül bekötésre; step 5.9-ben a kattintás nem vált ki eseményt.
 
 **Téma:** `ag-theme-quartz` / `ag-theme-quartz-dark` — az alkalmazás aktuális dark/light mode állapotából, változásra automatikusan reagál.
 
