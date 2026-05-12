@@ -74,7 +74,7 @@ A token generálási logika (random rész generálás + hash + összerakás) kö
 - Rotation: refresh után a régi tokennel újra hívva → `401`
 
 **Unit tesztek** (`AuthControllerTest` bővítése, MockMvc):
-- `POST /api/auth/refresh` érvényes cookie-val → `200 OK`, új `accessToken` a body-ban, `Set-Cookie` header: `HttpOnly`, `SameSite=Strict`, `Path=/api/auth`, `Max-Age=604800`
+- `POST /api/auth/refresh` érvényes cookie-val → `200 OK`, új `accessToken` a body-ban, `Set-Cookie` header: `HttpOnly`, `SameSite=Strict`, `Path=/api/auth`, `Max-Age=604800` *(tesztek local profillal futnak → SameSite=Strict)*
 - `POST /api/auth/refresh` hiányzó cookie-val → `401`
 
 **Manuálisan:**

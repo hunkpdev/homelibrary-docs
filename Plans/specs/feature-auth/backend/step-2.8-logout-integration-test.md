@@ -24,7 +24,7 @@ A cookie törlése minden esetben megtörténik — a controlleren.
 
 - `@Operation` és `@ApiResponse` annotációk
 - `AuthService.logout()` hívása
-- Refresh token törlő cookie beállítása a response-ban minden esetben (a 2.6-ban definiált delete helper metódussal: `Max-Age=0`, üres érték, azonos attribútumok — `HttpOnly`, `Secure`, `SameSite=Strict`, `Path=/api/auth`)
+- Refresh token törlő cookie beállítása a response-ban minden esetben (a 2.6-ban definiált delete helper metódussal: `Max-Age=0`, üres érték, azonos attribútumok — `HttpOnly`, `Secure`, `SameSite=cookieProperties.getSameSite()`, `Path=/api/auth`)
 - `204 No Content` visszaadása
 
 ---
@@ -48,7 +48,7 @@ A cookie törlése minden esetben megtörténik — a controlleren.
 - Nem autentikált hívás esetén logout → nem dob hibát, DB változatlan
 
 **Unit tesztek** (`AuthControllerTest` bővítése, MockMvc):
-- `POST /api/auth/logout` → `204 No Content`, `Set-Cookie` header: `Max-Age=0`, üres érték, `HttpOnly`, `SameSite=Strict`, `Path=/api/auth`
+- `POST /api/auth/logout` → `204 No Content`, `Set-Cookie` header: `Max-Age=0`, üres érték, `HttpOnly`, `SameSite=Strict`, `Path=/api/auth` *(tesztek local profillal futnak → SameSite=Strict)*
 
 **Integrációs teszt** (`AuthIntegrationTest`):
 - A fenti 5 lépéses flow hibamentesen lefut
