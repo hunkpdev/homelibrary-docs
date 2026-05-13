@@ -72,7 +72,7 @@ Webalapú elektronikus házi könyvtárkezelő alkalmazás, amellyel egy háztar
 - [ ] Helyiség/polc kezelés
 - [ ] Státusz kezelés (AT_HOME, LOANED, DELETED)
 - [ ] Kölcsönzés nyilvántartás (kinek, mikor, visszahozta-e)
-- [ ] Alap responsive UI (React), dark mode, i18n (hu/en): böngésző locale alapján automatikus nyelvválasztás (magyar → hu, egyéb → en fallback), manuális váltás zászló ikonnal a menüben (az ikon mindig a másik nyelvet jelöli)
+- [ ] Alap responsive UI (React), dark mode, témaváltó (shadcn/ui gyári színtémák, localStorage perzisztencia), i18n (hu/en): böngésző locale alapján automatikus nyelvválasztás (magyar → hu, egyéb → en fallback), manuális váltás zászló ikonnal a menüben (az ikon mindig a másik nyelvet jelöli)
 - [ ] AWS deploy (Lambda + API Gateway + S3 + CloudFront)
 - [ ] CI/CD (GitHub Actions) + SonarQube Cloud
 - [ ] Demo role (portfólió bemutató) — lásd Főbb funkciók / Demo role
@@ -81,7 +81,6 @@ Webalapú elektronikus házi könyvtárkezelő alkalmazás, amellyel egy háztar
 - [ ] Borítókép megjelenítés (S3 pre-signed URL)
 - [ ] Jelszó visszaállítás
 - [ ] Helyszín másolása: meglévő location „Másolás" gombja előtölti a létrehozó modalt (room, name, description egyaránt), a felhasználó csak a különbséget módosítja — tipikus eset: polcos szekrény több polca. Az új location `bookCount = 0`-val jön létre (a form előtölti a többi mezőt, de a könyvszám nem másolódik).
-- [ ] Témaváltó: shadcn/ui gyári témák közötti váltás (a dark/light toggle megmarad, ehhez képest külön szín-téma választó) — perzisztencia helye (localStorage vs `users` tábla) Fázis 2 spec tervezésekor döntendő.
 
 ### Fázis 3 – AI & kiterjesztés
 - [ ] AI alapú leírás-fordítás (Gemini vagy DeepL – tesztelés után döntés)

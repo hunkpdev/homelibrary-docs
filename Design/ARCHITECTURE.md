@@ -210,9 +210,14 @@ homelibrary-docs/                   ← GitHub repo: homelibrary-docs
 │       └── 011-license-change.md
 └── Plans/
     ├── phase1-feature-order.md
+    ├── tech-debt.md
     ├── specs/
-    │   └── feature-auth/
-    │       └── refresh-token-rotation.md
+    │   ├── feature-project-setup/     (backend/, frontend/, infra/)
+    │   ├── feature-auth/              (backend/, frontend/, infra/)
+    │   ├── feature-locations-crud/    (backend/, frontend/)
+    │   ├── feature-isbn-lookup/       (backend/, frontend/)
+    │   ├── feature-books-crud/        (backend/, frontend/)
+    │   └── feature-theme-switcher/    (frontend/)
     └── postmortems/
         └── yaz4j-lambda-linux.md
 ```

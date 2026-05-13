@@ -54,6 +54,9 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
        │
        ▼
 8. i18n kiegészítések ← függ: Project Setup (1.6, 1.7)
+       │
+       ▼
+9. Témaváltó ← függ: Project Setup (1.6, 1.7)
 ```
 
 ---
@@ -276,4 +279,18 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 |------|---------------|
 | 8.1 | `i18next-browser-languagedetector` plugin bekötése: böngésző locale detektálás, hu → `hu`, egyéb → `en` fallback. Bejelentkezett user esetén `user.preferred_language` az egyetlen forrás (`PUT /api/users/{id}` perzisztálva) — `localStorage` réteg nincs. Anonymous oldalakon (login form) csak `navigator.language` autodetect, perzisztencia nincs. |
 | 8.2 | `LanguageSwitcher` komponens: flag ikon gomb a sidebar alján (dark mode toggle mellé), mindig a másik nyelvet jelöli, kattintásra nyelvváltás i18next-en keresztül |
+
+---
+
+## Feature 9 – Témaváltó
+
+**Cél:** shadcn/ui gyári színtémák közötti váltás — a dark/light toggle megmarad, ehhez képest külön szín-téma választó. localStorage perzisztencia.
+
+**Megjegyzés:** Technikailag már Feature 1 után implementálható (csak project setup-tól függ), de kényelmi feature — tudatos döntés, hogy a core feature-ök (3–8) után kerül sorra.
+
+### Frontend
+
+| Step | Mit állít elő |
+|------|---------------|
+| [9.1](specs/feature-theme-switcher/frontend/step-9.1-theme-switcher.md) | Témaváltó: shadcn/ui színtémák közötti váltás, localStorage perzisztencia |
 
