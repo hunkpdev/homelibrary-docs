@@ -67,3 +67,5 @@ shadcn/ui komponensekkel:
 ## Implementációs megjegyzés
 
 A tervezett "Új helyszín" page-szintű gomb nem lett megvalósítva. A döntés indoka: egy location mindig konkrét roomhoz tartozik, ezért természetes belépési pont a rooms panel per-room `+` gombja. Egy második, párhuzamos létrehozási útvonal UX szempontból redundáns és zavaró lenne. A `roomId` combobox (kereshető dropdown) szintén elhagyható emiatt — a room mindig előre adott, a select disabled állapotban nyílik.
+
+**DEMO szerepkör (2026-08-07):** a step 3.9 grid (és a step 10.3 kártyalista) mostantól `DEMO`-nak is megjeleníti a szerkesztés/törlés gombokat, `MutationButton` auto-disabled állapotban — ez a modalokat (`LocationFormModal`, `LocationDeleteModal`) nem érinti, mert a disabled gomb miatt DEMO tokennel a modal soha nem nyílik meg. A modal maga nem tud/nem is kell tudnia a DEMO szerepkörről.

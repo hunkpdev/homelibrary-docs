@@ -1,7 +1,7 @@
 # 1. Fázis – Implementációs terv
 
 > **Státusz:** Tervezés alatt
-> **Utolsó frissítés:** 2026-05-06
+> **Utolsó frissítés:** 2026-08-07
 > **Hatókör:** MVP – az első működő, deployolható alkalmazáshoz szükséges core feature-ök
 
 ## Fejlesztési workflow
@@ -47,7 +47,7 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
     MutationButton itt kerül be)                  │
        │                                          │
        ▼                                          │
-5.5. Mobil kártyás nézet ← függ: Books + Locations │
+10. Mobil kártyás nézet ← függ: Books + Locations │
        │                                          │
        ▼                                          │
 6. Loans ← függ: Books + Auth                     │
@@ -61,6 +61,8 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
        ▼
 9. Témaváltó ← függ: Project Setup (1.6, 1.7)
 ```
+
+> A számozás nem szigorúan kronologikus: a **10. feature** (Mobil kártyás nézet) implementációs sorrendben a Books CRUD (5) és a Loans (6) közé kerül — a diagramban emiatt szerepel itt, a 6–9 elé, számozásban mégis utánuk következik. A `5.5` jelölés a korábbi tervezés maradványa volt, ütközött a Feature 5 step 5.5-tel (BookService) — 2026-08-07-én átszámozva.
 
 ---
 
@@ -224,7 +226,9 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 
 ---
 
-## Feature 5.5 – Mobil kártyás nézet
+## Feature 10 – Mobil kártyás nézet
+
+> Implementációs sorrendben a Books CRUD (5) után, a Loans (6) előtt kerül sorra — a diagramban ott is szerepel. A számozás (`10`) a Feature 9 (Témaváltó) utáni szabad sorszám, hogy ne ütközzön a Feature 5 stepjeivel (5.1–5.13).
 
 **Cél:** A Books és Locations táblázatos (AG Grid) nézete mobil viewporton rosszul használható. Breakpoint alapján (nem orientáció alapján) mindkét lista kártyás, folyamatosan görgető nézetre vált mobilon — asztali nézetben az AG Grid marad. Mindkét kártyás nézet a meglévő backend API-t hívja (`GET /api/books`, `GET /api/locations`), közös data-fetching és scroll infrastruktúrán keresztül — csak egyszer megtervezve és implementálva, nem duplikálva feature-önként.
 
@@ -234,9 +238,9 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 
 | Step | Mit állít elő |
 |------|---------------|
-| [5.5.1](specs/feature-mobile-card-view/frontend/step-5.5.1-shared-infra.md) | Közös infrastruktúra: `useMediaQuery` breakpoint hook, `useInfiniteBackendList` generikus infinite-scroll hook, `InfiniteCardList` generikus kártyalista UI shell |
-| [5.5.2](specs/feature-mobile-card-view/frontend/step-5.5.2-books-card-view.md) | Books kártyás nézet mobilon: `BookListPage` breakpoint alapján vált grid/kártya között, kártya-layout, szűrő/sort sáv |
-| [5.5.3](specs/feature-mobile-card-view/frontend/step-5.5.3-locations-card-view.md) | Locations kártyás nézet mobilon: `LocationManagementPage` breakpoint alapján vált, Rooms panel + szűrő sáv + kártyalista együttélése |
+| [10.1](specs/feature-mobile-card-view/frontend/step-10.1-shared-infra.md) | Közös infrastruktúra: `useMediaQuery` breakpoint hook, `useInfiniteBackendList` generikus infinite-scroll hook, `InfiniteCardList` generikus kártyalista UI shell |
+| [10.2](specs/feature-mobile-card-view/frontend/step-10.2-books-card-view.md) | Books kártyás nézet mobilon: `BookListPage` breakpoint alapján vált grid/kártya között, kártya-layout, szűrő/sort sáv |
+| [10.3](specs/feature-mobile-card-view/frontend/step-10.3-locations-card-view.md) | Locations kártyás nézet mobilon: `LocationManagementPage` breakpoint alapján vált, Rooms panel + szűrő sáv + kártyalista együttélése |
 
 ---
 
