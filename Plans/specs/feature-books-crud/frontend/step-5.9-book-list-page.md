@@ -15,7 +15,7 @@
 [ AG Grid Community táblázat (embedded column filterekkel) ]
 ```
 
-Az „+ Új könyv" gomb step 5.12-ben kerül be, amikor a form modal is elkészül. Külső szűrősor nincs.
+Az „+ Új könyv" gomb step 5.11-ben kerül be, amikor a form modal is elkészül. Külső szűrősor nincs.
 
 ---
 
@@ -47,7 +47,7 @@ Szűrő / sort / lapozás változásakor csak a grid datasource fetch fut újra.
 
 **Műveletek oszlop** (csak `ADMIN` és `DEMO` látja — `DEMO`-nál `MutationButton` auto-disabled):
 - **Törlés** ikon gomb → step 5.9-ben teljesen bekötve (`DeleteModal` + `deleteBook` API hívás)
-- **Szerkesztés** ikon gomb → gomb megjelenik, de step 5.12-ig nem nyit modalt
+- **Szerkesztés** ikon gomb → gomb megjelenik, de step 5.12-ig nem nyit modalt (a szerkesztés modal az 5.12-ben készül el, a "+ Új könyv" gomb viszont már az 5.11-ben)
 
 **Sorra kattintás** (bárhol a műveletek oszlopon kívül) → `onRowClicked` handler step 5.10-ben kerül bekötésre; step 5.9-ben a kattintás nem vált ki eseményt.
 
@@ -75,7 +75,7 @@ Szűrő / sort / lapozás változásakor csak a grid datasource fetch fut újra.
 
 ## Tech-debt
 
-- **Mobilos oszlopoptimalizálás:** AG Grid oszlopok priorizálása kis képernyőn — Feature 5-ben nem prioritás, külön task-ként kezelendő (konzisztens a Locations oldal tech-debt-jével)
+- **Mobilos oszlopoptimalizálás:** AG Grid oszlopok priorizálása kis képernyőn — Feature 5-ben nem prioritás, külön task-ként kezelendő (konzisztens a Locations oldal tech-debt-jével). **Frissítve 2026-08-07:** ez a tétel a `Plans/tech-debt.md`-ben (feltételesen) lezárva — a Feature 10 (Mobil kártyás nézet, step 10.2) mobilon teljesen leváltja a gridet kártyás nézettel, így oszlopoptimalizálásra itt már nincs szükség.
 
 ---
 

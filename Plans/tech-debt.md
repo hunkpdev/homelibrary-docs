@@ -47,17 +47,6 @@ Olyan feladatok, amelyek nem tartoznak aktív feature-höz, de határidőre vagy
 
 ---
 
-### AG Grid — mobilos oszlopoptimalizálás
-
-**Érintett fájlok (frontend):**
-- `src/pages/LocationManagementPage.tsx` — AG Grid `columnDefs`
-
-**Teendő:** Kis képernyőn (`xs`/`sm` breakpoint) egyes oszlopok elrejtése, pl. `description`. Az AG Grid Community `hide` property responsive breakpointokhoz kötve, vagy CSS media query alapján dinamikusan állítva.
-
-**Forrás:** Feature 3 frontend tervezés során azonosítva — step-3.9 spec.
-
----
-
 ### Frontend hiba-üzenetek differenciálása
 
 **Teendő:** Jelenleg minden API-hiba `common.errorUnexpected`-et mutat. Axios-szal technikailag megkülönböztethető a network error (`!err.response`) és a szerver 500-as hiba, de háztartási skálán a nyereség minimális — a felhasználónak mindkét esetben ugyanazt kell tennie (újratöltés). Újragondolandó, ha élesebb felhasználói bázis vagy SLA-elvárások merülnek fel.
@@ -96,6 +85,20 @@ Olyan feladatok, amelyek nem tartoznak aktív feature-höz, de határidőre vagy
 
 ---
 
+### Books API dokumentáció — `search` és `publishYear` eltér a tényleges implementációtól
+
+**Teendő:** A `Design/API_DESIGN.md` és a step-5.5 (`BookService`) / step-5.6 (`BookController`) backend specek egy kombinált `search` (LIKE cím ÉS szerző, OR) query paramétert és `publishYear`-t Integer exact-match mezőként dokumentálnak. A tényleges, step-5.9-cel (frontend, implementáció-szinkronizált) igazolt kontraktus ettől eltér: külön `isbn` (prefix), `title` (contains), `authors` (contains) paraméterek, és `publishYear` String-ként, prefix-kereséssel (`"202"` → 2020–2029). A backend-oldali doksi (API_DESIGN.md, step-5.5, step-5.6) frissítendő, hogy a tényleges implementációt tükrözze — hasonlóan a korábbi `fix/feature-5-impl-doc-sync` PR-hoz.
+
+**Forrás:** Feature 10 (Mobil kártyás nézet, step 10.2) tervezése során azonosítva, 2026-08-07 — a kártyás nézet a step-5.9-ben rögzített, tényleges kontraktust veszi alapul, és eközben derült ki az API_DESIGN.md-vel való eltérés.
+
+---
+
 ## Lezárt
 
-*(még üres)*
+### AG Grid — mobilos oszlopoptimalizálás
+
+**Eredeti teendő volt:** Kis képernyőn (`xs`/`sm` breakpoint) egyes AG Grid oszlopok elrejtése (pl. `description`) a Locations gridnél; a Books grid analóg tétele (step-5.9 „Tech-debt" szekciója) ugyanide tartozik, sosem lett önálló bejegyzésként felvéve.
+
+**Miért okafogyott — feltételesen (2026-08-07):** A lezárás a **tervre** vonatkozik, nem tényleges implementációra: Feature 10 (Mobil kártyás nézet, step 10.2 + 10.3, korábban „5.5") specifikációja szerint mindkét lista (Books, Locations) kártyás nézetre vált mobil breakpoint alatt, ahol az AG Grid többé nem renderelődik — így nincs mit oszlopoptimalizálni. **Feltétel:** ez csak akkor áll, ha a Feature 10 ténylegesen, a jelenlegi scope szerint elkészül és mergelődik (kód-repóban). Ha a feature descope-olódik vagy csak részben valósul meg, ez a tétel újra megnyitandó.
+
+**Forrás:** Feature 3 frontend tervezés során azonosítva — step-3.9 spec (Locations); step-5.9 spec (Books, analóg tétel).

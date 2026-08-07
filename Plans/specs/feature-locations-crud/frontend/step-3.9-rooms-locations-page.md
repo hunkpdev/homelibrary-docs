@@ -40,7 +40,7 @@
   - **Törlés** ikon gomb — csak akkor látható, ha `locationCount === 0`; backend 409 védelme ettől függetlenül megmarad (step 3.10 modalja)
   - **+ Location** ikon gomb — step 3.11 modalját nyitja, `roomId` előre kitöltve
 
-### Locations grid (csak `ADMIN` látja a művelet gombokat)
+### Locations grid (`ADMIN` és `DEMO` látja a művelet gombokat, `DEMO` disabled)
 
 - Flat lista, AG Grid Community Infinite Row Model
 - Oszlopok: `name`, `description`, `room.name`, `bookCount`
@@ -50,9 +50,11 @@
   - `description` — szöveges szűrő (AG Grid beépített)
 - Sort: minden oszlopon, `name ASC` alapértelmezetten
 - Lapozás: AG Grid Infinite Row Model — backend `Page<T>` válasz alapján
-- Soronként (csak `ADMIN`):
-  - **Szerkesztés** ikon gomb (step 3.11 modalja)
-  - **Törlés** ikon gomb — csak akkor látható, ha `bookCount === 0`; backend 409 védelme ettől függetlenül megmarad (step 3.11 modalja)
+- Soronként:
+  - **Szerkesztés** ikon gomb (step 3.11 modalja) — `ADMIN`-nál aktív, `DEMO`-nál `MutationButton` auto-disabled tooltip-pal, `VISITOR`-nál nem látható
+  - **Törlés** ikon gomb — csak akkor látható, ha `bookCount === 0`; `ADMIN`-nál aktív, `DEMO`-nál `MutationButton` auto-disabled tooltip-pal, `VISITOR`-nál nem látható; backend 409 védelme ettől függetlenül megmarad (step 3.11 modalja)
+
+**DEMO szerepkör (2026-08-07, utólag felvéve):** a globális Security szabály (step 5.2) szerint DEMO token minden `/api/**` GET végpontot elér (a `/api/users/**` kivételével), így `GET /api/locations` DEMO-nak is 200-at ad — a DEMO user tehát mindig is látta volna a listát. Kezdetben a művelet-oszlop emiatt VISITOR-nál és DEMO-nál egyaránt rejtve volt; ez a step mostantól megkülönbözteti a kettőt: DEMO látja a gombokat (disabled, `MutationButton` mintával, konzisztensen a Books listával — step 5.9), VISITOR nem lát semmit. A **Rooms panel** művelet gombjai (alább) egyelőre változatlanul `ADMIN`-only maradnak — ugyanez az aszimmetria technikailag ott is fennáll (DEMO `GET /api/rooms`-ra is 200-at kap), de ennek kiterjesztése nem volt része ennek a döntésnek; külön mérlegelendő.
 
 ---
 
@@ -82,6 +84,8 @@ shadcn/ui + AG Grid Community:
 - ADMIN tokennel, `locationCount === 0` esetén a room törlés gombja látható
 - ADMIN tokennel, `bookCount > 0` esetén a location törlés gombja nem látható
 - ADMIN tokennel, `bookCount === 0` esetén a location törlés gombja látható
+- DEMO tokennel a gridben a szerkesztés és törlés gomb látható, de `MutationButton` disabled tooltip-pal (a törlés láthatóságára a `bookCount === 0` feltétel változatlanul érvényes)
+- DEMO tokennel a rooms panelben egyetlen művelet gomb sem látható (a Rooms panel egyelőre `ADMIN`-only marad)
 - Room dropdown szűrőben az összes aktív room megjelenik
 - Ha room van kiválasztva, a location dropdown csak az adott roomhoz tartozó locationöket mutatja
 - Ha nincs room kiválasztva, a location dropdown az összes aktív locationt mutatja
