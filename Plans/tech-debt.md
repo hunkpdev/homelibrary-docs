@@ -47,17 +47,6 @@ Olyan feladatok, amelyek nem tartoznak aktív feature-höz, de határidőre vagy
 
 ---
 
-### AG Grid — mobilos oszlopoptimalizálás
-
-**Érintett fájlok (frontend):**
-- `src/pages/LocationManagementPage.tsx` — AG Grid `columnDefs`
-
-**Teendő:** Kis képernyőn (`xs`/`sm` breakpoint) egyes oszlopok elrejtése, pl. `description`. Az AG Grid Community `hide` property responsive breakpointokhoz kötve, vagy CSS media query alapján dinamikusan állítva.
-
-**Forrás:** Feature 3 frontend tervezés során azonosítva — step-3.9 spec.
-
----
-
 ### Frontend hiba-üzenetek differenciálása
 
 **Teendő:** Jelenleg minden API-hiba `common.errorUnexpected`-et mutat. Axios-szal technikailag megkülönböztethető a network error (`!err.response`) és a szerver 500-as hiba, de háztartási skálán a nyereség minimális — a felhasználónak mindkét esetben ugyanazt kell tennie (újratöltés). Újragondolandó, ha élesebb felhasználói bázis vagy SLA-elvárások merülnek fel.
@@ -98,4 +87,10 @@ Olyan feladatok, amelyek nem tartoznak aktív feature-höz, de határidőre vagy
 
 ## Lezárt
 
-*(még üres)*
+### AG Grid — mobilos oszlopoptimalizálás
+
+**Eredeti teendő volt:** Kis képernyőn (`xs`/`sm` breakpoint) egyes AG Grid oszlopok elrejtése (pl. `description`) a Locations gridnél.
+
+**Miért okafogyott (2026-08-07):** Feature 5.5 (Mobil kártyás nézet, step 5.5.2 + 5.5.3) mindkét listát (Books, Locations) kártyás nézetre váltja mobil breakpoint alatt — az AG Grid ott többé nem is renderelődik, így nincs mit oszlopoptimalizálni.
+
+**Forrás:** Feature 3 frontend tervezés során azonosítva — step-3.9 spec.

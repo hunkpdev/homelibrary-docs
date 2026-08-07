@@ -47,6 +47,9 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
     MutationButton itt kerül be)                  │
        │                                          │
        ▼                                          │
+5.5. Mobil kártyás nézet ← függ: Books + Locations │
+       │                                          │
+       ▼                                          │
 6. Loans ← függ: Books + Auth                     │
        │                                          │
        ▼                                          │
@@ -218,6 +221,22 @@ Minden feature vertikálisan (teljes stack egyszerre) kerül implementálásra, 
 | [5.10](specs/feature-books-crud/frontend/step-5.10-book-detail-panel.md) | Könyv részletek panel (shadcn Sheet): teljes adatlap read-only, szerkesztés és törlés gomb (ADMIN) |
 | [5.11](specs/feature-books-crud/frontend/step-5.11-book-add-form.md) | Könyv felvétel form (shadcn Dialog): ISBN bevitel → lookup előtöltés (Feature 4) + kézi kitöltés |
 | [5.12](specs/feature-books-crud/frontend/step-5.12-book-edit-delete.md) | Könyv szerkesztés form (shadcn Dialog) + soft delete megerősítő Dialog |
+
+---
+
+## Feature 5.5 – Mobil kártyás nézet
+
+**Cél:** A Books és Locations táblázatos (AG Grid) nézete mobil viewporton rosszul használható. Breakpoint alapján (nem orientáció alapján) mindkét lista kártyás, folyamatosan görgető nézetre vált mobilon — asztali nézetben az AG Grid marad. Mindkét kártyás nézet a meglévő backend API-t hívja (`GET /api/books`, `GET /api/locations`), közös data-fetching és scroll infrastruktúrán keresztül — csak egyszer megtervezve és implementálva, nem duplikálva feature-önként.
+
+**Függ:** Feature 5 (Books CRUD), Feature 3 (Locations CRUD)
+
+### Frontend
+
+| Step | Mit állít elő |
+|------|---------------|
+| [5.5.1](specs/feature-mobile-card-view/frontend/step-5.5.1-shared-infra.md) | Közös infrastruktúra: `useMediaQuery` breakpoint hook, `useInfiniteBackendList` generikus infinite-scroll hook, `InfiniteCardList` generikus kártyalista UI shell |
+| [5.5.2](specs/feature-mobile-card-view/frontend/step-5.5.2-books-card-view.md) | Books kártyás nézet mobilon: `BookListPage` breakpoint alapján vált grid/kártya között, kártya-layout, szűrő/sort sáv |
+| [5.5.3](specs/feature-mobile-card-view/frontend/step-5.5.3-locations-card-view.md) | Locations kártyás nézet mobilon: `LocationManagementPage` breakpoint alapján vált, Rooms panel + szűrő sáv + kártyalista együttélése |
 
 ---
 
