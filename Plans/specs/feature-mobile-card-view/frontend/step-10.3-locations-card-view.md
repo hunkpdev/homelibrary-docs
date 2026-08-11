@@ -16,7 +16,7 @@ Függ: [10.1](step-10.1-shared-infra.md) (közös infra), 3.10 (Room form/delete
 
 ## Nézetváltás
 
-`LocationManagementPage` a `useMediaQuery` (10.1) eredménye alapján dönt: mobil breakpoint alatt (`< 768px`) kártyalistát renderel (`InfiniteCardList` + `LocationCard`) a locations grid helyén, `≥ 768px`-nél a meglévő AG Grid-et — változatlanul, `React.lazy()` mögött.
+`LocationManagementPage` a meglévő `useIsMobile()` (`src/hooks/use-mobile.tsx`, ld. 10.1) eredménye alapján dönt: mobil breakpoint alatt (`< 768px`) kártyalistát renderel (`InfiniteCardList` + `LocationCard`) a locations grid helyén, `≥ 768px`-nél a meglévő AG Grid-et — változatlanul, `React.lazy()` mögött.
 
 A **Rooms panel** (step 3.9) mindkét nézetben megjelenik, felül, a szűrő/sort sáv fölött — a panel saját nyitott/csukott alapállapota (asztali: nyitva, mobil: csukva) és funkciója (room CRUD, per-room "+ Location" gomb) nem változik. Elrendezés mobilon fentről lefelé: Rooms panel → szűrő/sort sáv → kártyalista.
 
