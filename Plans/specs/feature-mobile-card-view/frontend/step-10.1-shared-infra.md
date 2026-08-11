@@ -2,11 +2,11 @@
 
 ## Mit állít elő
 
-- `src/lib/breakpoints.ts` — breakpoint konstans
-- `src/hooks/useMediaQuery.ts` — generikus media query hook
 - `src/hooks/useInfiniteBackendList.ts` — generikus infinite-scroll adatlekérő hook
 - `src/components/common/InfiniteCardList.tsx` — generikus kártyalista UI shell
 - Hozzájuk tartozó unit tesztek
+
+Breakpoint-detektálásra **nincs új hook** — a meglévő `src/hooks/use-mobile.tsx` (`useIsMobile()`) kerül újrahasználásra (ld. lentebb).
 
 ---
 
@@ -18,21 +18,13 @@ Asztali nézetben mindkét oldal AG Grid Infinite Row Model-t használ továbbra
 
 ---
 
-## Breakpoint
+## Breakpoint — meglévő `useIsMobile` hook újrahasználva
 
-Egy konstans query definiálja a mobil breakpointot, igazítva a Tailwind `md` töréshez: `< 768px` → mobil (kártyás nézet), `≥ 768px` → asztali (grid).
+A mobil breakpoint már definiálva van: `src/hooks/use-mobile.tsx` → `useIsMobile()`, `< 768px` → mobil (kártyás nézet), `≥ 768px` → asztali (grid) — ez a shadcn Sidebar generálta hook, amit a `Sidebar` komponens és a `LocationManagementPage` (Rooms panel alap nyitott/csukott állapota) már ma is használ. Ez a step ezt a hookot használja fel a grid↔kártya váltásra is, **nem vezet be új `useMediaQuery` hookot vagy `breakpoints.ts` konstanst** — ez felesleges duplikáció lenne egy már meglévő, azonos célú megoldás mellett.
 
 A váltás **JS-alapú**, nem CSS `display:none` — így mindig csak az aktív nézet (grid vagy kártyalista) épül fel és lekérez adatot, a másik egyáltalán nem renderel, nem duplikálódik az API hívás.
 
----
-
-## `useMediaQuery` hook
-
-- Egy media query stringet fogad, boolean-t ad vissza, hogy az aktuálisan illeszkedik-e
-- A böngésző natív media query API-jára épül, viewport-változásra (pl. elforgatás, ablak átméretezés) automatikusan frissül
-- Kliens-oldali komponens, SSR eset nem releváns (SPA)
-
-Használat a lapokon: a breakpoint hook eredménye dönt, hogy `GridView` vagy `CardView` render-elődik.
+Használat a lapokon: `useIsMobile()` eredménye dönt, hogy `GridView` vagy `CardView` render-elődik.
 
 ---
 
@@ -88,7 +80,7 @@ Generikus UI shell — a kártya *tartalmát* nem ismeri, azt a hívó oldal adj
 ## Kulcs döntések
 
 - **Nincs TanStack Query bevezetve** — a jelenlegi axios + Zustand refresh trigger minta konzisztenciáját tartjuk meg; a hook kézzel implementálja az akkumulációt és reset logikát
-- Breakpoint JS hookkal döntve, nem CSS-sel, hogy csak egy nézet fetch-eljen egyszerre
+- Breakpoint JS hookkal döntve, nem CSS-sel, hogy csak egy nézet fetch-eljen egyszerre — a meglévő `useIsMobile()` újrahasználva, nincs új breakpoint-hook vagy konstans
 - Alapértelmezett oldalméret kártyás nézetben: **20** — nem kell egyezzen az asztali grid oldalméretével
 - A grid nézet (AG Grid Infinite Row Model) ezzel a steppel nem módosul
 - A meglévő API hívó függvények (`bookApi.ts`, `locationApi.ts`) újrahasználva, nem duplikálva — a hook csak orchestrálja a meglévő hívásokat
@@ -105,8 +97,7 @@ Generikus UI shell — a kártya *tartalmát* nem ismeri, azt a hívó oldal adj
 
 ## Elfogadási kritériumok
 
-**Unit tesztek** (Vitest + React Testing Library, `matchMedia`, `IntersectionObserver` és axios mockolva — az `IntersectionObserver` jsdom-ban alapból nincs implementálva, `vi.stubGlobal`-lal mockolandó):
-- `useMediaQuery`: kezdeti érték a query state-jét tükrözi; viewport-változásra frissül
+**Unit tesztek** (Vitest + React Testing Library, `IntersectionObserver` és axios mockolva — az `IntersectionObserver` jsdom-ban alapból nincs implementálva, `vi.stubGlobal`-lal mockolandó):
 - `useInfiniteBackendList`: "tölts be többet" hívásra a következő oldal hozzáfűződik a listához, nem duplikál
 - `useInfiniteBackendList`: ha nincs több oldal, "tölts be többet" nem indít újabb fetch-et
 - `useInfiniteBackendList`: a reset kulcs változásakor a lista törlődik, majd az elejéről tölt újra

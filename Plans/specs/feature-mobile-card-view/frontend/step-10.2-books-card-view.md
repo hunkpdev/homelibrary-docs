@@ -16,7 +16,7 @@ Függ: [10.1](step-10.1-shared-infra.md) (közös infra), 5.10–5.12 (meglévő
 
 ## Nézetváltás
 
-`BookListPage` a `useMediaQuery` (10.1) eredménye alapján dönt: mobil breakpoint alatt (`< 768px`) kártyalistát renderel (`InfiniteCardList` + `BookCard`), `≥ 768px`-nél a meglévő AG Grid-et — változatlanul.
+`BookListPage` a meglévő `useIsMobile()` (`src/hooks/use-mobile.tsx`, ld. 10.1) eredménye alapján dönt: mobil breakpoint alatt (`< 768px`) kártyalistát renderel (`InfiniteCardList` + `BookCard`), `≥ 768px`-nél a meglévő AG Grid-et — változatlanul.
 
 A grid nézet komponense `React.lazy()`-vel töltődik be, `Suspense` fallback-kel — mobilon, ahol sosem renderelődik, a chunk-ja le sem töltődik. Ez a legnagyobb, legolcsóbb teljesítmény-nyereség ebben a stepben, mert az AG Grid bundle mérete jelentős (ld. ADR-009), és pont a mobil célközönségnél számít.
 
