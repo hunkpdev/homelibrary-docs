@@ -93,6 +93,14 @@ Olyan feladatok, amelyek nem tartoznak aktív feature-höz, de határidőre vagy
 
 ---
 
+### CloudFront `errorResponses` 403/404 → 200 leképezése elfedi a hiányzó asseteket
+
+**Teendő:** Az SPA deep-linkhez szükséges a 403/404 → `index.html` 200-as leképezés, de mellékhatásként egy hiányzó JS chunk kérésére HTML érkezik 200-as státusszal, ami néma fehér képernyőt okoz JS syntax error formájában. A helyes cache header-ek bevezetése (ld. step-1.14-github-actions.md) ezt a gyakorlatban megszünteti, mert elavult chunk-hash-re már nem fut rá kliens. Ha később mégis kell rá védelem, a leképezést érdemes az `/assets/*` útvonalra kizárni egy külön cache behavior-rel.
+
+**Forrás:** Elavult bundle cache bug diagnózisa, 2026-08 (`l:\AI reviews\bug-stale-bundle-cache-headers.md`, 4. szakasz).
+
+---
+
 ## Lezárt
 
 ### AG Grid — mobilos oszlopoptimalizálás
