@@ -42,8 +42,11 @@ Mindkét workflow csak `main` branch-re való push esetén fut — és csak akko
        VITE_API_BASE_URL: ${{ vars.API_GATEWAY_URL }}
    ```
 5. AWS hitelesítés OIDC-vel (step 1.13 szerepköre)
-6. `aws s3 sync dist/ s3://<bucket> --delete`
-7. `aws cloudfront create-invalidation --paths "/*"`
+6. Hash-elt assetek feltöltése (minden a `dist/`-ben, `index.html` kivételével): `aws s3 sync dist/ s3://<bucket> --delete --exclude "index.html" --cache-control "public,max-age=31536000,immutable"`
+7. `index.html` feltöltése külön, mindig revalidálandó módon: `aws s3 cp dist/index.html s3://<bucket>/index.html --cache-control "no-cache" --content-type "text/html; charset=utf-8"`
+8. `aws cloudfront create-invalidation --paths "/*"`
+
+**Miért nem elég önmagában az invalidálás (2026-08, elavult bundle bug alapján felvéve):** a CloudFront invalidálás kizárólag az **edge cache-t** üríti, a böngészők saját HTTP cache-éhez nem fér hozzá. `Cache-Control` header nélkül a böngésző heurisztikus frissességet alkalmaz (RFC 9111 §4.2.2), és órákig hálózati kérés nélkül szolgálja ki a fájlokat a lemez-cache-ből — emiatt egy visszatérő felhasználó a deploy után is a régi appot futtathatja. Ez éles hibaként jelentkezett a Feature 10 kiszállítása után (kódhibának tűnt, valójában a régi bundle futott). Ezért az `index.html` `no-cache`-sel megy (tárolható, de minden használat előtt revalidálni kell), a hash-elt assetek pedig `max-age=31536000, immutable`-lel — a feltöltési sorrend (assetek előbb, `index.html` utána) szándékos: így nincs olyan ablak, amelyben az új `index.html` már fent nem lévő chunkra hivatkozna.
 
 ---
 
