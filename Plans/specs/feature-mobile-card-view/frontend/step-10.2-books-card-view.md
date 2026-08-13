@@ -31,7 +31,7 @@ A szűrő és sort állapot **egy szinttel feljebb**, a `BookListPage`-ben él, 
 - **Szűrők** gomb — badge-dzsel jelzi az aktív (a keresésen kívüli) szűrők számát, megnyitja a `BookFiltersSheet`-et
 - **Találatszám** — a szűrő sáv alatt egy halvány "N találat" sor, a backend `Page<T>` válasz `totalElements` mezőjéből — ez az egyetlen visszajelzés szűrés után, hogy a szűrő hatott
 
-**"Kiadási év legújabb/legrégebbi" megjegyzés:** a `publishYear` mező **String** (ld. step-5.9), ezért ez a rendezés lexikografikus, nem numerikus. 4 jegyű, kitöltött évekre ez helyes sorrendet ad, de üres vagy csonka `publishYear` érték esetén a sorrend meglepő lehet (pl. üres string az elején rendeződik ASC esetén) — ezt a `BookFilterBar`/`BookCard` implementációja nem próbálja korrigálni, ismert korlát.
+A `publishYear` mező az entitásban és a `BookResponse`-ban **Integer** — a „Kiadási év legújabb/legrégebbi" rendezés numerikus, nem lexikografikus. (Csak a *szűrő* paraméter String, prefix-egyezéssel — ld. `Plans/tech-debt.md` „Books API dokumentáció" tétel.)
 
 ---
 
@@ -59,7 +59,8 @@ Ugyanazok a mezők, mint a grid oszlopai (5.9) — nincs extra vagy hiányzó ad
 - ISBN (halványabb, másodlagos szöveg)
 
 **Akciók** (csak `ADMIN` és `DEMO` látja, azonos szabályok a grid műveletek oszlopával):
-- Szerkesztés / Törlés ikon gomb — `DEMO`-nál `MutationButton` auto-disabled tooltip-pal
+- Szerkesztés ikon gomb — plain `Button`, `DEMO`-nak is aktív (form-nyitó akció, a tényleges mentés a modalon belül van gate-elve)
+- Törlés ikon gomb — `MutationButton`, `DEMO`-nál auto-disabled tooltip-pal (a törlés maga a mutáció)
 - Kártyára koppintás (akciógombokon kívül) → megnyitja a meglévő `BookDetailPanel`-t (5.10), ugyanúgy, mint a grid sorra kattintás
 
 **Akadálymentesítés:** a kártya interaktív elemként viselkedik (`role="button"`, `tabIndex={0}`, `Enter`/`Space` a koppintással egyenértékű) — nemcsak `onClick`-es `div`, hogy billentyűzettel is elérhető legyen. A beágyazott akciógombok (szerkesztés/törlés) kattintása `stopPropagation()`-nel véd az ellen, hogy a kártya-szintű "megnyitás" is kiváltódjon.
@@ -68,7 +69,7 @@ Ugyanazok a mezők, mint a grid oszlopai (5.9) — nincs extra vagy hiányzó ad
 
 ## „+ Új könyv" hozzáférés mobilon
 
-Floating action button (jobb alsó sarok, fixen a scroll fölött) — a meglévő hozzáadás `Dialog`-ot (5.11 — `BookListPage.tsx` kiegészítése az "Új könyv" gombbal) nyitja meg. A grid fejléc gombja (5.11) helyett ez a mobil megfelelője, mert a felső sáv már tele van a keresés/sort/szűrők elemekkel. `VISITOR` nem látja; `DEMO`-nál `MutationButton` auto-disabled.
+Floating action button (jobb alsó sarok, fixen a scroll fölött) — a meglévő hozzáadás `Dialog`-ot (5.11 — `BookListPage.tsx` kiegészítése az "Új könyv" gombbal) nyitja meg. A grid fejléc gombja (5.11) helyett ez a mobil megfelelője, mert a felső sáv már tele van a keresés/sort/szűrők elemekkel. `VISITOR` nem látja; a FAB plain `Button`, `DEMO`-nak is aktív — form-nyitó akció, a tényleges mentés a dialógon belül van gate-elve.
 
 A `InfiniteCardList` alsó paddingja a FAB magasságával + margóval megnövelt, hogy a FAB ne takarja el az utolsó kártya akciógombjait vagy a "következő oldal" betöltés-jelzőt; iOS-en `env(safe-area-inset-bottom)` is figyelembe veendő a FAB pozicionálásánál.
 
@@ -92,6 +93,7 @@ A `InfiniteCardList` alsó paddingja a FAB magasságával + margóval megnövelt
 - Grid és kártya nézet közös szűrő/sort state-et használ (`BookListPage` szinten) — nézetváltásnál a beállítások megmaradnak
 - Kártya mezői 1:1 megegyeznek a grid oszlopaival
 - A rendezési opciók szándékosan szűkebbek a grid sortolható oszlopainál (ISBN kimarad) — mobilon a select rövid legyen, nincs valós mobil use-case ISBN szerinti rendezésre
+- A **szerző szerinti rendezés közelítés**: `Book.authors` JSON oszlop (`@JdbcTypeCode(SqlTypes.JSON)`), a `sort=authors` a szerializált tömböt szövegként rendezi — gyakorlatban ≈ első szerző szerinti ábécésorrend, nem normalizált szerző-rendezés. Ugyanez a viselkedés a griddel is (ott is sortolható az `authors` oszlop), a kártyás nézet csak explicit, jól látható select-opcióvá teszi, ezért gyakrabban fog lefutni
 - „+ Új könyv" mobilon FAB, nem header gomb
 - Keresőmező debounce-olt (300–400 ms), a sheet mezői nem (explicit "Alkalmaz" trigger)
 - Szerkesztés/törlés után helyben-frissítés (`updateItem`/`removeItem`), csak létrehozás után teljes reset
@@ -108,7 +110,7 @@ A `InfiniteCardList` alsó paddingja a FAB magasságával + margóval megnövelt
 ## Elfogadási kritériumok
 
 **Unit tesztek** (Vitest + React Testing Library, axios mock):
-- `BookCard`: ADMIN esetén szerkesztés/törlés aktív; DEMO esetén látható, de disabled (`MutationButton` tooltip); VISITOR esetén nem látható
+- `BookCard`: ADMIN esetén szerkesztés/törlés aktív; DEMO esetén a szerkesztés aktív (form-nyitó akció, a mentés a modalon belül gate-elt), a törlés disabled (`MutationButton` tooltip); VISITOR esetén egyik gomb sem látható
 - `BookCard`: `role="button"`, `tabIndex={0}`, `Enter`/`Space` megnyitja a `BookDetailPanel`-t; akciógombra kattintás nem váltja ki a kártya-szintű megnyitást (`stopPropagation`)
 - `BookFilterBar`: keresés mezőbe gyors, egymást követő gépelés csak egy lekérdezést indít, a gépelés befejezése (debounce) után
 - `BookFiltersSheet`: „Alkalmaz" a megfelelő paraméterekkel indít lekérdezést; „Törlés" alapállapotba állít; mezőbe gépelés önmagában (Alkalmaz nélkül) nem indít lekérdezést
